@@ -1,5 +1,5 @@
-import { getFirestoreDb } from "@/lib/firebase/client";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { getFirebaseAdminApp } from "@/lib/firebase/admin";
+import { getFirestore, collection, addDoc, query, where, getDocs } from "firebase-admin/firestore";
 import type { Product } from "@/types/domain";
 
 // Seed data embedded directly in the API route
@@ -181,7 +181,8 @@ export async function POST(request: Request) {
       console.warn("⚠️  Seed endpoint called in production!");
     }
 
-    const db = getFirestoreDb();
+    const adminApp = getFirebaseAdminApp();
+    const db = getFirestore(adminApp);
     const productsCollection = collection(db, "products");
 
     // Check if products already exist
@@ -270,7 +271,9 @@ export async function POST(request: Request) {
 // GET endpoint to check seeding status
 export async function GET() {
   try {
-    const db = getFirestoreDb();
+    // Use Admin SDK on the server to inspect products
+    const adminApp = getFirebaseAdminApp();
+    const db = getFirestore(adminApp);
     const productsCollection = collection(db, "products");
 
     const activeProducts = await getDocs(

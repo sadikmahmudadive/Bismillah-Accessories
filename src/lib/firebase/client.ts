@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
-import { getFirestore, type Firestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, type Firestore } from "firebase/firestore";
 
 type FirebaseConfig = {
   apiKey: string;
@@ -54,7 +54,18 @@ export function getFirebaseAuth() {
 
 export function getFirestoreDb() {
   if (!firestoreDb) {
-    firestoreDb = getFirestore(getFirebaseClientApp());
+    const app = getFirebaseClientApp();
+    const forceLongPolling = process.env.NEXT_PUBLIC_FIRESTORE_FORCE_LONG_POLLING === "true";
+
+    if (forceLongPolling) {
+      // Force long-polling transport to avoid gRPC issues in constrained networks
+      firestoreDb = initializeFirestore(app, {
+        experimentalForceLongPolling: true,
+        useFetchStreams: false,
+      });
+    } else {
+      firestoreDb = getFirestore(app);
+    }
   }
 
   return firestoreDb;

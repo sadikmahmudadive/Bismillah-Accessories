@@ -22,6 +22,43 @@ import {
   productCategories,
   updateProduct,
 } from "@/lib/products";
+
+const USE_SERVER_ADMIN_API = process.env.NEXT_PUBLIC_USE_SERVER_ADMIN_API === "true";
+
+async function callServerCreate(token: string, payload: any) {
+  const res = await fetch("/api/admin/products", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return res.json();
+}
+
+async function callServerUpdate(token: string, id: string, payload: any) {
+  const res = await fetch(`/api/admin/products/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return res.json();
+}
+
+async function callServerDelete(token: string, id: string) {
+  const res = await fetch(`/api/admin/products/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  return res.json();
+}
 import { cn } from "@/lib/utils";
 import type { Product, ProductInput, ProductStatus } from "@/types/domain";
 
@@ -63,7 +100,14 @@ export function ProductManager() {
     setError(null);
 
     try {
-      setProducts(await getAdminProducts());
+      if (USE_SERVER_ADMIN_API) {
+        const res = await fetch('/api/products');
+        if (!res.ok) throw new Error(`Server returned ${res.status}`);
+        const payload = await res.json();
+        setProducts(payload || []);
+      } else {
+        setProducts(await getAdminProducts());
+      }
     } catch (loadError) {
       setError(getErrorMessage(loadError));
     } finally {
@@ -106,12 +150,25 @@ export function ProductManager() {
     const productInput = normalizeProductInput(form, tagText);
 
     try {
-      if (editingId) {
-        await updateProduct(editingId, productInput);
-        setMessage("Product updated.");
+      if (USE_SERVER_ADMIN_API && user) {
+        const token = await user.getIdToken();
+        if (editingId) {
+          const res = await callServerUpdate(token, editingId, productInput);
+          if (!res?.success) throw new Error(res?.error || "Update failed");
+          setMessage("Product updated.");
+        } else {
+          const res = await callServerCreate(token, productInput);
+          if (!res?.success) throw new Error(res?.error || "Create failed");
+          setMessage("Product created.");
+        }
       } else {
-        await createProduct(productInput);
-        setMessage("Product created.");
+        if (editingId) {
+          await updateProduct(editingId, productInput);
+          setMessage("Product updated.");
+        } else {
+          await createProduct(productInput);
+          setMessage("Product created.");
+        }
       }
 
       resetForm();
@@ -132,8 +189,15 @@ export function ProductManager() {
     setMessage(null);
 
     try {
-      await deleteProduct(product.id);
-      setMessage("Product deleted.");
+      if (USE_SERVER_ADMIN_API && user) {
+        const token = await user.getIdToken();
+        const res = await callServerDelete(token, product.id);
+        if (!res?.success) throw new Error(res?.error || "Delete failed");
+        setMessage("Product deleted.");
+      } else {
+        await deleteProduct(product.id);
+        setMessage("Product deleted.");
+      }
       await loadProducts();
     } catch (deleteError) {
       setError(getErrorMessage(deleteError));

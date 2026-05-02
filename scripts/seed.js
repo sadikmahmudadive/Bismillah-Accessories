@@ -21,6 +21,19 @@ const productsData = require("./products-seed.json");
 const serviceAccountPath =
   process.env.FIREBASE_ADMIN_SDK_PATH || "./firebase-adminsdk.json";
 
+async function deleteCollection(collectionRef) {
+  const batchSize = 500;
+  while (true) {
+    const snapshot = await collectionRef.limit(batchSize).get();
+    if (snapshot.empty) break;
+
+    const batch = collectionRef.firestore.batch();
+    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+    console.log(`   - Deleted ${snapshot.size} documents...`);
+  }
+}
+
 async function seedProducts() {
   try {
     console.log("🚀 Starting Firestore products seeding...\n");
@@ -57,13 +70,21 @@ async function seedProducts() {
       .limit(1)
       .get();
 
+    const force = process.argv.includes("--force");
+
     if (!existingQuery.empty) {
       const totalQuery = await productsCollection.get();
       console.log(
         `\n⚠️  Products already exist in database (${totalQuery.size} total, ${existingQuery.docs.length} active).`
       );
-      console.log("💡 Tip: Delete documents manually or use --force flag to override");
-      process.exit(0);
+      if (!force) {
+        console.log("💡 Tip: Rerun with --force to delete existing products and reseed: node scripts/seed.js --force");
+        process.exit(0);
+      }
+
+      console.log("\n⛳ Force flag detected — deleting existing products...");
+      await deleteCollection(productsCollection);
+      console.log("\n🧹 Existing products deleted. Proceeding to seed new products...\n");
     }
 
     // Seed products

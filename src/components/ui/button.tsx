@@ -51,18 +51,17 @@ export function ButtonLink({
   children,
   ...props
 }: ButtonLinkProps) {
+  const MotionLink = motion(Link);
   return (
-    <motion.a
-      asChild
+    <MotionLink
       whileHover={{ y: -2, scale: 1.02 }}
       whileTap={{ scale: 0.98, y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={cn(buttonBase, variants[variant], className)}
-    >
-      <Link {...props}>
-        {children}
-        {showArrow ? <ArrowRight aria-hidden="true" className="size-4" /> : null}
-      </Link>
-    </motion.a>
+      {...props}
+      >
+      {children}
+      {showArrow ? <ArrowRight aria-hidden="true" className="size-4" /> : null}
+    </MotionLink>
   );
 }

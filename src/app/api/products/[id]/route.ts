@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { doc, getDoc } from "firebase/firestore";
-import { getFirestoreDb } from "@/lib/firebase/client";
+import { doc, getDoc } from "firebase-admin/firestore";
+import { getFirebaseAdminApp } from "@/lib/firebase/admin";
+import { getFirestore } from "firebase-admin/firestore";
 import type { Product } from "@/types/domain";
 
 export async function GET(
@@ -17,7 +18,8 @@ export async function GET(
       );
     }
 
-    const db = getFirestoreDb();
+    const adminApp = getFirebaseAdminApp();
+    const db = getFirestore(adminApp);
     const productRef = doc(db, "products", id);
     const snapshot = await getDoc(productRef);
 

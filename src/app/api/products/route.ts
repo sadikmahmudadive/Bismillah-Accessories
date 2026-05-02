@@ -8,8 +8,9 @@ import {
   limit,
   startAfter,
   QueryConstraint,
-} from "firebase/firestore";
-import { getFirestoreDb } from "@/lib/firebase/client";
+} from "firebase-admin/firestore";
+import { getFirebaseAdminApp } from "@/lib/firebase/admin";
+import { getFirestore } from "firebase-admin/firestore";
 import type { Product } from "@/types/domain";
 
 export async function GET(request: NextRequest) {
@@ -21,7 +22,8 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get("pageSize") || "12", 10);
     const page = parseInt(searchParams.get("page") || "0", 10);
 
-    const db = getFirestoreDb();
+    const adminApp = getFirebaseAdminApp();
+    const db = getFirestore(adminApp);
     const productsRef = collection(db, "products");
 
     // Build query constraints
