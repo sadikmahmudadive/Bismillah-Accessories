@@ -1,14 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  limit,
-  startAfter,
-  QueryConstraint,
-} from "firebase-admin/firestore";
 import { getFirebaseAdminApp } from "@/lib/firebase/admin";
 import { getFirestore } from "firebase-admin/firestore";
 import type { Product } from "@/types/domain";
@@ -24,33 +14,23 @@ export async function GET(request: NextRequest) {
 
     const adminApp = getFirebaseAdminApp();
     const db = getFirestore(adminApp);
-    const productsRef = collection(db, "products");
 
-    // Build query constraints
-    const constraints: QueryConstraint[] = [where("status", "==", "active")];
+    // Build admin SDK query using instance methods to avoid mixing client/module APIs
+    let qRef: FirebaseFirestore.Query = db.collection("products");
+    qRef = qRef.where("status", "==", "active");
 
-    // Filter by category if provided
     if (category && category !== "all") {
-      constraints.push(where("category", "==", category));
+      qRef = qRef.where("category", "==", category);
     }
 
-    // Sort based on sortBy parameter
-    if (sortBy === "price_asc") {
-      constraints.push(orderBy("price", "asc"));
-    } else if (sortBy === "price_desc") {
-      constraints.push(orderBy("price", "desc"));
-    } else if (sortBy === "newest") {
-      constraints.push(orderBy("createdAt", "desc"));
-    } else {
-      constraints.push(orderBy("name", "asc"));
-    }
+    // Avoid composite-index requirements by doing ordering/pagination in memory.
+    // Fetch a reasonable cap of documents and sort/paginate below.
+    const FETCH_CAP = Math.max(1000, pageSize * 20);
+    qRef = qRef.limit(FETCH_CAP);
 
-    constraints.push(limit(pageSize + 1)); // Get one extra to check if more exist
+    const snapshot = await qRef.get();
 
-    const q = query(productsRef, ...constraints);
-    const snapshot = await getDocs(q);
-
-    // Filter by search term if provided (client-side for simplicity)
+    // Convert docs to plain objects and apply server-side search/sort/pagination
     let docs = snapshot.docs;
     if (search) {
       const searchLower = search.toLowerCase();
@@ -64,12 +44,28 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Map to product objects
+    let products = docs.map((doc) => ({ ...(doc.data() as Product), id: doc.id })) as Product[];
+
+    // Sort in-memory according to sortBy
+    if (sortBy === "price_asc") {
+      products.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price_desc") {
+      products.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "newest") {
+      products.sort((a, b) => {
+        const da = (a as any).createdAt ? new Date((a as any).createdAt) : new Date(0);
+        const db = (b as any).createdAt ? new Date((b as any).createdAt) : new Date(0);
+        return db.getTime() - da.getTime();
+      });
+    } else {
+      products.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
     // Pagination
-    const hasMore = docs.length > pageSize;
-    const products = docs.slice(0, pageSize).map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    })) as Product[];
+    const start = page * pageSize;
+    const paged = products.slice(start, start + pageSize);
+    const hasMore = start + pageSize < products.length;
 
     return NextResponse.json({
       success: true,

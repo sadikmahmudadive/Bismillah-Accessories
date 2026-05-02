@@ -104,7 +104,8 @@ export function ProductManager() {
         const res = await fetch('/api/products');
         if (!res.ok) throw new Error(`Server returned ${res.status}`);
         const payload = await res.json();
-        setProducts(payload || []);
+        if (!payload?.success) throw new Error(payload?.error || 'Failed to load products');
+        setProducts(payload.data || []);
       } else {
         setProducts(await getAdminProducts());
       }
