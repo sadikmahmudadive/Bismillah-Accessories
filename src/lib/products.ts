@@ -29,24 +29,53 @@ function mapProductDoc(snapshot: QueryDocumentSnapshot<DocumentData>) {
 }
 
 export async function getActiveProducts() {
-  // Use Admin SDK on the server to avoid importing client Firestore during SSR
+  // Use the API route for consistency and to avoid admin SDK issues
   if (typeof window === "undefined") {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { getFirestoreDb } = require("@/lib/firebase/admin");
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { collection, query, where, getDocs } = require("firebase-admin/firestore");
-    const db = getFirestoreDb();
-    const snap = await getDocs(query(collection(db, PRODUCTS_COLLECTION), where("status", "==", "active")));
-    return snap.docs.map((d: any) => ({ id: d.id, ...d.data() })).sort((a: any, b: any) => a.name.localeCompare(b.name));
+    try {
+      console.log("🏭 Server-side: Fetching products via API");
+      // On server side, we can use fetch to call our own API
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      const response = await fetch(`${baseUrl}/api/products?status=active&limit=100`, {
+        headers: {
+          // For server-side calls, we might need to handle auth differently
+          // For now, let's try without auth and see if it works
+        },
+        // Add timeout to prevent hanging
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (!response.ok) {
+        console.warn(`Server-side API call failed: ${response.status}`);
+        return []; // Return empty array instead of failing
+      }
+
+      const data = await response.json();
+      if (data.success && data.data) {
+        return data.data.sort((a: any, b: any) => a.name.localeCompare(b.name));
+      }
+
+      return [];
+    } catch (error) {
+      console.warn("Server-side product fetch failed, returning empty array:", error);
+      return []; // Return empty array to prevent SSR crashes
+    }
   }
 
-  const database = getFirestoreDb();
-  // Lazy import client functions to keep client bundles small
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { collection, getDocs, query, where } = require("firebase/firestore");
-  const snapshot = await getDocs(query(collection(database, PRODUCTS_COLLECTION), where("status", "==", "active")));
+  // Client-side: use the API route
+  console.log("🖥️ Client-side: Fetching products via API");
+  const response = await fetch('/api/products?status=active&limit=100');
 
-  return snapshot.docs.map(mapProductDoc).sort((a: any, b: any) => a.name.localeCompare(b.name));
+  if (!response.ok) {
+    console.warn(`Client-side API call failed: ${response.status}`);
+    return [];
+  }
+
+  const data = await response.json();
+  if (data.success && data.data) {
+    return data.data.sort((a: any, b: any) => a.name.localeCompare(b.name));
+  }
+
+  return [];
 }
 
 export async function getAdminProducts() {

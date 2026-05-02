@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { AuthGate } from "@/components/auth/auth-gate";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
+import { PopularProducts } from "@/components/product/popular-products";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -27,6 +28,11 @@ export default function CheckoutPage() {
           </div>
 
           <CheckoutForm />
+
+          {/* Popular Products Section */}
+          <div className="mt-16">
+            <PopularProducts />
+          </div>
         </div>
       </main>
     </AuthGate>

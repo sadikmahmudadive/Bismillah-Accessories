@@ -16,6 +16,7 @@ import {
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { ButtonLink } from "@/components/ui/button";
+import { OrderProducts } from "@/components/product/order-products";
 import type { Order } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
@@ -269,6 +270,11 @@ export default function OrderConfirmationPage({ params }: PageProps) {
             </motion.div>
           </div>
         </motion.div>
+
+        {/* More Products Section */}
+        <div className="mt-16">
+          <OrderProducts />
+        </div>
       </div>
     </main>
   );

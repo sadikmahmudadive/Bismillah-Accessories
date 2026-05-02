@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CartDisplay } from "@/components/cart/cart-display";
+import { RecommendedProducts } from "@/components/product/recommended-products";
 
 export const metadata: Metadata = {
   title: "Shopping Cart",
@@ -21,6 +22,11 @@ export default function CartPage() {
 
         <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <CartDisplay />
+        </div>
+
+        {/* Recommended Products Section */}
+        <div className="mt-12">
+          <RecommendedProducts />
         </div>
       </div>
     </main>

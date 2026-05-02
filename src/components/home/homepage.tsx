@@ -2,33 +2,15 @@
 
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Check, CreditCard, PackageCheck, ShieldCheck, Sparkles, Truck } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { HeroScene } from "@/components/home/hero-scene";
 import { ProductCard } from "@/components/product/product-card";
 import { ButtonLink } from "@/components/ui/button";
 import { ProductCardSkeleton } from "@/components/ui/loader";
+import type { Product } from "@/types/domain";
 
-const previewProducts = [
-  {
-    name: "MagSafe Clear Case",
-    category: "Phone Case",
-    price: 1250,
-    accent: "#2f9e74",
-  },
-  {
-    name: "Braided USB-C Cable",
-    category: "Charging",
-    price: 850,
-    accent: "#d65f5f",
-  },
-  {
-    name: "Matte Camera Lens Guard",
-    category: "Protection",
-    price: 690,
-    accent: "#b8860b",
-  },
-];
+// We'll fetch real products instead of using hardcoded ones
 
 const benefits = [
   { icon: Truck, label: "Fast local delivery" },
@@ -38,6 +20,10 @@ const benefits = [
 ];
 
 export function Homepage() {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const smoothX = useSpring(mouseX, { stiffness: 80, damping: 18 });
@@ -54,6 +40,40 @@ export function Homepage() {
     window.addEventListener("pointermove", handlePointer);
     return () => window.removeEventListener("pointermove", handlePointer);
   }, [mouseX, mouseY]);
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        setIsLoadingProducts(true);
+        setProductsError(null);
+
+        console.log("🏠 Fetching featured products for homepage");
+        const response = await fetch('/api/products?limit=4&sortBy=newest');
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch products: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Take only the first 4 active products
+          const activeProducts = data.data.filter((product: Product) => product.status === 'active');
+          setFeaturedProducts(activeProducts.slice(0, 4));
+          console.log(`✅ Loaded ${activeProducts.length} featured products`);
+        } else {
+          throw new Error(data.error || 'Failed to load products');
+        }
+      } catch (error) {
+        console.error('❌ Error fetching featured products:', error);
+        setProductsError(error instanceof Error ? error.message : 'Failed to load products');
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
 
   return (
     <main className="relative isolate overflow-hidden bg-[#fafaf8] text-neutral-950">
@@ -131,30 +151,52 @@ export function Homepage() {
                   </div>
                 </div>
                 <div className="mt-5 grid gap-3">
-                  {previewProducts.map((product) => (
-                    <div
-                      key={product.name}
-                      className="flex items-center justify-between rounded-2xl bg-white p-3 shadow-sm"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span
-                          className="size-12 rounded-2xl"
-                          style={{
-                            background: `radial-gradient(circle at 35% 25%, ${product.accent}66, transparent 36%), #f7f7f2`,
-                          }}
-                        />
-                        <div>
-                          <p className="text-sm font-semibold text-neutral-950">
-                            {product.name}
-                          </p>
-                          <p className="text-xs font-medium text-neutral-500">
-                            {product.category}
-                          </p>
+                  {isLoadingProducts ? (
+                    // Show loading skeletons
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between rounded-2xl bg-white p-3 shadow-sm"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="size-12 rounded-2xl bg-neutral-200 animate-pulse" />
+                          <div>
+                            <div className="h-4 w-32 bg-neutral-200 rounded animate-pulse mb-1" />
+                            <div className="h-3 w-20 bg-neutral-200 rounded animate-pulse" />
+                          </div>
                         </div>
+                        <Check className="size-5 text-[#2f9e74]" />
                       </div>
-                      <Check className="size-5 text-[#2f9e74]" />
+                    ))
+                  ) : featuredProducts.length > 0 ? (
+                    featuredProducts.slice(0, 3).map((product) => (
+                      <div
+                        key={product.id}
+                        className="flex items-center justify-between rounded-2xl bg-white p-3 shadow-sm"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="size-12 rounded-2xl bg-neutral-200 flex items-center justify-center text-xs font-bold text-neutral-600">
+                            {product.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-neutral-950">
+                              {product.name}
+                            </p>
+                            <p className="text-xs font-medium text-neutral-500">
+                              {product.category}
+                            </p>
+                          </div>
+                        </div>
+                        <Check className="size-5 text-[#2f9e74]" />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-neutral-500">
+                        {productsError ? "Failed to load products" : "No products available"}
+                      </p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>
@@ -181,10 +223,25 @@ export function Homepage() {
           </div>
 
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {previewProducts.map((product) => (
-              <ProductCard key={product.name} {...product} />
-            ))}
-            <ProductCardSkeleton />
+            {isLoadingProducts ? (
+              // Show loading skeletons
+              Array.from({ length: 4 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))
+            ) : featuredProducts.length > 0 ? (
+              featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-neutral-500 mb-4">
+                  {productsError ? "Failed to load products" : "No products available"}
+                </p>
+                <ButtonLink href="/admin" variant="secondary">
+                  {productsError ? "Check admin panel" : "Add products"}
+                </ButtonLink>
+              </div>
+            )}
           </div>
 
           <div className="mt-12 flex justify-center">
