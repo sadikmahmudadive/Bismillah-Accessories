@@ -23,9 +23,26 @@ export function getFirebaseAdminApp() {
   const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
   const privateKey = getPrivateKey();
 
+  // If service account JSON path is provided, prefer that (useful for local dev)
+  const serviceAccountPath = process.env.FIREBASE_ADMIN_SDK_PATH;
+  if (serviceAccountPath) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const sa = require(serviceAccountPath);
+      adminApp = initializeApp({
+        credential: cert(sa),
+      });
+      return adminApp;
+    } catch (err) {
+      // fall through and try env vars; log for visibility
+      // eslint-disable-next-line no-console
+      console.warn(`Failed to load service account from ${serviceAccountPath}: ${err}`);
+    }
+  }
+
   if (!projectId || !clientEmail || !privateKey) {
     throw new Error(
-      "Missing Firebase Admin environment values. Add FIREBASE_ADMIN_PROJECT_ID, FIREBASE_ADMIN_CLIENT_EMAIL, and FIREBASE_ADMIN_PRIVATE_KEY.",
+      "Missing Firebase Admin environment values. Add FIREBASE_ADMIN_PROJECT_ID, FIREBASE_ADMIN_CLIENT_EMAIL, and FIREBASE_ADMIN_PRIVATE_KEY, or set FIREBASE_ADMIN_SDK_PATH to a service account JSON.",
     );
   }
 
