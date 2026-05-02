@@ -16,10 +16,10 @@ function AccessoryObject({
 }) {
   const mesh = useRef<Mesh>(null);
 
-  useFrame(({ clock, pointer }) => {
+  useFrame((state, delta) => {
     if (!mesh.current) return;
-    mesh.current.rotation.x = clock.elapsedTime * speed + pointer.y * 0.5;
-    mesh.current.rotation.y = clock.elapsedTime * (speed * 0.7) + pointer.x * 0.5;
+    mesh.current.rotation.x = state.clock.elapsedTime * speed + state.pointer.y * 0.5;
+    mesh.current.rotation.y = state.clock.elapsedTime * (speed * 0.7) + state.pointer.x * 0.5;
   });
 
   return (

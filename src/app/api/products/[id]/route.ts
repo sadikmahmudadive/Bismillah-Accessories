@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { doc, getDoc } from "firebase-admin/firestore";
 import { getFirebaseAdminApp, getFirestoreDb } from "@/lib/firebase/admin";
 import type { Product } from "@/types/domain";
 
@@ -17,12 +16,10 @@ export async function GET(
       );
     }
 
-    const adminApp = getFirebaseAdminApp();
     const db = getFirestoreDb();
-    const productRef = doc(db, "products", id);
-    const snapshot = await getDoc(productRef);
+    const snapshot = await db.doc(`products/${id}`).get();
 
-    if (!snapshot.exists()) {
+    if (!snapshot.exists) {
       return NextResponse.json(
         { success: false, error: "Product not found" },
         { status: 404 }

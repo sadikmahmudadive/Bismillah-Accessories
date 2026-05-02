@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { doc, updateDoc, deleteDoc, getDoc } from "firebase-admin/firestore";
 import { getFirebaseAdminApp, verifyAdminIdToken, getFirestoreDb } from "@/lib/firebase/admin";
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -26,15 +25,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const body = await request.json();
     if (!body) return NextResponse.json({ success: false, error: "Invalid payload" }, { status: 400 });
 
-    const adminApp = getFirebaseAdminApp();
     const db = getFirestoreDb();
-    const productRef = doc(db, "products", id);
+    const productRef = db.doc(`products/${id}`);
 
-    const snapshot = await getDoc(productRef);
-    if (!snapshot.exists()) return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+    const snapshot = await productRef.get();
+    if (!snapshot.exists) return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
 
     const updatePayload = { ...body, updatedAt: new Date().toISOString() };
-    await updateDoc(productRef, updatePayload as any);
+    await productRef.update(updatePayload as any);
 
     console.log(`[PUT /api/admin/products/[id]] Product ${id} updated successfully`);
     return NextResponse.json({ success: true, id, data: updatePayload });
@@ -57,11 +55,10 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const { id } = await params;
     if (!id) return NextResponse.json({ success: false, error: "Missing product id" }, { status: 400 });
 
-    const adminApp = getFirebaseAdminApp();
     const db = getFirestoreDb();
-    const productRef = doc(db, "products", id);
+    const productRef = db.doc(`products/${id}`);
 
-    await deleteDoc(productRef);
+    await productRef.delete();
 
     return NextResponse.json({ success: true, id });
   } catch (error) {

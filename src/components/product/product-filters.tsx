@@ -35,7 +35,7 @@ export function ProductFilters({
     >
       {/* Search */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-semibold text-neutral-700 mb-2">
           Search Products
         </label>
         <input
@@ -43,13 +43,13 @@ export function ProductFilters({
           placeholder="Search by name, description..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+          className="w-full rounded-2xl border border-neutral-200 bg-[#fafaf8] px-4 py-3 text-sm font-medium text-neutral-950 outline-none transition focus:border-neutral-950 placeholder:text-neutral-400"
         />
       </div>
 
       {/* Category Filter */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+        <label className="block text-sm font-semibold text-neutral-700 mb-3">
           Category
         </label>
         <div className="space-y-2">
@@ -65,9 +65,9 @@ export function ProductFilters({
                 value={category}
                 checked={selectedCategory === category}
                 onChange={(e) => onCategoryChange(e.target.value)}
-                className="w-4 h-4 text-green-500 cursor-pointer"
+                className="size-4 text-[#2f9e74] focus:ring-[#2f9e74]/50"
               />
-              <span className="ml-3 text-sm text-gray-700 dark:text-gray-300 capitalize">
+              <span className="ml-3 text-sm text-neutral-700 capitalize">
                 {category === "all" ? "All Products" : category}
               </span>
             </motion.label>
@@ -77,13 +77,13 @@ export function ProductFilters({
 
       {/* Sort Options */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-semibold text-neutral-700 mb-2">
           Sort By
         </label>
         <select
           value={sortBy}
           onChange={(e) => onSortChange(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+          className="w-full rounded-2xl border border-neutral-200 bg-[#fafaf8] px-4 py-3 text-sm font-medium text-neutral-950 outline-none transition focus:border-neutral-950"
         >
           {sortOptions.map((option) => (
             <option key={option.value} value={option.value}>

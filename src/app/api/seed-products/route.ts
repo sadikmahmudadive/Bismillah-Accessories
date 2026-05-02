@@ -1,5 +1,5 @@
 import { getFirebaseAdminApp, getFirestoreDb } from "@/lib/firebase/admin";
-import { collection, addDoc, query, where, getDocs } from "firebase-admin/firestore";
+import { Timestamp } from "firebase-admin/firestore";
 import type { Product } from "@/types/domain";
 
 // Seed data embedded directly in the API route
@@ -183,10 +183,10 @@ export async function POST(request: Request) {
 
     const adminApp = getFirebaseAdminApp();
     const db = getFirestoreDb();
-    const productsCollection = collection(db, "products");
+    const productsCollection = db.collection("products");
 
     // Check if products already exist
-    let existingProducts = await getDocs(productsCollection);
+    let existingProducts = await productsCollection.get();
 
     if (existingProducts.size > 0 && !forceReseed) {
       return Response.json(
@@ -218,12 +218,13 @@ export async function POST(request: Request) {
       try {
         const product: Omit<Product, "id"> = {
           ...productData,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          status: productData.status as any,
+          createdAt: Timestamp.now() as any,
+          updatedAt: Timestamp.now() as any,
           cloudinaryPublicId: "", // Will be set when uploading images
         };
 
-        const docRef = await addDoc(productsCollection, product);
+        const docRef = await productsCollection.add(product);
         addedProducts.push(docRef.id);
         console.log(`✅ Added product: ${productData.name} (ID: ${docRef.id})`);
       } catch (error) {
@@ -274,12 +275,10 @@ export async function GET() {
     // Use Admin SDK on the server to inspect products
     const adminApp = getFirebaseAdminApp();
     const db = getFirestoreDb();
-    const productsCollection = collection(db, "products");
+    const productsCollection = db.collection("products");
 
-    const activeProducts = await getDocs(
-      query(productsCollection, where("status", "==", "active"))
-    );
-    const allProducts = await getDocs(productsCollection);
+    const activeProducts = await productsCollection.where("status", "==", "active").get();
+    const allProducts = await productsCollection.get();
 
     return Response.json({
       success: true,

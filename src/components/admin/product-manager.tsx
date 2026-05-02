@@ -15,50 +15,12 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
-import {
-  createProduct,
-  deleteProduct,
-  getAdminProducts,
-  productCategories,
-  updateProduct,
-} from "@/lib/products";
+import { productCategories } from "@/lib/products";
 
-const USE_SERVER_ADMIN_API = process.env.NEXT_PUBLIC_USE_SERVER_ADMIN_API === "true";
-
-async function callServerCreate(token: string, payload: any) {
-  const res = await fetch("/api/admin/products", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
-
-  return res.json();
-}
-
-async function callServerUpdate(token: string, id: string, payload: any) {
-  const res = await fetch(`/api/admin/products/${id}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
-
-  return res.json();
-}
-
-async function callServerDelete(token: string, id: string) {
-  const res = await fetch(`/api/admin/products/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  return res.json();
-}
+// Simplified admin operations using client-side Firestore
+import { collection, addDoc, doc, getDoc, updateDoc, deleteDoc, getDocs, serverTimestamp } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
+import { getFirebaseClientApp } from "@/lib/firebase/client";
 import { cn } from "@/lib/utils";
 import type { Product, ProductInput, ProductStatus } from "@/types/domain";
 
@@ -100,28 +62,23 @@ export function ProductManager() {
     setError(null);
 
     try {
-      if (USE_SERVER_ADMIN_API) {
-        const res = await fetch('/api/products');
-        if (!res.ok) throw new Error(`Server returned ${res.status}`);
-        const payload = await res.json();
-        if (!payload?.success) throw new Error(payload?.error || 'Failed to load products');
-        setProducts(payload.data || []);
-      } else {
-        setProducts(await getAdminProducts());
-      }
+      if (!user) throw new Error("Please sign in to access admin panel");
+
+      console.log("Loading all products for admin...");
+      const db = getFirestore(getFirebaseClientApp());
+      const productsRef = collection(db, "products");
+
+      const snapshot = await getDocs(productsRef);
+      const products = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Product[];
+
+      console.log("Successfully loaded", products.length, "products");
+      setProducts(products);
     } catch (loadError) {
-      // If server API fails and we're using it, log but don't show error — products may already be displayed
       console.error("Load products error:", loadError);
-      // Optional: fall back to client API on server error
-      if (USE_SERVER_ADMIN_API) {
-        try {
-          setProducts(await getAdminProducts());
-        } catch (fallbackError) {
-          setError(getErrorMessage(fallbackError));
-        }
-      } else {
-        setError(getErrorMessage(loadError));
-      }
+      setError(`Failed to load products: ${loadError instanceof Error ? loadError.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -159,33 +116,43 @@ export function ProductManager() {
     setError(null);
     setMessage(null);
 
+    if (!user) {
+      setError("Not authenticated");
+      setIsLoading(false);
+      return;
+    }
+
     const productInput = normalizeProductInput(form, tagText);
 
     try {
-      if (USE_SERVER_ADMIN_API && user) {
-        const token = await user.getIdToken();
-        if (editingId) {
-          const res = await callServerUpdate(token, editingId, productInput);
-          if (!res?.success) throw new Error(res?.error || "Update failed");
-          setMessage("Product updated.");
-        } else {
-          const res = await callServerCreate(token, productInput);
-          if (!res?.success) throw new Error(res?.error || "Create failed");
-          setMessage("Product created.");
-        }
+      console.log("Submitting product form...", { editingId, productInput });
+      const db = getFirestore(getFirebaseClientApp());
+
+      if (editingId) {
+        console.log("Updating product", editingId);
+        const productRef = doc(db, "products", editingId);
+        await updateDoc(productRef, {
+          ...productInput,
+          updatedAt: serverTimestamp(),
+        });
+        console.log("Product updated successfully");
+        setMessage("Product updated.");
       } else {
-        if (editingId) {
-          await updateProduct(editingId, productInput);
-          setMessage("Product updated.");
-        } else {
-          await createProduct(productInput);
-          setMessage("Product created.");
-        }
+        console.log("Creating new product");
+        const productsRef = collection(db, "products");
+        await addDoc(productsRef, {
+          ...productInput,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+        console.log("Product created successfully");
+        setMessage("Product created.");
       }
 
       resetForm();
       await loadProducts();
     } catch (submitError) {
+      console.error("Submit error:", submitError);
       setError(getErrorMessage(submitError));
     } finally {
       setIsLoading(false);
@@ -200,18 +167,22 @@ export function ProductManager() {
     setError(null);
     setMessage(null);
 
+    if (!user) {
+      setError("Not authenticated");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      if (USE_SERVER_ADMIN_API && user) {
-        const token = await user.getIdToken();
-        const res = await callServerDelete(token, product.id);
-        if (!res?.success) throw new Error(res?.error || "Delete failed");
-        setMessage("Product deleted.");
-      } else {
-        await deleteProduct(product.id);
-        setMessage("Product deleted.");
-      }
+      console.log("Deleting product", product.id);
+      const db = getFirestore(getFirebaseClientApp());
+      const productRef = doc(db, "products", product.id);
+      await deleteDoc(productRef);
+      console.log("Product deleted successfully");
+      setMessage("Product deleted.");
       await loadProducts();
     } catch (deleteError) {
+      console.error("Delete error:", deleteError);
       setError(getErrorMessage(deleteError));
     } finally {
       setIsLoading(false);

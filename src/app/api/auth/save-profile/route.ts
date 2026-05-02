@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFirestoreDb } from "@/lib/firebase/admin";
-import { doc, setDoc, serverTimestamp } from "firebase-admin/firestore";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,15 +13,15 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getFirestoreDb();
-    
+
     // Save user profile to Firestore
-    await setDoc(doc(db, "users", uid), {
+    await db.doc(`users/${uid}`).set({
       id: uid,
       email,
       displayName: displayName || email.split("@")[0] || "Customer",
       role: "customer",
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     console.log(`[save-profile] User profile created in Firestore for ${uid}`);

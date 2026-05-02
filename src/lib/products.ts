@@ -37,7 +37,7 @@ export async function getActiveProducts() {
     const { collection, query, where, getDocs } = require("firebase-admin/firestore");
     const db = getFirestoreDb();
     const snap = await getDocs(query(collection(db, PRODUCTS_COLLECTION), where("status", "==", "active")));
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => a.name.localeCompare(b.name));
+    return snap.docs.map((d: any) => ({ id: d.id, ...d.data() })).sort((a: any, b: any) => a.name.localeCompare(b.name));
   }
 
   const database = getFirestoreDb();
@@ -46,7 +46,7 @@ export async function getActiveProducts() {
   const { collection, getDocs, query, where } = require("firebase/firestore");
   const snapshot = await getDocs(query(collection(database, PRODUCTS_COLLECTION), where("status", "==", "active")));
 
-  return snapshot.docs.map(mapProductDoc).sort((a, b) => a.name.localeCompare(b.name));
+  return snapshot.docs.map(mapProductDoc).sort((a: any, b: any) => a.name.localeCompare(b.name));
 }
 
 export async function getAdminProducts() {
@@ -55,7 +55,7 @@ export async function getAdminProducts() {
     const { collection, getDocs } = require("firebase-admin/firestore");
     const db = getFirestoreDb();
     const snap = await getDocs(collection(db, PRODUCTS_COLLECTION));
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => a.name.localeCompare(b.name));
+    return snap.docs.map((d: any) => ({ id: d.id, ...d.data() })).sort((a: any, b: any) => a.name.localeCompare(b.name));
   }
 
   const database = getFirestoreDb();
@@ -63,7 +63,7 @@ export async function getAdminProducts() {
   const { collection, getDocs } = require("firebase/firestore");
   const snapshot = await getDocs(collection(database, PRODUCTS_COLLECTION));
 
-  return snapshot.docs.map(mapProductDoc).sort((a, b) => a.name.localeCompare(b.name));
+  return snapshot.docs.map(mapProductDoc).sort((a: any, b: any) => a.name.localeCompare(b.name));
 }
 
 export async function getProductBySlug(slug: string) {
@@ -73,7 +73,7 @@ export async function getProductBySlug(slug: string) {
     const db = getFirestoreDb();
     const snap = await getDocs(query(collection(db, PRODUCTS_COLLECTION), where("slug", "==", slug)));
     const doc = snap.docs[0];
-    return doc ? { id: doc.id, ...doc.data() } : null;
+    return doc ? { id: doc.id, ...(doc.data() as any) } : null;
   }
 
   const database = getFirestoreDb();
@@ -98,7 +98,7 @@ export async function getProductById(id: string) {
   const database = getFirestoreDb();
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { doc, getDoc } = require("firebase/firestore");
-  const snapshot = await getDoc(doc(database, PRODUCTS_COLLECTION, id));
+    const snapshot = await getDoc(doc(database, PRODUCTS_COLLECTION, id));
 
   if (!snapshot.exists()) {
     return null;
@@ -106,7 +106,7 @@ export async function getProductById(id: string) {
 
   return {
     id: snapshot.id,
-    ...snapshot.data(),
+    ...(snapshot.data() as any),
   } as Product;
 }
 

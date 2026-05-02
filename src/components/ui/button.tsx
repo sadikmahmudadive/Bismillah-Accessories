@@ -28,6 +28,8 @@ type ButtonLinkProps = ComponentPropsWithoutRef<typeof Link> & {
   showArrow?: boolean;
 };
 
+const MotionLink = motion(Link);
+
 export function Button({
   className,
   variant = "primary",
@@ -39,7 +41,7 @@ export function Button({
       whileTap={{ scale: 0.98, y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={cn(buttonBase, variants[variant], className)}
-      {...props}
+      {...(props as any)}
     />
   );
 }
@@ -51,15 +53,14 @@ export function ButtonLink({
   children,
   ...props
 }: ButtonLinkProps) {
-  const MotionLink = motion(Link);
   return (
     <MotionLink
       whileHover={{ y: -2, scale: 1.02 }}
       whileTap={{ scale: 0.98, y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={cn(buttonBase, variants[variant], className)}
-      {...props}
-      >
+      {...(props as any)}
+    >
       {children}
       {showArrow ? <ArrowRight aria-hidden="true" className="size-4" /> : null}
     </MotionLink>

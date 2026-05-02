@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { AuthGate } from "@/components/auth/auth-gate";
+import { OrderManager } from "@/components/admin/order-manager";
 import { ProductManager } from "@/components/admin/product-manager";
 
 const dashboardCards = [
@@ -38,7 +39,6 @@ export function AdminDashboardShell() {
       y: 0,
       transition: {
         duration: 0.5,
-        ease: "easeOut",
       },
     },
   };
@@ -74,6 +74,10 @@ export function AdminDashboardShell() {
 
         <motion.div variants={itemVariants}>
           <ProductManager />
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <OrderManager />
         </motion.div>
 
         <motion.div

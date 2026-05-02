@@ -166,17 +166,17 @@ export function Homepage() {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#d65f5f]">
-                Storefront System
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#2f9e74]">
+                Featured Products
               </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-normal sm:text-4xl">
-                Reusable product cards and loading states
+                Shop our bestsellers
               </h2>
             </div>
             <p className="max-w-xl text-sm leading-6 text-neutral-600">
-              These components are ready to connect to Firestore in the product
-              module. For now, they define the UI contract, animation behavior,
-              and responsive grid.
+              Discover premium mobile accessories with fast delivery and COD
+              payments. Browse our curated collection of cases, cables, and
+              protection.
             </p>
           </div>
 
@@ -185,6 +185,12 @@ export function Homepage() {
               <ProductCard key={product.name} {...product} />
             ))}
             <ProductCardSkeleton />
+          </div>
+
+          <div className="mt-12 flex justify-center">
+            <ButtonLink href="/products" showArrow>
+              Browse all products
+            </ButtonLink>
           </div>
         </div>
       </section>

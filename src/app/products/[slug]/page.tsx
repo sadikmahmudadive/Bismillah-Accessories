@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, PackageCheck, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
+import { ArrowLeft, PackageCheck, ShieldCheck, Truck } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { AddToCartSection } from "@/components/product/add-to-cart-section";
 import { getProductBySlug } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
@@ -92,7 +92,7 @@ export default async function ProductDetailsPage({
 
             {product.tags.length > 0 ? (
               <div className="mt-6 flex flex-wrap gap-2">
-                {product.tags.map((tag) => (
+                {product.tags.map((tag: string) => (
                   <span
                     key={tag}
                     className="rounded-full border border-neutral-200 px-3 py-1 text-xs font-semibold text-neutral-600"
@@ -103,14 +103,8 @@ export default async function ProductDetailsPage({
               </div>
             ) : null}
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button type="button" disabled={product.stock <= 0}>
-                <ShoppingBag className="size-4" />
-                Add to cart
-              </Button>
-              <Button type="button" variant="secondary">
-                Buy now
-              </Button>
+            <div className="mt-8">
+              <AddToCartSection product={product} />
             </div>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-3">

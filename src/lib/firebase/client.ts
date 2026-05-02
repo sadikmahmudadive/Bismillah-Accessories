@@ -61,7 +61,6 @@ export function getFirestoreDb() {
       // Force long-polling transport to avoid gRPC issues in constrained networks
       firestoreDb = initializeFirestore(app, {
         experimentalForceLongPolling: true,
-        useFetchStreams: false,
       });
     } else {
       firestoreDb = getFirestore(app);

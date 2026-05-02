@@ -1,167 +1,184 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Trash2, Plus, Minus } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+
+import { ButtonLink } from "@/components/ui/button";
 import { useCartStore } from "@/lib/store/cart";
-import { Button } from "@/components/ui/button";
+
+const DELIVERY_FEE = 99; // BDT
 
 export function CartDisplay() {
-  const { items, itemCount, subtotal, removeItem, updateQuantity } =
-    useCartStore();
+  const { items, itemCount, subtotal, removeItem, updateQuantity } = useCartStore();
 
-  const DELIVERY_FEE = 99; // BDT
   const total = subtotal + (items.length > 0 ? DELIVERY_FEE : 0);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.1 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
 
   if (items.length === 0) {
     return (
       <motion.div
-        variants={itemVariants}
-        initial="hidden"
-        animate="visible"
-        className="text-center py-12"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex flex-col items-center gap-5 py-16 text-center"
       >
-        <p className="text-gray-500 dark:text-gray-400 mb-4">
-          Your cart is empty
-        </p>
-        <Link href="/products">
-          <Button>Continue Shopping</Button>
-        </Link>
+        <div className="grid size-16 place-items-center rounded-full bg-neutral-100 text-neutral-400">
+          <ShoppingBag className="size-7" />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold text-neutral-950">Your cart is empty</h2>
+          <p className="mt-1 text-sm text-neutral-500">
+            Browse the store and add items to get started.
+          </p>
+        </div>
+        <ButtonLink href="/products" showArrow>
+          Browse products
+        </ButtonLink>
       </motion.div>
     );
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
+    exit: { opacity: 0, x: -20, transition: { duration: 0.3 } },
+  };
+
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="space-y-6"
-    >
-      {/* Cart Items */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Order Summary ({itemCount} {itemCount === 1 ? "item" : "items"})
-        </h2>
+    <div className="grid gap-6 lg:grid-cols-[1fr_0.42fr] lg:items-start">
+      {/* Items list */}
+      <div>
+        <p className="text-sm font-semibold text-neutral-500">
+          {itemCount} {itemCount === 1 ? "item" : "items"}
+        </p>
 
-        <div className="space-y-3">
-          {items.map((item) => (
-            <motion.div
-              key={item.productId}
-              variants={itemVariants}
-              className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
-            >
-              {/* Product Image */}
-              <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
-                <Image
-                  src={item.imageUrl}
-                  alt={item.name}
-                  fill
-                  className="object-cover"
-                  sizes="80px"
-                />
-              </div>
-
-              {/* Product Info */}
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 dark:text-white truncate">
-                  {item.name}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  ৳{item.price.toFixed(0)} each
-                </p>
-              </div>
-
-              {/* Quantity Controls */}
-              <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                >
-                  <Minus className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                </motion.button>
-
-                <span className="w-8 text-center font-semibold text-gray-900 dark:text-white">
-                  {item.quantity}
-                </span>
-
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                >
-                  <Plus className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                </motion.button>
-              </div>
-
-              {/* Item Total */}
-              <div className="text-right">
-                <p className="font-semibold text-gray-900 dark:text-white">
-                  ৳{(item.price * item.quantity).toFixed(0)}
-                </p>
-              </div>
-
-              {/* Remove Button */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => removeItem(item.productId)}
-                className="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400"
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="mt-4 grid gap-3"
+        >
+          <AnimatePresence mode="popLayout">
+            {items.map((item) => (
+              <motion.article
+                key={item.productId}
+                variants={itemVariants}
+                exit="exit"
+                layout
+                className="grid grid-cols-[5rem_1fr_auto] items-center gap-4 rounded-[1.75rem] border border-neutral-200 bg-white p-3 shadow-sm"
               >
-                <Trash2 className="w-5 h-5" />
-              </motion.button>
-            </motion.div>
-          ))}
-        </div>
+                {/* Image */}
+                <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#f6f4ee]">
+                  {item.imageUrl ? (
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.name}
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-neutral-200 to-neutral-100" />
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="min-w-0">
+                  <h3 className="truncate text-sm font-semibold text-neutral-950">
+                    {item.name}
+                  </h3>
+                  <p className="mt-0.5 text-xs font-medium text-neutral-500">
+                    {item.category}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-neutral-800">
+                    ৳{(item.price * item.quantity).toLocaleString("en-BD")}
+                  </p>
+                </div>
+
+                {/* Controls */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-[#f6f4ee] p-1">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      type="button"
+                      aria-label="Decrease quantity"
+                      onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                      className="grid size-7 place-items-center rounded-full transition hover:bg-white"
+                    >
+                      <Minus className="size-3.5 text-neutral-600" />
+                    </motion.button>
+                    <span className="w-6 text-center text-sm font-semibold text-neutral-950">
+                      {item.quantity}
+                    </span>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      type="button"
+                      aria-label="Increase quantity"
+                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      className="grid size-7 place-items-center rounded-full transition hover:bg-white"
+                    >
+                      <Plus className="size-3.5 text-neutral-600" />
+                    </motion.button>
+                  </div>
+
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    type="button"
+                    aria-label={`Remove ${item.name}`}
+                    onClick={() => removeItem(item.productId)}
+                    className="grid size-9 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-400 transition hover:border-[#d65f5f]/30 hover:bg-[#d65f5f]/10 hover:text-[#d65f5f]"
+                  >
+                    <Trash2 className="size-4" />
+                  </motion.button>
+                </div>
+              </motion.article>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       </div>
 
-      {/* Order Summary */}
+      {/* Order summary */}
       <motion.div
-        variants={itemVariants}
-        className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+        className="rounded-[1.75rem] border border-neutral-200 bg-white p-5 shadow-sm lg:sticky lg:top-24"
       >
-        <div className="space-y-3">
-          <div className="flex justify-between text-gray-700 dark:text-gray-300">
+        <h2 className="text-lg font-semibold text-neutral-950">Order summary</h2>
+
+        <div className="mt-5 grid gap-3 text-sm text-neutral-700">
+          <div className="flex justify-between">
             <span>Subtotal</span>
-            <span>৳{subtotal.toFixed(0)}</span>
+            <span className="font-semibold">৳{subtotal.toLocaleString("en-BD")}</span>
           </div>
-          <div className="flex justify-between text-gray-700 dark:text-gray-300">
-            <span>Delivery Fee</span>
-            <span>৳{items.length > 0 ? DELIVERY_FEE : 0}</span>
+          <div className="flex justify-between">
+            <span>Delivery fee</span>
+            <span className="font-semibold">৳{DELIVERY_FEE}</span>
           </div>
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex justify-between font-semibold text-lg text-gray-900 dark:text-white">
+          <div className="my-1 h-px bg-neutral-100" />
+          <div className="flex justify-between text-base font-semibold text-neutral-950">
             <span>Total</span>
-            <span>৳{total.toFixed(0)}</span>
+            <span>৳{total.toLocaleString("en-BD")}</span>
           </div>
+        </div>
+
+        <div className="mt-5 grid gap-3">
+          <ButtonLink href="/checkout" className="w-full">
+            Proceed to checkout
+          </ButtonLink>
+          <ButtonLink href="/products" variant="secondary" className="w-full">
+            Continue shopping
+          </ButtonLink>
         </div>
       </motion.div>
-
-      {/* Action Buttons */}
-      <div className="flex gap-3">
-        <Link href="/products" className="flex-1">
-          <Button variant="secondary">Continue Shopping</Button>
-        </Link>
-        <Link href="/checkout" className="flex-1">
-          <Button>Proceed to Checkout</Button>
-        </Link>
-      </div>
-    </motion.div>
+    </div>
   );
 }

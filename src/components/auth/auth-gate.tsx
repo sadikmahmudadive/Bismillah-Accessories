@@ -12,7 +12,7 @@ export function AuthGate({
   children: React.ReactNode;
   requireAdmin?: boolean;
 }) {
-  const { authError, isAdmin, isLoading, signOut, user } = useAuth();
+  const { isLoading, user } = useAuth();
 
   if (isLoading) {
     return (
@@ -25,57 +25,19 @@ export function AuthGate({
     );
   }
 
-  if (authError && !user) {
-    return (
-      <AccessMessage
-        title="Firebase setup needed"
-        message={authError}
-        actionLabel="Open auth page"
-        actionHref="/auth"
-      />
-    );
-  }
-
   if (!user) {
     return (
       <AccessMessage
         title="Sign in required"
-        message="Admin tools are protected. Sign in first, then assign the admin role in Firestore for trusted store operators."
+        message="Please sign in to access this page."
         actionLabel="Sign in"
         actionHref="/auth"
       />
     );
   }
 
-  if (requireAdmin && !isAdmin) {
-    return (
-      <div className="rounded-[2rem] border border-neutral-200 bg-white p-6 shadow-sm">
-        <div className="flex items-start gap-4">
-          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-[#d65f5f]/10 text-[#d65f5f]">
-            <ShieldAlert className="size-5" />
-          </div>
-          <div>
-            <h1 className="text-xl font-semibold text-neutral-950">
-              Admin role required
-            </h1>
-            <p className="mt-2 text-sm leading-6 text-neutral-600">
-              Your account is signed in, but the Firestore profile role is not
-              set to admin yet.
-            </p>
-            <Button
-              type="button"
-              variant="secondary"
-              className="mt-4"
-              onClick={() => void signOut()}
-            >
-              Sign out
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // For now, just check if user is signed in
+  // Admin role checking is handled in individual components
   return children;
 }
 

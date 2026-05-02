@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/store/cart";
 import type { Product } from "@/types/domain";
 
@@ -39,7 +38,6 @@ export function ProductCard({
   const displayPrice = product?.price || price || 0;
   const displayImage = product?.imageUrl || imageUrl;
   const productLink = product ? `/products/${product.slug}` : href;
-  const productId = product?.id;
 
   const handleAddToCart = async () => {
     if (!product) return;

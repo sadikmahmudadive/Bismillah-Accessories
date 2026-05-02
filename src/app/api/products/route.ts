@@ -10,10 +10,13 @@ const MOCK_PRODUCTS: Product[] = [
     slug: "hijab-classic-black",
     description: "Premium quality hijab in classic black with comfortable fit",
     price: 15.99,
-    image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=500",
+    stock: 50,
+    imageUrl: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=500",
     category: "hijabs",
     tags: ["hijab", "black", "classic"],
     status: "active" as const,
+    createdAt: { seconds: 0, nanoseconds: 0 } as any,
+    updatedAt: { seconds: 0, nanoseconds: 0 } as any,
   },
   {
     id: "2",
@@ -21,10 +24,13 @@ const MOCK_PRODUCTS: Product[] = [
     slug: "prayer-mat-floral",
     description: "Beautiful prayer mat with intricate floral patterns",
     price: 24.99,
-    image: "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=500",
+    stock: 25,
+    imageUrl: "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=500",
     category: "prayer-mats",
     tags: ["prayer", "mat", "floral"],
     status: "active" as const,
+    createdAt: { seconds: 0, nanoseconds: 0 } as any,
+    updatedAt: { seconds: 0, nanoseconds: 0 } as any,
   },
   {
     id: "3",
@@ -32,10 +38,13 @@ const MOCK_PRODUCTS: Product[] = [
     slug: "abaya-elegant",
     description: "Elegant and comfortable black abaya for everyday wear",
     price: 49.99,
-    image: "https://images.unsplash.com/photo-1539622066829-3e23aba3f4e8?w=500",
+    stock: 15,
+    imageUrl: "https://images.unsplash.com/photo-1539622066829-3e23aba3f4e8?w=500",
     category: "abayas",
     tags: ["abaya", "black", "elegant"],
     status: "active" as const,
+    createdAt: { seconds: 0, nanoseconds: 0 } as any,
+    updatedAt: { seconds: 0, nanoseconds: 0 } as any,
   },
   {
     id: "4",
@@ -43,10 +52,13 @@ const MOCK_PRODUCTS: Product[] = [
     slug: "hijab-pins-gold",
     description: "Decorative gold hijab pins set of 3",
     price: 8.99,
-    image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500",
+    stock: 100,
+    imageUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500",
     category: "accessories",
     tags: ["pins", "gold", "hijab"],
     status: "active" as const,
+    createdAt: { seconds: 0, nanoseconds: 0 } as any,
+    updatedAt: { seconds: 0, nanoseconds: 0 } as any,
   },
   {
     id: "5",
@@ -54,10 +66,13 @@ const MOCK_PRODUCTS: Product[] = [
     slug: "niqab-premium",
     description: "Premium quality niqab with comfortable breathable fabric",
     price: 29.99,
-    image: "https://images.unsplash.com/photo-1577591804779-591b32be3338?w=500",
+    stock: 30,
+    imageUrl: "https://images.unsplash.com/photo-1577591804779-591b32be3338?w=500",
     category: "niqabs",
     tags: ["niqab", "premium"],
     status: "active" as const,
+    createdAt: { seconds: 0, nanoseconds: 0 } as any,
+    updatedAt: { seconds: 0, nanoseconds: 0 } as any,
   },
 ];
 
@@ -142,6 +157,12 @@ export async function GET(request: NextRequest) {
       console.warn(
         "[products route] Firestore query failed, using mock data:",
         firestoreError?.message
+      );
+      console.warn(
+        "[products route] To fix Firestore access:",
+        "1. Create a Firestore database in Firebase Console",
+        "2. Ensure service account has 'Cloud Datastore User' role",
+        "3. Check FIREBASE_ADMIN_* environment variables"
       );
 
       // Fallback to mock products
