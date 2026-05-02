@@ -110,7 +110,18 @@ export function ProductManager() {
         setProducts(await getAdminProducts());
       }
     } catch (loadError) {
-      setError(getErrorMessage(loadError));
+      // If server API fails and we're using it, log but don't show error — products may already be displayed
+      console.error("Load products error:", loadError);
+      // Optional: fall back to client API on server error
+      if (USE_SERVER_ADMIN_API) {
+        try {
+          setProducts(await getAdminProducts());
+        } catch (fallbackError) {
+          setError(getErrorMessage(fallbackError));
+        }
+      } else {
+        setError(getErrorMessage(loadError));
+      }
     } finally {
       setIsLoading(false);
     }

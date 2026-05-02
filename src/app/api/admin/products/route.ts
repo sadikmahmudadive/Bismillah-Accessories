@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { collection, addDoc } from "firebase-admin/firestore";
-import { getFirebaseAdminApp, verifyAdminIdToken } from "@/lib/firebase/admin";
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirebaseAdminApp, verifyAdminIdToken, getFirestoreDb } from "@/lib/firebase/admin";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const adminApp = getFirebaseAdminApp();
-    const db = getFirestore(adminApp);
+    const db = getFirestoreDb();
     const productsRef = collection(db, "products");
 
     const product = {

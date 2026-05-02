@@ -29,6 +29,9 @@ export async function createCustomerAccount({
   await updateProfile(credential.user, { displayName: cleanName });
 
   // Try to store user profile in Firestore
+  let profileSaved = false;
+  
+  // First, try client-side Firestore
   try {
     await setDoc(doc(database, "users", credential.user.uid), {
       id: credential.user.uid,
@@ -38,15 +41,44 @@ export async function createCustomerAccount({
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
-    console.log(`✅ User profile created in Firestore for ${credential.user.uid}`);
-  } catch (error) {
-    // Log the error clearly but don't prevent auth from working
-    console.error("❌ Failed to store user profile in Firestore:", error);
-    console.error("Firestore Database Issue: Ensure the database is created in Firebase Console > Firestore Database");
-    // Re-throw so the UI can show the error
-    throw new Error(
-      `Failed to create user profile in Firestore. ${error instanceof Error ? error.message : "Unknown error"}`
-    );
+    console.log(`✅ User profile created in Firestore (client) for ${credential.user.uid}`);
+    profileSaved = true;
+  } catch (clientError) {
+    console.warn("⚠️  Client-side Firestore failed, trying server API...", clientError);
+    
+    // Fall back to server API
+    try {
+      const token = await credential.user.getIdToken();
+      const response = await fetch("/api/auth/save-profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          uid: credential.user.uid,
+          email: credential.user.email,
+          displayName: cleanName,
+        }),
+      });
+
+      if (response.ok) {
+        console.log(`✅ User profile created in Firestore (server) for ${credential.user.uid}`);
+        profileSaved = true;
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save profile");
+      }
+    } catch (serverError) {
+      console.error("❌ Both client and server profile save failed:", serverError);
+      // Log but don't prevent auth - user is authenticated even if profile save fails
+      console.error("Firestore Database Issue: Ensure the database is created and service account has permissions");
+    }
+  }
+
+  if (!profileSaved) {
+    console.warn("⚠️  User profile could not be saved to Firestore, but authentication succeeded");
+    // Consider this a warning, not a fatal error
   }
 
   return credential.user;

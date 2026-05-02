@@ -32,11 +32,10 @@ export async function getActiveProducts() {
   // Use Admin SDK on the server to avoid importing client Firestore during SSR
   if (typeof window === "undefined") {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { getFirebaseAdminApp } = require("@/lib/firebase/admin");
+    const { getFirestoreDb } = require("@/lib/firebase/admin");
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { getFirestore, collection, query, where, getDocs } = require("firebase-admin/firestore");
-    const adminApp = getFirebaseAdminApp();
-    const db = getFirestore(adminApp);
+    const { collection, query, where, getDocs } = require("firebase-admin/firestore");
+    const db = getFirestoreDb();
     const snap = await getDocs(query(collection(db, PRODUCTS_COLLECTION), where("status", "==", "active")));
     return snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => a.name.localeCompare(b.name));
   }
@@ -52,10 +51,9 @@ export async function getActiveProducts() {
 
 export async function getAdminProducts() {
   if (typeof window === "undefined") {
-    const { getFirebaseAdminApp } = require("@/lib/firebase/admin");
-    const { getFirestore, collection, getDocs } = require("firebase-admin/firestore");
-    const adminApp = getFirebaseAdminApp();
-    const db = getFirestore(adminApp);
+    const { getFirestoreDb } = require("@/lib/firebase/admin");
+    const { collection, getDocs } = require("firebase-admin/firestore");
+    const db = getFirestoreDb();
     const snap = await getDocs(collection(db, PRODUCTS_COLLECTION));
     return snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => a.name.localeCompare(b.name));
   }
@@ -70,10 +68,9 @@ export async function getAdminProducts() {
 
 export async function getProductBySlug(slug: string) {
   if (typeof window === "undefined") {
-    const { getFirebaseAdminApp } = require("@/lib/firebase/admin");
-    const { getFirestore, collection, query, where, getDocs } = require("firebase-admin/firestore");
-    const adminApp = getFirebaseAdminApp();
-    const db = getFirestore(adminApp);
+    const { getFirestoreDb } = require("@/lib/firebase/admin");
+    const { collection, query, where, getDocs } = require("firebase-admin/firestore");
+    const db = getFirestoreDb();
     const snap = await getDocs(query(collection(db, PRODUCTS_COLLECTION), where("slug", "==", slug)));
     const doc = snap.docs[0];
     return doc ? { id: doc.id, ...doc.data() } : null;
@@ -90,10 +87,9 @@ export async function getProductBySlug(slug: string) {
 
 export async function getProductById(id: string) {
   if (typeof window === "undefined") {
-    const { getFirebaseAdminApp } = require("@/lib/firebase/admin");
-    const { getFirestore, doc, getDoc } = require("firebase-admin/firestore");
-    const adminApp = getFirebaseAdminApp();
-    const db = getFirestore(adminApp);
+    const { getFirestoreDb } = require("@/lib/firebase/admin");
+    const { doc, getDoc } = require("firebase-admin/firestore");
+    const db = getFirestoreDb();
     const snapshot = await getDoc(doc(db, PRODUCTS_COLLECTION, id));
     if (!snapshot.exists()) return null;
     return { id: snapshot.id, ...snapshot.data() } as Product;

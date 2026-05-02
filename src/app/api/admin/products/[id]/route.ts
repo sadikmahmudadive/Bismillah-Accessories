@@ -1,17 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { doc, updateDoc, deleteDoc, getDoc } from "firebase-admin/firestore";
-import { getFirebaseAdminApp, verifyAdminIdToken } from "@/lib/firebase/admin";
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirebaseAdminApp, verifyAdminIdToken, getFirestoreDb } from "@/lib/firebase/admin";
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authHeader = request.headers.get("authorization") || request.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
+      console.error("[PUT /api/admin/products/[id]] Missing or invalid Authorization header");
       return NextResponse.json({ success: false, error: "Missing Authorization" }, { status: 401 });
     }
 
     const idToken = authHeader.split(" ")[1];
-    await verifyAdminIdToken(idToken);
+    console.log("[PUT /api/admin/products/[id]] Verifying token...");
+    
+    try {
+      await verifyAdminIdToken(idToken);
+    } catch (authErr) {
+      console.error("[PUT /api/admin/products/[id]] Token verification failed:", authErr);
+      throw authErr;
+    }
 
     const { id } = await params;
     if (!id) return NextResponse.json({ success: false, error: "Missing product id" }, { status: 400 });
@@ -20,7 +27,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (!body) return NextResponse.json({ success: false, error: "Invalid payload" }, { status: 400 });
 
     const adminApp = getFirebaseAdminApp();
-    const db = getFirestore(adminApp);
+    const db = getFirestoreDb();
     const productRef = doc(db, "products", id);
 
     const snapshot = await getDoc(productRef);
@@ -29,6 +36,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const updatePayload = { ...body, updatedAt: new Date().toISOString() };
     await updateDoc(productRef, updatePayload as any);
 
+    console.log(`[PUT /api/admin/products/[id]] Product ${id} updated successfully`);
     return NextResponse.json({ success: true, id, data: updatePayload });
   } catch (error) {
     console.error("Admin update product error:", error);
@@ -50,7 +58,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     if (!id) return NextResponse.json({ success: false, error: "Missing product id" }, { status: 400 });
 
     const adminApp = getFirebaseAdminApp();
-    const db = getFirestore(adminApp);
+    const db = getFirestoreDb();
     const productRef = doc(db, "products", id);
 
     await deleteDoc(productRef);
