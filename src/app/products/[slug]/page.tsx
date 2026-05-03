@@ -6,6 +6,7 @@ import { ArrowLeft, PackageCheck, ShieldCheck, Truck } from "lucide-react";
 import * as motion from "framer-motion/client";
 
 import { AddToCartSection } from "@/components/product/add-to-cart-section";
+import { ProductGallery } from "@/components/product/product-gallery";
 import { RelatedProducts } from "@/components/product/related-products";
 import { getProductBySlug } from "@/lib/products";
 
@@ -73,27 +74,18 @@ export default async function ProductDetailsPage({
         </motion.div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-          {/* Left: Image */}
+          {/* Left: Image Gallery */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="overflow-hidden rounded-[2.25rem] border border-neutral-200 bg-white p-3 shadow-sm lg:sticky lg:top-24"
           >
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem] bg-[#f6f4ee]">
-              {product.imageUrl ? (
-                <Image
-                  src={product.imageUrl}
-                  alt={product.name}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 52vw, 100vw"
-                  className="object-cover transition duration-700 hover:scale-105"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_25%,rgba(47,158,116,0.26),transparent_36%),linear-gradient(135deg,#f8faf8,#ece8de_48%,#f7f7f3)]" />
-              )}
-            </div>
+            <ProductGallery 
+              mainImage={product.imageUrl} 
+              gallery={product.gallery || []} 
+              productName={product.name} 
+            />
           </motion.section>
 
           {/* Right: Details */}

@@ -31,6 +31,7 @@ const emptyProductForm: ProductInput = {
   price: 0,
   stock: 0,
   imageUrl: "",
+  gallery: [],
   cloudinaryPublicId: "",
   tags: [],
   status: "draft",
@@ -101,6 +102,7 @@ export function ProductManager() {
       price: product.price,
       stock: product.stock,
       imageUrl: product.imageUrl,
+      gallery: product.gallery || [],
       cloudinaryPublicId: product.cloudinaryPublicId || "",
       tags: product.tags,
       status: product.status,
@@ -125,33 +127,47 @@ export function ProductManager() {
     const productInput = normalizeProductInput(form, tagText);
 
     try {
-      console.log("Submitting product form...", { editingId, productInput });
-      const db = getFirestore(getFirebaseClientApp());
+      console.log("Submitting product form via API...", { editingId, productInput });
+      const token = await user.getIdToken();
+      const slug = createProductSlug(productInput.name);
+      
+      const payloadBody = {
+        ...productInput,
+        slug,
+      };
+
+      let response: Response;
 
       if (editingId) {
         console.log("Updating product", editingId);
-        const productRef = doc(db, "products", editingId);
-        const slug = createProductSlug(productInput.name);
-        await updateDoc(productRef, {
-          ...productInput,
-          slug,
-          updatedAt: serverTimestamp(),
+        response = await fetch(`/api/products/${editingId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payloadBody),
         });
-        console.log("Product updated successfully");
-        setMessage("Product updated.");
       } else {
         console.log("Creating new product");
-        const productsRef = collection(db, "products");
-        const slug = createProductSlug(productInput.name);
-        await addDoc(productsRef, {
-          ...productInput,
-          slug,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
+        response = await fetch("/api/products", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payloadBody),
         });
-        console.log("Product created successfully");
-        setMessage("Product created.");
       }
+
+      const payload = await response.json();
+
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error || "Failed to save product.");
+      }
+
+      console.log("Product saved successfully via API");
+      setMessage(editingId ? "Product updated." : "Product created.");
 
       resetForm();
       await loadProducts();
@@ -263,6 +279,51 @@ export function ProductManager() {
     }
   }
 
+  async function handleGalleryUpload(files: FileList | null) {
+    if (!files || files.length === 0 || !user) return;
+    setIsUploading(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const token = await user.getIdToken();
+      const newUrls: string[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const uploadData = new FormData();
+        uploadData.append("file", files[i]);
+
+        const response = await fetch("/api/cloudinary/upload", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: uploadData,
+        });
+        const payload = await response.json();
+        if (response.ok && payload.imageUrl) {
+          newUrls.push(payload.imageUrl);
+        }
+      }
+
+      setForm((current) => ({
+        ...current,
+        gallery: [...(current.gallery || []), ...newUrls],
+      }));
+      setMessage(`${newUrls.length} gallery images uploaded.`);
+    } catch (uploadError) {
+      setError(getErrorMessage(uploadError));
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  function removeGalleryImage(index: number) {
+    setForm((current) => {
+      const newGallery = [...(current.gallery || [])];
+      newGallery.splice(index, 1);
+      return { ...current, gallery: newGallery };
+    });
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
       <motion.form
@@ -336,38 +397,67 @@ export function ProductManager() {
             placeholder="case, magsafe, iphone"
           />
 
-          <div className="rounded-[1.5rem] border border-neutral-200 bg-[#fafaf8] p-4">
-            <label className="grid gap-2 text-sm font-semibold text-neutral-700">
-              Cloudinary image
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(event) =>
-                  void handleImageUpload(event.target.files?.[0] || null)
-                }
-                className="block w-full rounded-2xl border border-neutral-200 bg-white p-3 text-sm text-neutral-600"
-              />
-            </label>
-            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Button
-                type="button"
-                variant="secondary"
-                disabled={isUploading}
-                className="pointer-events-none"
-              >
-                {isUploading ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <CloudUpload className="size-4" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-[1.5rem] border border-neutral-200 bg-[#fafaf8] p-4">
+              <label className="grid gap-2 text-sm font-semibold text-neutral-700">
+                Main Image
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) =>
+                    void handleImageUpload(event.target.files?.[0] || null)
+                  }
+                  className="block w-full rounded-2xl border border-neutral-200 bg-white p-3 text-sm text-neutral-600"
+                />
+              </label>
+              <div className="mt-3 flex flex-col gap-3">
+                <TextField
+                  label="Image URL"
+                  value={form.imageUrl}
+                  onChange={(value) => setFormField("imageUrl", value, setForm)}
+                  placeholder="https://res.cloudinary.com/..."
+                />
+                {form.imageUrl && (
+                  <div className="relative h-20 w-20 overflow-hidden rounded-xl border border-neutral-200">
+                    <Image src={form.imageUrl} alt="Main" fill sizes="80px" className="object-cover" />
+                  </div>
                 )}
-                {isUploading ? "Uploading" : "Upload ready"}
-              </Button>
-              <TextField
-                label="Image URL"
-                value={form.imageUrl}
-                onChange={(value) => setFormField("imageUrl", value, setForm)}
-                placeholder="https://res.cloudinary.com/..."
-              />
+              </div>
+            </div>
+
+            <div className="rounded-[1.5rem] border border-neutral-200 bg-[#fafaf8] p-4">
+              <label className="grid gap-2 text-sm font-semibold text-neutral-700">
+                Gallery Images
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(event) =>
+                    void handleGalleryUpload(event.target.files)
+                  }
+                  className="block w-full rounded-2xl border border-neutral-200 bg-white p-3 text-sm text-neutral-600"
+                />
+              </label>
+              <div className="mt-3">
+                {form.gallery && form.gallery.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {form.gallery.map((url, i) => (
+                      <div key={i} className="group relative h-16 w-16 overflow-hidden rounded-xl border border-neutral-200">
+                        <Image src={url} alt={`Gallery ${i}`} fill sizes="64px" className="object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(i)}
+                          className="absolute inset-0 bg-black/40 opacity-0 flex items-center justify-center text-white transition group-hover:opacity-100"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-neutral-500">No gallery images</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -482,6 +572,7 @@ function normalizeProductInput(form: ProductInput, tagText: string): ProductInpu
     description: form.description.trim(),
     category: form.category.trim(),
     imageUrl: form.imageUrl.trim(),
+    gallery: form.gallery || [],
     cloudinaryPublicId: form.cloudinaryPublicId?.trim() || "",
     tags: tagText
       .split(",")

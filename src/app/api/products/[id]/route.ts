@@ -103,3 +103,56 @@ export async function DELETE(
     );
   }
 }
+
+// PUT /api/products/:id — admin: update a product
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const authHeader = request.headers.get("Authorization");
+
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized: Missing token" },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.slice(7);
+    await verifyAdminIdToken(token); // Throws if not admin
+
+    const body = await request.json();
+    const db = getFirestoreDb();
+    const productRef = db.collection("products").doc(id);
+    
+    // First check if it exists
+    const docSnap = await productRef.get();
+    if (!docSnap.exists) {
+      return NextResponse.json(
+        { success: false, error: "Product not found" },
+        { status: 404 }
+      );
+    }
+
+    await productRef.update({
+      ...body,
+      updatedAt: new Date(),
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Product updated successfully",
+    });
+  } catch (error) {
+    console.error("[PUT /api/products/:id]", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to update product",
+      },
+      { status: 500 }
+    );
+  }
+}

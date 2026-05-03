@@ -22,6 +22,7 @@ export type Product = {
   price: number;
   stock: number;
   imageUrl: string;
+  gallery?: string[];
   cloudinaryPublicId?: string;
   tags: string[];
   status: ProductStatus;
@@ -36,6 +37,7 @@ export type ProductInput = {
   price: number;
   stock: number;
   imageUrl: string;
+  gallery?: string[];
   cloudinaryPublicId?: string;
   tags: string[];
   status: ProductStatus;

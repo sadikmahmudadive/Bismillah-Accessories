@@ -49,3 +49,45 @@ export async function GET(request: Request) {
     );
   }
 }
+
+// POST /api/products — admin: create a product
+export async function POST(request: Request) {
+  try {
+    const authHeader = request.headers.get("Authorization");
+
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized: Missing token" },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.slice(7);
+    const { verifyAdminIdToken } = await import("@/lib/firebase/admin");
+    await verifyAdminIdToken(token); // Throws if not admin
+
+    const body = await request.json();
+    const db = getFirestoreDb();
+    
+    const docRef = await db.collection("products").add({
+      ...body,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: { id: docRef.id },
+      message: "Product created successfully",
+    });
+  } catch (error) {
+    console.error("[POST /api/products]", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to create product",
+      },
+      { status: 500 }
+    );
+  }
+}
