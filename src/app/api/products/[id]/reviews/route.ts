@@ -25,7 +25,21 @@ export async function GET(
       createdAt: doc.data().createdAt?.toDate?.()?.toISOString?.() ?? doc.data().createdAt,
     }));
 
-    return NextResponse.json({ success: true, data: reviews });
+    // Calculate distribution
+    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    reviews.forEach(r => {
+      const rating = Math.round(Number(r.rating)) as keyof typeof distribution;
+      if (distribution[rating] !== undefined) distribution[rating]++;
+    });
+
+    return NextResponse.json({ 
+      success: true, 
+      data: reviews,
+      summary: {
+        total: reviews.length,
+        distribution
+      }
+    });
   } catch (error) {
     console.error(`[GET /api/products/${productId}/reviews]`, error);
     return NextResponse.json({ success: false, error: "Failed to fetch reviews" }, { status: 500 });
@@ -64,6 +78,24 @@ export async function POST(
 
     const db = getFirestoreDb();
     
+    // Check if user has purchased the product
+    const ordersSnap = await db.collection("orders")
+      .where("userId", "==", decodedToken.uid)
+      .where("status", "==", "delivered")
+      .get();
+    
+    const hasPurchased = ordersSnap.docs.some(doc => {
+      const items = doc.data().items || [];
+      return items.some((item: any) => item.id === productId);
+    });
+
+    if (!hasPurchased) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Only customers who have purchased and received this product can leave a review." 
+      }, { status: 403 });
+    }
+
     // Check if user already reviewed
     const existingReviews = await db
       .collection("products")
@@ -82,6 +114,7 @@ export async function POST(
       userName: userName || decodedToken.name || decodedToken.email?.split("@")[0] || "Anonymous",
       rating: Number(rating),
       comment: String(comment || "").trim(),
+      isVerified: true, // Enforced by check above
       createdAt: new Date(),
     };
 

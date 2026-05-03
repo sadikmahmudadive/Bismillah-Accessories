@@ -9,6 +9,7 @@ import {
   Package,
   Ticket,
   History,
+  MessageSquare,
 } from "lucide-react";
 
 import { AuthGate } from "@/components/auth/auth-gate";
@@ -17,9 +18,10 @@ import { ProductManager } from "@/components/admin/product-manager";
 import { PromoManager } from "@/components/admin/promo-manager";
 import { AdminOverview } from "@/components/admin/admin-overview";
 import { StockHistory } from "@/components/admin/stock-history";
+import { ReviewManager } from "@/components/admin/review-manager";
 import { cn } from "@/lib/utils";
 
-type AdminTab = "overview" | "products" | "orders" | "promos" | "history";
+type AdminTab = "overview" | "products" | "orders" | "promos" | "history" | "reviews";
 
 export function AdminDashboardShell() {
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
@@ -105,6 +107,12 @@ export function AdminDashboardShell() {
                 icon={History}
                 label="History"
               />
+              <TabButton 
+                active={activeTab === "reviews"} 
+                onClick={() => setActiveTab("reviews")}
+                icon={MessageSquare}
+                label="Reviews"
+              />
             </div>
           </div>
         </motion.div>
@@ -152,7 +160,7 @@ export function AdminDashboardShell() {
               >
                 <PromoManager />
               </motion.div>
-            ) : (
+            ) : activeTab === "history" ? (
               <motion.div
                 key="history"
                 initial={{ opacity: 0, y: 10 }}
@@ -161,6 +169,16 @@ export function AdminDashboardShell() {
                 transition={{ duration: 0.3 }}
               >
                 <StockHistory />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="reviews"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ReviewManager />
               </motion.div>
             )}
           </AnimatePresence>
