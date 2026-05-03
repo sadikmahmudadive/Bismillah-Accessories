@@ -81,10 +81,11 @@ export async function getActiveProducts() {
 export async function getAdminProducts() {
   if (typeof window === "undefined") {
     const { getFirestoreDb } = require("@/lib/firebase/admin");
-    const { collection, getDocs } = require("firebase-admin/firestore");
     const db = getFirestoreDb();
-    const snap = await getDocs(collection(db, PRODUCTS_COLLECTION));
-    return snap.docs.map((d: any) => ({ id: d.id, ...d.data() })).sort((a: any, b: any) => a.name.localeCompare(b.name));
+    const snap = await db.collection(PRODUCTS_COLLECTION).get();
+    return snap.docs
+      .map((d: any) => ({ id: d.id, ...d.data() }))
+      .sort((a: any, b: any) => a.name.localeCompare(b.name));
   }
 
   const database = getFirestoreDb();
@@ -92,15 +93,20 @@ export async function getAdminProducts() {
   const { collection, getDocs } = require("firebase/firestore");
   const snapshot = await getDocs(collection(database, PRODUCTS_COLLECTION));
 
-  return snapshot.docs.map(mapProductDoc).sort((a: any, b: any) => a.name.localeCompare(b.name));
+  return snapshot.docs
+    .map(mapProductDoc)
+    .sort((a: any, b: any) => a.name.localeCompare(b.name));
 }
 
 export async function getProductBySlug(slug: string) {
   if (typeof window === "undefined") {
     const { getFirestoreDb } = require("@/lib/firebase/admin");
-    const { collection, query, where, getDocs } = require("firebase-admin/firestore");
     const db = getFirestoreDb();
-    const snap = await getDocs(query(collection(db, PRODUCTS_COLLECTION), where("slug", "==", slug)));
+    const snap = await db
+      .collection(PRODUCTS_COLLECTION)
+      .where("slug", "==", slug)
+      .limit(1)
+      .get();
     const doc = snap.docs[0];
     return doc ? { id: doc.id, ...(doc.data() as any) } : null;
   }
@@ -108,7 +114,13 @@ export async function getProductBySlug(slug: string) {
   const database = getFirestoreDb();
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { collection, query, where, getDocs } = require("firebase/firestore");
-  const snapshot = await getDocs(query(collection(database, PRODUCTS_COLLECTION), where("slug", "==", slug)));
+  const snapshot = await getDocs(
+    query(
+      collection(database, PRODUCTS_COLLECTION),
+      where("slug", "==", slug),
+      where("status", "==", "active")
+    )
+  );
 
   const product = snapshot.docs.at(0);
   return product ? mapProductDoc(product) : null;
@@ -117,17 +129,16 @@ export async function getProductBySlug(slug: string) {
 export async function getProductById(id: string) {
   if (typeof window === "undefined") {
     const { getFirestoreDb } = require("@/lib/firebase/admin");
-    const { doc, getDoc } = require("firebase-admin/firestore");
     const db = getFirestoreDb();
-    const snapshot = await getDoc(doc(db, PRODUCTS_COLLECTION, id));
-    if (!snapshot.exists()) return null;
+    const snapshot = await db.collection(PRODUCTS_COLLECTION).doc(id).get();
+    if (!snapshot.exists) return null;
     return { id: snapshot.id, ...snapshot.data() } as Product;
   }
 
   const database = getFirestoreDb();
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { doc, getDoc } = require("firebase/firestore");
-    const snapshot = await getDoc(doc(database, PRODUCTS_COLLECTION, id));
+  const snapshot = await getDoc(doc(database, PRODUCTS_COLLECTION, id));
 
   if (!snapshot.exists()) {
     return null;

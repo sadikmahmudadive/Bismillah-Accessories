@@ -15,7 +15,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
-import { productCategories } from "@/lib/products";
+import { productCategories, createProductSlug } from "@/lib/products";
 
 // Simplified admin operations using client-side Firestore
 import { collection, addDoc, doc, getDoc, updateDoc, deleteDoc, getDocs, serverTimestamp } from "firebase/firestore";
@@ -131,8 +131,10 @@ export function ProductManager() {
       if (editingId) {
         console.log("Updating product", editingId);
         const productRef = doc(db, "products", editingId);
+        const slug = createProductSlug(productInput.name);
         await updateDoc(productRef, {
           ...productInput,
+          slug,
           updatedAt: serverTimestamp(),
         });
         console.log("Product updated successfully");
@@ -140,8 +142,10 @@ export function ProductManager() {
       } else {
         console.log("Creating new product");
         const productsRef = collection(db, "products");
+        const slug = createProductSlug(productInput.name);
         await addDoc(productsRef, {
           ...productInput,
+          slug,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });

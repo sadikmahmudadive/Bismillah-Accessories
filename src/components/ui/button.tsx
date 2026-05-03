@@ -28,7 +28,7 @@ type ButtonLinkProps = ComponentPropsWithoutRef<typeof Link> & {
   showArrow?: boolean;
 };
 
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 
 export function Button({
   className,

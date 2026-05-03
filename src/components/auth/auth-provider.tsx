@@ -52,21 +52,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const userProfile = await getUserProfile(nextUser);
-      setProfile(userProfile);
-      
+
       if (!userProfile) {
-        console.warn(`ℹ️ No Firestore profile found for user ${nextUser.uid}. This is normal for fresh signups if Firestore is not yet provisioned.`);
+        // No Firestore profile yet — build a stub from Auth data so the app
+        // can function without a DB write (e.g. social sign-in, legacy users).
+        setProfile({
+          id: nextUser.uid,
+          email: nextUser.email ?? "",
+          displayName:
+            nextUser.displayName ||
+            nextUser.email?.split("@")[0] ||
+            "Customer",
+          role: "customer",
+          // Timestamps will be absent — cast to avoid needing a real Timestamp
+          createdAt: null as unknown as import("firebase/firestore").Timestamp,
+          updatedAt: null as unknown as import("firebase/firestore").Timestamp,
+        });
+      } else {
+        setProfile(userProfile);
       }
     } catch (error) {
       console.error("🔴 Firestore Error:", error);
-      
-      // Show error to user but allow them to continue with cached auth
+
       if (error instanceof Error && error.message.includes("Database")) {
-        setAuthError("⚠️ Firestore Database Error: Please ensure you've created a Firestore database in Firebase Console > Firestore Database, and have proper security rules allowing authenticated users to write to /users collection.");
+        setAuthError(
+          "⚠️ Firestore Database Error: Please ensure you've created a Firestore database in Firebase Console > Firestore Database."
+        );
       } else {
         setAuthError(getFriendlyAuthError(error));
       }
-      
+
       setProfile(null);
     }
   }, []);

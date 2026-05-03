@@ -1,8 +1,20 @@
 import type { Metadata } from "next";
-import { AuthProvider } from "@/components/auth/auth-provider";
-import { Footer } from "@/components/layout/footer";
-import { Navbar } from "@/components/layout/navbar";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+import { AuthProvider } from "@/components/auth/auth-provider";
+import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: {
@@ -10,7 +22,8 @@ export const metadata: Metadata = {
     template: "%s | Bismillah Accessories",
   },
   description:
-    "Premium accessories e-commerce storefront with COD, bKash, cart, checkout, and admin workflows.",
+    "Premium mobile accessories, everyday tech essentials, and gift-ready add-ons.",
+  keywords: ["accessories", "mobile cases", "tech gear", "Bismillah Accessories"],
 };
 
 export default function RootLayout({
@@ -20,7 +33,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className="flex min-h-full flex-col antialiased">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} flex min-h-full flex-col antialiased`}
+      >
         <AuthProvider>
           <Navbar />
           <div className="flex-1">{children}</div>

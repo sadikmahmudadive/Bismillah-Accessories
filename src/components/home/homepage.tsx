@@ -1,8 +1,25 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { Check, CreditCard, PackageCheck, ShieldCheck, Sparkles, Truck } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  motion,
+  useMotionValue,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import {
+  ArrowRight,
+  Award,
+  CreditCard,
+  PackageCheck,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Truck,
+  Zap,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 import { HeroScene } from "@/components/home/hero-scene";
 import { ProductCard } from "@/components/product/product-card";
@@ -10,13 +27,27 @@ import { ButtonLink } from "@/components/ui/button";
 import { ProductCardSkeleton } from "@/components/ui/loader";
 import type { Product } from "@/types/domain";
 
-// We'll fetch real products instead of using hardcoded ones
-
 const benefits = [
-  { icon: Truck, label: "Fast local delivery" },
-  { icon: CreditCard, label: "COD and bKash ready" },
-  { icon: ShieldCheck, label: "Admin-controlled catalog" },
-  { icon: PackageCheck, label: "Order tracking foundation" },
+  { icon: Truck, label: "Fast delivery", sub: "Dhaka & nationwide" },
+  { icon: CreditCard, label: "COD & bKash", sub: "Flexible payments" },
+  { icon: ShieldCheck, label: "Quality checked", sub: "Every item verified" },
+  { icon: PackageCheck, label: "Easy returns", sub: "7-day policy" },
+];
+
+const stats = [
+  { value: "500+", label: "Products" },
+  { value: "10k+", label: "Happy customers" },
+  { value: "4.9★", label: "Average rating" },
+  { value: "48h", label: "Avg delivery" },
+];
+
+const categories = [
+  { name: "Phone Cases", emoji: "📱", href: "/products?category=Phone+Case" },
+  { name: "Charging", emoji: "⚡", href: "/products?category=Charging" },
+  { name: "Protection", emoji: "🛡️", href: "/products?category=Protection" },
+  { name: "Audio", emoji: "🎧", href: "/products?category=Audio" },
+  { name: "Smart Watch", emoji: "⌚", href: "/products?category=Watch" },
+  { name: "Storage", emoji: "💾", href: "/products?category=Storage" },
 ];
 
 export function Homepage() {
@@ -26,229 +57,397 @@ export function Homepage() {
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const smoothX = useSpring(mouseX, { stiffness: 80, damping: 18 });
-  const smoothY = useSpring(mouseY, { stiffness: 80, damping: 18 });
-  const glowX = useTransform(smoothX, (value) => `${value}px`);
-  const glowY = useTransform(smoothY, (value) => `${value}px`);
+  const smoothX = useSpring(mouseX, { stiffness: 60, damping: 20 });
+  const smoothY = useSpring(mouseY, { stiffness: 60, damping: 20 });
+  const glowX = useTransform(smoothX, (v) => `${v}px`);
+  const glowY = useTransform(smoothY, (v) => `${v}px`);
+
+  const productsRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: productsRef,
+    offset: ["start end", "end start"],
+  });
+  const productsOpacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
+  const productsY = useTransform(scrollYProgress, [0, 0.2], [40, 0]);
 
   useEffect(() => {
-    const handlePointer = (event: PointerEvent) => {
-      mouseX.set(event.clientX);
-      mouseY.set(event.clientY);
+    const handlePointer = (e: PointerEvent) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
     };
-
     window.addEventListener("pointermove", handlePointer);
     return () => window.removeEventListener("pointermove", handlePointer);
   }, [mouseX, mouseY]);
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
+    const fetchFeatured = async () => {
       try {
         setIsLoadingProducts(true);
         setProductsError(null);
-
-        console.log("🏠 Fetching featured products for homepage");
-        const response = await fetch('/api/products?limit=4&sortBy=newest');
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.status}`);
-        }
-
-        const data = await response.json();
-
+        const res = await fetch("/api/products?limit=4&sortBy=newest");
+        if (!res.ok) throw new Error(`${res.status}`);
+        const data = await res.json();
         if (data.success) {
-          // Take only the first 4 active products
-          const activeProducts = data.data.filter((product: Product) => product.status === 'active');
-          setFeaturedProducts(activeProducts.slice(0, 4));
-          console.log(`✅ Loaded ${activeProducts.length} featured products`);
+          const active = (data.data as Product[]).filter(
+            (p) => p.status === "active"
+          );
+          setFeaturedProducts(active.slice(0, 4));
         } else {
-          throw new Error(data.error || 'Failed to load products');
+          throw new Error(data.error || "Failed");
         }
-      } catch (error) {
-        console.error('❌ Error fetching featured products:', error);
-        setProductsError(error instanceof Error ? error.message : 'Failed to load products');
+      } catch (err) {
+        setProductsError(
+          err instanceof Error ? err.message : "Failed to load products"
+        );
       } finally {
         setIsLoadingProducts(false);
       }
     };
-
-    fetchFeaturedProducts();
+    void fetchFeatured();
   }, []);
 
   return (
     <main className="relative isolate overflow-hidden bg-[#fafaf8] text-neutral-950">
+      {/* Cursor glow */}
       <motion.div
-        aria-hidden="true"
-        className="pointer-events-none fixed left-0 top-0 z-50 hidden size-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#2f9e74]/10 blur-3xl lg:block"
+        aria-hidden
+        className="pointer-events-none fixed left-0 top-0 z-50 hidden size-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#2f9e74]/8 blur-3xl lg:block"
         style={{ x: glowX, y: glowY }}
       />
 
+      {/* ─── Hero ─────────────────────────────────────────────────────── */}
       <section className="relative min-h-[calc(100svh-4rem)] px-4 pb-16 pt-14 sm:px-6 lg:px-8">
         <HeroScene />
-        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+
+        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <motion.div
-            initial={{ opacity: 0, y: 22 }}
+            initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: "easeOut" }}
-            className="max-w-3xl"
+            transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/70 px-3 py-1 text-sm font-semibold text-neutral-700 shadow-sm backdrop-blur">
-              <Sparkles className="size-4 text-[#b8860b]" />
-              Premium accessories commerce starter
-            </div>
-            <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-[1.03] tracking-normal text-neutral-950 sm:text-6xl lg:text-7xl">
-              Bismillah Accessories
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.15, duration: 0.5 }}
+              className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/80 px-4 py-1.5 text-sm font-semibold text-neutral-700 shadow-sm backdrop-blur"
+            >
+              <Sparkles className="size-3.5 text-[#b8860b]" />
+              Bangladesh&apos;s premium accessory store
+            </motion.div>
+
+            <h1 className="mt-6 max-w-2xl text-5xl font-bold leading-[1.05] tracking-tight text-neutral-950 sm:text-6xl lg:text-7xl">
+              Bismillah{" "}
+              <span className="bg-gradient-to-r from-[#2f9e74] to-[#1a6b4a] bg-clip-text text-transparent">
+                Accessories
+              </span>
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-neutral-650">
-              A polished e-commerce foundation for mobile accessories, with a
-              fast storefront, cart-ready interaction model, and admin workflows
-              planned around Firebase, Cloudinary, COD, and bKash.
+
+            <p className="mt-6 max-w-xl text-lg leading-8 text-neutral-600">
+              Premium mobile accessories, everyday tech essentials, and
+              gift-ready add-ons — with fast delivery across Bangladesh.
             </p>
+
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href="/products" showArrow>
                 Browse products
               </ButtonLink>
-              <ButtonLink href="/admin" variant="secondary">
-                Open admin
+              <ButtonLink href="/auth" variant="secondary">
+                Create account
               </ButtonLink>
             </div>
+
+            {/* Benefit chips */}
             <div className="mt-10 grid max-w-xl grid-cols-2 gap-3 sm:grid-cols-4">
-              {benefits.map((item) => (
+              {benefits.map((item, i) => (
                 <motion.div
                   key={item.label}
-                  whileHover={{ y: -4 }}
-                  className="rounded-3xl border border-neutral-200 bg-white/75 p-4 shadow-sm backdrop-blur"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + i * 0.07 }}
+                  whileHover={{ y: -4, scale: 1.03 }}
+                  className="rounded-2xl border border-neutral-200 bg-white/80 p-3.5 shadow-sm backdrop-blur"
                 >
                   <item.icon className="size-5 text-[#2f9e74]" />
-                  <p className="mt-3 text-sm font-semibold leading-5 text-neutral-700">
+                  <p className="mt-2.5 text-sm font-semibold leading-5 text-neutral-800">
                     {item.label}
                   </p>
+                  <p className="text-xs text-neutral-500">{item.sub}</p>
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
+          {/* Hero card */}
           <motion.div
-            id="operations"
-            initial={{ opacity: 0, scale: 0.96, y: 24 }}
+            initial={{ opacity: 0, scale: 0.94, y: 28 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.12, ease: "easeOut" }}
-            className="relative"
+            transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
+            className="relative hidden lg:block"
           >
-            <div className="rounded-[2rem] border border-white/70 bg-white/78 p-3 shadow-[0_30px_90px_rgba(31,31,31,0.16)] backdrop-blur-2xl">
-              <div className="rounded-[1.55rem] border border-neutral-200 bg-[#f6f4ee] p-4">
+            <div className="rounded-[2rem] border border-white/80 bg-white/85 p-4 shadow-[0_32px_96px_rgba(0,0,0,0.14)] backdrop-blur-2xl">
+              <div className="rounded-[1.6rem] border border-neutral-100 bg-[#f6f4ee] p-5">
+                {/* Card header */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-neutral-500">
-                      Today&apos;s storefront
+                    <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
+                      Store status
                     </p>
-                    <h2 className="mt-1 text-2xl font-semibold text-neutral-950">
-                      Live preview
-                    </h2>
+                    <p className="mt-1 text-2xl font-bold text-neutral-950">
+                      Live & ready
+                    </p>
                   </div>
-                  <div className="rounded-full bg-neutral-950 px-3 py-1 text-xs font-semibold text-white">
-                    Phase 1
-                  </div>
+                  <span className="flex items-center gap-1.5 rounded-full bg-[#2f9e74]/15 px-3 py-1.5 text-xs font-bold text-[#257a5a]">
+                    <span className="size-2 rounded-full bg-[#2f9e74] animate-pulse" />
+                    Online
+                  </span>
                 </div>
-                <div className="mt-5 grid gap-3">
-                  {isLoadingProducts ? (
-                    // Show loading skeletons
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between rounded-2xl bg-white p-3 shadow-sm"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="size-12 rounded-2xl bg-neutral-200 animate-pulse" />
-                          <div>
-                            <div className="h-4 w-32 bg-neutral-200 rounded animate-pulse mb-1" />
-                            <div className="h-3 w-20 bg-neutral-200 rounded animate-pulse" />
-                          </div>
-                        </div>
-                        <Check className="size-5 text-[#2f9e74]" />
-                      </div>
-                    ))
-                  ) : featuredProducts.length > 0 ? (
-                    featuredProducts.slice(0, 3).map((product) => (
-                      <div
-                        key={product.id}
-                        className="flex items-center justify-between rounded-2xl bg-white p-3 shadow-sm"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="size-12 rounded-2xl bg-neutral-200 flex items-center justify-center text-xs font-bold text-neutral-600">
-                            {product.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-neutral-950">
-                              {product.name}
-                            </p>
-                            <p className="text-xs font-medium text-neutral-500">
-                              {product.category}
-                            </p>
-                          </div>
-                        </div>
-                        <Check className="size-5 text-[#2f9e74]" />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-4">
-                      <p className="text-sm text-neutral-500">
-                        {productsError ? "Failed to load products" : "No products available"}
+
+                {/* Stats */}
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  {stats.map((s) => (
+                    <div
+                      key={s.label}
+                      className="rounded-2xl bg-white px-4 py-3 shadow-sm"
+                    >
+                      <p className="text-xl font-bold text-neutral-950">
+                        {s.value}
                       </p>
+                      <p className="text-xs text-neutral-500">{s.label}</p>
                     </div>
-                  )}
+                  ))}
+                </div>
+
+                {/* Recent activity */}
+                <div className="mt-4 space-y-2">
+                  {[
+                    { text: "New order placed — Phone Case", time: "2m ago" },
+                    { text: "Charging Cable sold out", time: "14m ago" },
+                    { text: "bKash payment confirmed", time: "31m ago" },
+                  ].map((item) => (
+                    <div
+                      key={item.text}
+                      className="flex items-center justify-between rounded-xl bg-white px-3 py-2.5 shadow-sm"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className="size-2 rounded-full bg-[#2f9e74]" />
+                        <span className="text-xs font-medium text-neutral-700">
+                          {item.text}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-neutral-400">
+                        {item.time}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
+
+            {/* Floating review badge */}
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+              className="absolute -bottom-4 -left-6 flex items-center gap-2.5 rounded-2xl bg-white px-4 py-3 shadow-xl"
+            >
+              <div className="flex -space-x-1.5">
+                {["#2f9e74", "#b8860b", "#d65f5f"].map((c) => (
+                  <span
+                    key={c}
+                    className="grid size-7 place-items-center rounded-full border-2 border-white text-[10px] font-bold text-white"
+                    style={{ background: c }}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-neutral-950">4.9 / 5.0</p>
+                <p className="text-[11px] text-neutral-500">from 2.4k reviews</p>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      <section id="products" className="px-4 py-16 sm:px-6 lg:px-8">
+      {/* ─── Stats bar ────────────────────────────────────────────────── */}
+      <section className="border-y border-neutral-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {[
+              { icon: Award, label: "Premium Quality", value: "100%" },
+              { icon: Truck, label: "Delivery Coverage", value: "Nationwide" },
+              { icon: Star, label: "Customer Rating", value: "4.9 / 5" },
+              { icon: Zap, label: "Order Processing", value: "Same day" },
+            ].map((item, i) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="flex items-center gap-3"
+              >
+                <div className="grid size-10 shrink-0 place-items-center rounded-full bg-[#f6f4ee]">
+                  <item.icon className="size-4 text-[#2f9e74]" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-neutral-950">
+                    {item.value}
+                  </p>
+                  <p className="text-xs text-neutral-500">{item.label}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Shop by Category ─────────────────────────────────────────── */}
+      <section className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55 }}
+          >
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e74]">
+              Categories
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              Shop by type
+            </h2>
+          </motion.div>
+
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            {categories.map((cat, i) => (
+              <motion.div
+                key={cat.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06, duration: 0.4 }}
+                whileHover={{ y: -6, scale: 1.04 }}
+              >
+                <Link
+                  href={cat.href}
+                  className="flex flex-col items-center gap-3 rounded-[1.75rem] border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#2f9e74]/40 hover:shadow-lg"
+                >
+                  <span className="text-3xl">{cat.emoji}</span>
+                  <span className="text-center text-sm font-semibold text-neutral-800">
+                    {cat.name}
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Featured Products ────────────────────────────────────────── */}
+      <section
+        ref={productsRef}
+        id="products"
+        className="bg-[#f6f4ee] px-4 py-16 sm:px-6 lg:px-8"
+      >
+        <motion.div
+          className="mx-auto max-w-7xl"
+          style={{ opacity: productsOpacity, y: productsY }}
+        >
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#2f9e74]">
-                Featured Products
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e74]">
+                Featured
               </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-normal sm:text-4xl">
-                Shop our bestsellers
+              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+                Bestsellers
               </h2>
             </div>
-            <p className="max-w-xl text-sm leading-6 text-neutral-600">
-              Discover premium mobile accessories with fast delivery and COD
-              payments. Browse our curated collection of cases, cables, and
-              protection.
-            </p>
+            <ButtonLink href="/products" variant="secondary" showArrow>
+              View all products
+            </ButtonLink>
           </div>
 
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {isLoadingProducts ? (
-              // Show loading skeletons
               Array.from({ length: 4 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />
               ))
             ) : featuredProducts.length > 0 ? (
-              featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              featuredProducts.map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08, duration: 0.45 }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
               ))
             ) : (
-              <div className="col-span-full text-center py-12">
-                <p className="text-neutral-500 mb-4">
-                  {productsError ? "Failed to load products" : "No products available"}
+              <div className="col-span-full rounded-[2rem] border border-dashed border-neutral-300 bg-white py-16 text-center">
+                <p className="text-neutral-500">
+                  {productsError
+                    ? "Failed to load products"
+                    : "No products yet — add some in the admin panel."}
                 </p>
-                <ButtonLink href="/admin" variant="secondary">
-                  {productsError ? "Check admin panel" : "Add products"}
-                </ButtonLink>
+                <div className="mt-6 flex justify-center gap-3">
+                  <ButtonLink href="/admin" variant="secondary">
+                    Open admin
+                  </ButtonLink>
+                </div>
               </div>
             )}
           </div>
+        </motion.div>
+      </section>
 
-          <div className="mt-12 flex justify-center">
-            <ButtonLink href="/products" showArrow>
-              Browse all products
-            </ButtonLink>
-          </div>
+      {/* ─── CTA Banner ───────────────────────────────────────────────── */}
+      <section className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative overflow-hidden rounded-[2.5rem] bg-neutral-950 px-8 py-14 text-center sm:px-16"
+          >
+            {/* Background glow */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+              <div className="absolute -left-32 -top-32 size-96 rounded-full bg-[#2f9e74]/20 blur-3xl" />
+              <div className="absolute -bottom-32 -right-32 size-96 rounded-full bg-[#b8860b]/15 blur-3xl" />
+            </div>
+
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white/80">
+                <Sparkles className="size-3.5 text-[#b8860b]" />
+                Limited time offer
+              </div>
+              <h2 className="mt-6 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
+                Free delivery on orders <br className="hidden sm:block" />
+                over ৳999
+              </h2>
+              <p className="mx-auto mt-4 max-w-lg text-base text-white/70">
+                Shop now and enjoy free home delivery on any order above ৳999.
+                Valid for Cash on Delivery and bKash payments.
+              </p>
+              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                <Link
+                  href="/products"
+                  className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-neutral-950 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
+                >
+                  Shop now <ArrowRight className="size-4" />
+                </Link>
+                <Link
+                  href="/auth"
+                  className="inline-flex h-12 items-center gap-2 rounded-full border border-white/25 px-6 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                  Create account
+                </Link>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
     </main>
