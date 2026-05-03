@@ -164,30 +164,58 @@ export function ProductManager() {
   }
 
   async function handleDelete(product: Product) {
-    const confirmed = window.confirm(`Delete ${product.name}? This cannot be undone.`);
+    if (!product.id) {
+      console.error("❌ Cannot delete product: Missing ID", product);
+      setError("Cannot delete product: Missing ID");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${product.name}"? This action cannot be undone.`
+    );
     if (!confirmed) return;
 
     setIsLoading(true);
     setError(null);
     setMessage(null);
 
-    if (!user) {
-      setError("Not authenticated");
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      console.log("Deleting product", product.id);
-      const db = getFirestore(getFirebaseClientApp());
-      const productRef = doc(db, "products", product.id);
-      await deleteDoc(productRef);
-      console.log("Product deleted successfully");
-      setMessage("Product deleted.");
+      console.log("🗑️ Attempting to delete product via API:", product.id, product.name);
+      
+      if (!user) {
+        throw new Error("You must be signed in to perform this action.");
+      }
+
+      const token = await user.getIdToken();
+      const response = await fetch(`/api/products/${product.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const payload = await response.json();
+      
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error || "Failed to delete product.");
+      }
+      
+      console.log("✅ Product deleted successfully via API:", product.id);
+      setMessage(`"${product.name}" has been deleted.`);
+      
+      // Refresh the list
       await loadProducts();
-    } catch (deleteError) {
-      console.error("Delete error:", deleteError);
-      setError(getErrorMessage(deleteError));
+    } catch (err: any) {
+      console.error("❌ Delete error:", err);
+      
+      let friendlyError = "Failed to delete product.";
+      if (err?.code === "permission-denied") {
+        friendlyError = "Permission denied. You don't have rights to delete products.";
+      } else if (err?.message) {
+        friendlyError = err.message;
+      }
+      
+      setError(friendlyError);
     } finally {
       setIsLoading(false);
     }
@@ -426,7 +454,8 @@ export function ProductManager() {
                     type="button"
                     variant="secondary"
                     className="size-10 px-0 text-[#8f3434]"
-                    onClick={() => void handleDelete(product)}
+                    onClick={() => handleDelete(product)}
+                    disabled={isLoading}
                   >
                     <Trash2 className="size-4" />
                   </Button>

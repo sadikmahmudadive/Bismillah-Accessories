@@ -68,32 +68,37 @@ export function ProductCard({
       transition={{ type: "spring", stiffness: 260, damping: 22 }}
       className="group rounded-[1.75rem] border border-neutral-200 bg-white p-3 shadow-sm transition hover:shadow-2xl hover:shadow-neutral-950/10"
     >
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[1.35rem] bg-neutral-100">
-        {displayImage ? (
-          <Image
-            src={displayImage}
-            alt={displayName}
-            fill
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `radial-gradient(circle at 30% 20%, ${accent}55, transparent 34%), linear-gradient(135deg, #f8faf8, #ece8de 48%, #f7f7f3)`,
-            }}
-          />
-        )}
-        <div className="absolute bottom-3 left-3 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-neutral-700 backdrop-blur">
-          {displayCategory}
+      <Link href={productLink || "#"} className="block">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[1.35rem] bg-neutral-100">
+          {displayImage ? (
+            <Image
+              src={displayImage}
+              alt={displayName}
+              fill
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover transition duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `radial-gradient(circle at 30% 20%, ${accent}55, transparent 34%), linear-gradient(135deg, #f8faf8, #ece8de 48%, #f7f7f3)`,
+              }}
+            />
+          )}
+          <div className="absolute bottom-3 left-3 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-neutral-700 backdrop-blur">
+            {displayCategory}
+          </div>
         </div>
-      </div>
+      </Link>
+
       <div className="p-3">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="text-base font-semibold text-neutral-950 flex-1 line-clamp-2">
-            {displayName}
-          </h3>
+          <Link href={productLink || "#"} className="flex-1 min-w-0">
+            <h3 className="text-base font-semibold text-neutral-950 line-clamp-2 hover:text-neutral-700 transition">
+              {displayName}
+            </h3>
+          </Link>
           {productLink ? (
             <Link
               href={productLink}
