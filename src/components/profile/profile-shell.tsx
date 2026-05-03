@@ -313,22 +313,33 @@ function TabButton({ active, onClick, icon: Icon, label }: any) {
 }
 
 function OrderRow({ order }: { order: Order }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
   const statusConfig = {
-    pending: { color: "bg-amber-100 text-amber-700", icon: Clock },
-    confirmed: { color: "bg-blue-100 text-blue-700", icon: CheckCircle2 },
-    processing: { color: "bg-indigo-100 text-indigo-700", icon: Package },
-    shipped: { color: "bg-purple-100 text-purple-700", icon: Truck },
-    delivered: { color: "bg-emerald-100 text-emerald-700", icon: CheckCircle2 },
-    cancelled: { color: "bg-red-100 text-red-700", icon: XCircle },
+    pending: { color: "bg-amber-100 text-amber-700", icon: Clock, label: "Pending" },
+    confirmed: { color: "bg-blue-100 text-blue-700", icon: CheckCircle2, label: "Confirmed" },
+    processing: { color: "bg-indigo-100 text-indigo-700", icon: Package, label: "Processing" },
+    shipped: { color: "bg-purple-100 text-purple-700", icon: Truck, label: "Shipped" },
+    delivered: { color: "bg-emerald-100 text-emerald-700", icon: CheckCircle2, label: "Delivered" },
+    cancelled: { color: "bg-red-100 text-red-700", icon: XCircle, label: "Cancelled" },
   };
 
   const config = statusConfig[order.status as keyof typeof statusConfig] || statusConfig.pending;
 
   return (
-    <article className="group overflow-hidden rounded-[2rem] border border-neutral-200 bg-white transition hover:border-neutral-300 hover:shadow-md">
-      <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
+    <article className={cn(
+      "group overflow-hidden rounded-[2rem] border transition-all duration-300",
+      isExpanded ? "border-neutral-300 bg-neutral-50/30 shadow-lg" : "border-neutral-200 bg-white hover:border-neutral-300"
+    )}>
+      <div 
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="flex cursor-pointer flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div className="flex items-center gap-4">
-          <div className="grid size-12 place-items-center rounded-2xl bg-neutral-100 text-neutral-950 group-hover:bg-neutral-950 group-hover:text-white transition-colors">
+          <div className={cn(
+            "grid size-12 place-items-center rounded-2xl transition-colors duration-300",
+            isExpanded ? "bg-neutral-950 text-white" : "bg-neutral-100 text-neutral-950 group-hover:bg-neutral-950 group-hover:text-white"
+          )}>
             <Package className="size-5" />
           </div>
           <div>
@@ -350,10 +361,115 @@ function OrderRow({ order }: { order: Order }) {
             config.color
           )}>
             <config.icon className="size-3" />
-            {order.status}
+            {config.label}
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="border-t border-neutral-100 bg-white"
+          >
+            <div className="grid gap-8 p-8 md:grid-cols-2">
+              {/* Items Detail */}
+              <div className="space-y-4">
+                <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+                  <ShoppingBag className="size-3" /> Order Items
+                </h5>
+                <div className="space-y-2">
+                  {order.items.map((item, idx) => (
+                    <div key={idx} className="flex items-center justify-between rounded-2xl bg-neutral-50 p-4 text-sm font-medium">
+                      <div className="flex items-center gap-3">
+                        <span className="grid size-6 place-items-center rounded-full bg-neutral-200 text-[10px] font-bold">
+                          {item.quantity}
+                        </span>
+                        <span>{item.name}</span>
+                        {item.variantName && (
+                          <span className="text-[10px] font-bold text-neutral-400 uppercase">
+                            ({item.variantName})
+                          </span>
+                        )}
+                      </div>
+                      <span className="font-bold text-neutral-900">৳{(item.price * item.quantity).toLocaleString()}</span>
+                    </div>
+                  ))}
+                  
+                  <div className="mt-4 space-y-1.5 border-t border-neutral-100 pt-4 text-sm">
+                    <div className="flex justify-between text-neutral-500">
+                      <span>Subtotal</span>
+                      <span>৳{(order.subtotal || 0).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-neutral-500">
+                      <span>Delivery Fee</span>
+                      <span>৳{(order.deliveryFee || 0).toLocaleString()}</span>
+                    </div>
+                    {order.discountAmount && order.discountAmount > 0 && (
+                      <div className="flex justify-between text-emerald-600 font-bold">
+                        <span>Discount ({order.promoCode})</span>
+                        <span>-৳{order.discountAmount.toLocaleString()}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between pt-2 text-base font-black text-neutral-950">
+                      <span>Grand Total</span>
+                      <span>৳{order.total.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Delivery & Payment Info */}
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+                    <MapPin className="size-3" /> Delivery Details
+                  </h5>
+                  <div className="space-y-3 rounded-2xl border border-neutral-100 p-5 text-sm">
+                    <div className="flex items-center gap-3 font-bold text-neutral-900">
+                      <User className="size-4 text-neutral-400" />
+                      {order.customerName}
+                    </div>
+                    <div className="flex items-center gap-3 font-medium text-neutral-600">
+                      <Phone className="size-4 text-neutral-400" />
+                      {order.phone}
+                    </div>
+                    <div className="flex items-start gap-3 leading-relaxed text-neutral-600">
+                      <MapPin className="size-4 shrink-0 mt-1 text-neutral-400" />
+                      {order.address}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+                    <Truck className="size-3" /> Payment Method
+                  </h5>
+                  <div className="flex items-center gap-3 rounded-2xl bg-neutral-50 p-4 text-sm font-bold text-neutral-950">
+                    <div className="grid size-8 place-items-center rounded-lg bg-white shadow-sm">
+                      <ShoppingBag className="size-4 text-[#2f9e74]" />
+                    </div>
+                    {order.paymentMethod === "bkash_mock" ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-[#e2136e]">bKash</span>
+                        {order.bkashTransactionId && (
+                          <span className="rounded bg-neutral-200 px-1.5 py-0.5 font-mono text-[10px] uppercase">
+                            {order.bkashTransactionId}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      "Cash on Delivery"
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </article>
   );
 }

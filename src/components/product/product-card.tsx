@@ -38,7 +38,7 @@ export function ProductCard({
   const displayCategory = product?.category || category || "Accessory";
   const displayPrice = product?.price || price || 0;
   const displayImage = product?.imageUrl || imageUrl;
-  const productLink = product ? `/products/${product.slug}` : href;
+  const productLink = product ? `/products/${product.slug || product.id}` : href;
 
   const handleAddToCart = async () => {
     if (!product) return;

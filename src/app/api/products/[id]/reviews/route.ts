@@ -86,7 +86,7 @@ export async function POST(
     
     const hasPurchased = ordersSnap.docs.some(doc => {
       const items = doc.data().items || [];
-      return items.some((item: any) => item.id === productId);
+      return items.some((item: any) => (item.productId || item.id) === productId);
     });
 
     if (!hasPurchased) {

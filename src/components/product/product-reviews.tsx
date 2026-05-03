@@ -79,16 +79,30 @@ export function ProductReviews({ productId }: { productId: string }) {
   async function checkPurchaseStatus() {
     try {
       const token = await user?.getIdToken();
-      const res = await fetch("/api/orders/user", {
+      const res = await fetch(`/api/orders/user?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const payload = await res.json();
       if (res.ok) {
         const orders = payload.data || [];
-        const purchased = orders.some((o: any) => 
-          o.status === "delivered" && 
-          o.items.some((i: any) => i.id === productId)
-        );
+        console.log(`[checkPurchaseStatus] Found ${orders.length} orders for user`);
+        const purchased = orders.some((o: any) => {
+          const status = String(o.status || "").toLowerCase();
+          const isDelivered = status === "delivered";
+          const items = o.items || [];
+          
+          const hasProduct = items.some((i: any) => {
+            const pId = i.productId || i.id;
+            const match = pId === productId;
+            return match;
+          });
+
+          if (hasProduct && !isDelivered) {
+            console.log(`[checkPurchaseStatus] Found product in order ${o.id} but status is ${o.status}`);
+          }
+          
+          return isDelivered && hasProduct;
+        });
         setCanReview(purchased);
       }
     } catch (err) {

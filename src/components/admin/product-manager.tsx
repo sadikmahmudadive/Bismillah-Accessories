@@ -268,6 +268,43 @@ export function ProductManager() {
     }
   }
 
+  async function healProductData() {
+    if (!isAdmin || !user) return;
+    const confirmed = window.confirm("This will generate missing slugs for all products. Proceed?");
+    if (!confirmed) return;
+
+    setIsLoading(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const db = getFirestore(getFirebaseClientApp());
+      const productsRef = collection(db, "products");
+      const snapshot = await getDocs(productsRef);
+      
+      let fixedCount = 0;
+      for (const docSnap of snapshot.docs) {
+        const data = docSnap.data();
+        if (!data.slug) {
+          const newSlug = createProductSlug(data.name || "unnamed-product");
+          await updateDoc(doc(db, "products", docSnap.id), {
+            slug: newSlug,
+            updatedAt: serverTimestamp()
+          });
+          fixedCount++;
+        }
+      }
+      
+      setMessage(`Healed ${fixedCount} products.`);
+      await loadProducts();
+    } catch (err) {
+      console.error("Heal error:", err);
+      setError("Failed to heal data.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   async function handleImageUpload(file: File | null) {
     if (!file || !user) return;
     setIsUploading(true);
@@ -568,15 +605,28 @@ export function ProductManager() {
               {products.length} total, {activeCount} published
             </p>
           </div>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => void loadProducts()}
-            disabled={isLoading}
-          >
-            <RefreshCw className={cn("size-4", isLoading && "animate-spin")} />
-            Refresh
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => void loadProducts()}
+              disabled={isLoading}
+            >
+              <RefreshCw className={cn("size-4", isLoading && "animate-spin")} />
+              Refresh
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => void healProductData()}
+              disabled={isLoading}
+              className="text-amber-600 hover:bg-amber-50"
+              title="Fix missing slugs for all products"
+            >
+              <RefreshCw className={cn("size-4", isLoading && "animate-spin")} />
+              Heal Data
+            </Button>
+          </div>
         </div>
 
         <div className="mt-5 grid gap-3">

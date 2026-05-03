@@ -1,4 +1,4 @@
-import { getFirestoreDb } from "./admin";
+import { getFirestoreDb } from "./firebase/admin";
 
 export type StockLogType = "sale" | "restock" | "manual_adjustment" | "cancellation_refund";
 

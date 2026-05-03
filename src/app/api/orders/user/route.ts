@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getFirestoreDb } from "@/lib/firebase/admin";
 import { getFirebaseAuth } from "@/lib/firebase/server-auth";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get("Authorization");
@@ -22,16 +24,21 @@ export async function GET(request: NextRequest) {
     const snapshot = await db
       .collection("orders")
       .where("userId", "==", decodedToken.uid)
-      .orderBy("createdAt", "desc")
-      .limit(50)
       .get();
 
-    const orders = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate?.()?.toISOString() ?? null,
-      updatedAt: doc.data().updatedAt?.toDate?.()?.toISOString() ?? null,
-    }));
+    const orders = snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate?.()?.toISOString() ?? null,
+        updatedAt: doc.data().updatedAt?.toDate?.()?.toISOString() ?? null,
+      }))
+      .sort((a: any, b: any) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      })
+      .slice(0, 50);
 
     return NextResponse.json({ success: true, data: orders });
   } catch (error) {

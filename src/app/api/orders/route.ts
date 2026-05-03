@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       items,
       subtotal: Number(subtotal) || 0,
       deliveryFee: Number(deliveryFee) || 0,
-      promoCode: promoCode ? String(promoCode).toUpperCase().trim() : undefined,
+      promoCode: promoCode ? String(promoCode).toUpperCase().trim() : null,
       discountAmount: Number(discountAmount) || 0,
       total: Number(total) || 0,
       paymentMethod: paymentMethod as PaymentMethod,
@@ -99,7 +99,8 @@ export async function POST(request: NextRequest) {
     try {
       const { logStockChange } = await import("@/lib/stock");
       for (const item of items) {
-        const productRef = db.collection("products").doc(item.id);
+        const pId = item.productId || item.id;
+        const productRef = db.collection("products").doc(pId);
         const productSnap = await productRef.get();
         
         if (productSnap.exists) {
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
           });
 
           await logStockChange(
-            item.id,
+            pId,
             item.name,
             "sale",
             -(Number(item.quantity) || 1),
