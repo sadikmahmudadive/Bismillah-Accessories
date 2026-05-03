@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Heart,
   Menu,
   Search,
   ShieldCheck,
@@ -15,6 +16,7 @@ import { useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { useCartStore } from "@/lib/store/cart";
+import { useFavoritesStore } from "@/lib/store/favorites";
 import { ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +33,7 @@ export function Navbar() {
   const pathname = usePathname();
   const { isLoading, isAdmin, profile, signOut, user } = useAuth();
   const cartCount = useCartStore((state) => state.itemCount);
+  const favCount = useFavoritesStore((state) => state.itemCount);
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/6 bg-[rgba(250,250,248,0.82)] backdrop-blur-2xl">
@@ -160,6 +163,30 @@ export function Navbar() {
             <User className="size-4" />
           </Link>
 
+          {/* Favorites */}
+          <Link
+            href="/favorites"
+            aria-label={`Favorites (${favCount} items)`}
+            title="Favorites"
+            className="relative grid size-10 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-700 transition hover:-translate-y-0.5 hover:border-neutral-300 hover:text-neutral-950 hover:shadow-md"
+          >
+            <Heart className="size-4" />
+            <AnimatePresence>
+              {favCount > 0 && (
+                <motion.span
+                  key="fav-badge"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                  className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-[#d65f5f] text-[10px] font-black text-white shadow-sm"
+                >
+                  {favCount > 99 ? "99+" : favCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Link>
+
           {/* Cart */}
           <Link
             href="/cart"
@@ -199,6 +226,20 @@ export function Navbar() {
 
         {/* Mobile hamburger */}
         <div className="flex items-center gap-2 md:hidden">
+          {/* Mobile favorites */}
+          <Link
+            href="/favorites"
+            aria-label="Favorites"
+            className="relative grid size-10 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-950"
+          >
+            <Heart className="size-4" />
+            {favCount > 0 && (
+              <span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-[#d65f5f] text-[9px] font-black text-white">
+                {favCount}
+              </span>
+            )}
+          </Link>
+
           {/* Mobile cart */}
           <Link
             href="/cart"

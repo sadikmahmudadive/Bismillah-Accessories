@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/store/cart";
+import { FavoriteButton } from "@/components/product/favorite-button";
 import type { Product } from "@/types/domain";
 
 export function AddToCartSection({ product }: { product: Product }) {
@@ -87,16 +88,24 @@ export function AddToCartSection({ product }: { product: Product }) {
         )}
       </Button>
 
-      <Button
-        type="button"
-        variant="secondary"
-        disabled={outOfStock}
-        onClick={handleBuyNow}
-        className="flex-1"
-      >
-        <Zap className="size-4" />
-        Buy now
-      </Button>
+      <div className="flex flex-1 gap-3">
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={outOfStock}
+          onClick={handleBuyNow}
+          className="flex-1"
+        >
+          <Zap className="size-4" />
+          Buy now
+        </Button>
+        <FavoriteButton 
+          product={product} 
+          className="h-12 w-12 shrink-0 rounded-[1.25rem]" 
+          iconClassName="size-5"
+          withBackground={true}
+        />
+      </div>
     </div>
   );
 }

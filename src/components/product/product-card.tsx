@@ -7,6 +7,7 @@ import { ArrowUpRight, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 
 import { useCartStore } from "@/lib/store/cart";
+import { FavoriteButton } from "@/components/product/favorite-button";
 import type { Product } from "@/types/domain";
 
 export type ProductCardProps = {
@@ -89,6 +90,12 @@ export function ProductCard({
           <div className="absolute bottom-3 left-3 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-neutral-700 backdrop-blur">
             {displayCategory}
           </div>
+          {product && (
+            <FavoriteButton 
+              product={product} 
+              className="absolute right-3 top-3" 
+            />
+          )}
         </div>
       </Link>
 
