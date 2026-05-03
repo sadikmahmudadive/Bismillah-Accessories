@@ -10,14 +10,16 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Products collection - allow admin users full access, authenticated users can read active products
+    // Products collection - allow public read for active products, authenticated users/admins can do more
     match /products/{productId} {
-      // Admins can do anything
-      allow read, write: if isAdminUser();
+      // Public read access for active products (no authentication required)
+      allow read: if resource.data.status == 'active';
 
-      // Authenticated users can read active products
-      allow read: if request.auth != null &&
-        (resource.data.status == 'active' || resource.data.status == null);
+      // Admins can do anything
+      allow write: if isAdminUser();
+
+      // Authenticated users can read all products (including draft)
+      allow read: if request.auth != null;
     }
 
     // Orders collection - users can read/write their own orders, admins can read all
