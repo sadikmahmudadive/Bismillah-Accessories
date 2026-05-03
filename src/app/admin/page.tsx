@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function AdminPage() {
   return (
-    <main className="bg-[#fafaf8] px-4 py-12 sm:px-6 lg:px-8">
+    <main className="bg-transparent px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <AdminDashboardShell />
       </div>

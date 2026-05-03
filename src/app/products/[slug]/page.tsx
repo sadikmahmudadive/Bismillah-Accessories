@@ -57,7 +57,7 @@ export default async function ProductDetailsPage({
   }
 
   return (
-    <main className="bg-[#fafaf8] px-4 py-12 sm:px-6 lg:px-8">
+    <main className="bg-transparent px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, x: -10 }}
@@ -79,7 +79,7 @@ export default async function ProductDetailsPage({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="overflow-hidden rounded-[2.25rem] border border-neutral-200 bg-white p-3 shadow-sm lg:sticky lg:top-24"
+            className="overflow-hidden rounded-[2.25rem] border border-neutral-200 bg-white/70 backdrop-blur-xl p-3 shadow-sm lg:sticky lg:top-24"
           >
             <ProductGallery 
               mainImage={product.imageUrl} 
@@ -93,7 +93,7 @@ export default async function ProductDetailsPage({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="rounded-[2.25rem] border border-neutral-200 bg-white p-6 shadow-sm sm:p-8"
+            className="rounded-[2.25rem] border border-neutral-200 bg-white/70 backdrop-blur-xl p-6 shadow-sm sm:p-8"
           >
             <div className="flex flex-wrap gap-2">
               <span className="rounded-full bg-[#f6f4ee] px-3 py-1 text-sm font-semibold text-neutral-700">

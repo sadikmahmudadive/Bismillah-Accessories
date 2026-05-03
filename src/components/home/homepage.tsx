@@ -11,17 +11,21 @@ import {
   ArrowRight,
   Award,
   CreditCard,
+  HardDrive,
+  Headphones,
   PackageCheck,
+  Shield,
   ShieldCheck,
+  Smartphone,
   Sparkles,
   Star,
   Truck,
+  Watch,
   Zap,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
-import { HeroScene } from "@/components/home/hero-scene";
 import { ProductCard } from "@/components/product/product-card";
 import { ButtonLink } from "@/components/ui/button";
 import { ProductCardSkeleton } from "@/components/ui/loader";
@@ -42,25 +46,18 @@ const stats = [
 ];
 
 const categories = [
-  { name: "Phone Cases", emoji: "📱", href: "/products?category=Phone+Case" },
-  { name: "Charging", emoji: "⚡", href: "/products?category=Charging" },
-  { name: "Protection", emoji: "🛡️", href: "/products?category=Protection" },
-  { name: "Audio", emoji: "🎧", href: "/products?category=Audio" },
-  { name: "Smart Watch", emoji: "⌚", href: "/products?category=Watch" },
-  { name: "Storage", emoji: "💾", href: "/products?category=Storage" },
+  { name: "Phone Cases", icon: Smartphone, href: "/products?category=Phone+Case" },
+  { name: "Charging", icon: Zap, href: "/products?category=Charging" },
+  { name: "Protection", icon: Shield, href: "/products?category=Protection" },
+  { name: "Audio", icon: Headphones, href: "/products?category=Audio" },
+  { name: "Smart Watch", icon: Watch, href: "/products?category=Watch" },
+  { name: "Storage", icon: HardDrive, href: "/products?category=Storage" },
 ];
 
 export function Homepage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [productsError, setProductsError] = useState<string | null>(null);
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const smoothX = useSpring(mouseX, { stiffness: 60, damping: 20 });
-  const smoothY = useSpring(mouseY, { stiffness: 60, damping: 20 });
-  const glowX = useTransform(smoothX, (v) => `${v}px`);
-  const glowY = useTransform(smoothY, (v) => `${v}px`);
 
   const productsRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -69,15 +66,6 @@ export function Homepage() {
   });
   const productsOpacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
   const productsY = useTransform(scrollYProgress, [0, 0.2], [40, 0]);
-
-  useEffect(() => {
-    const handlePointer = (e: PointerEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-    };
-    window.addEventListener("pointermove", handlePointer);
-    return () => window.removeEventListener("pointermove", handlePointer);
-  }, [mouseX, mouseY]);
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -107,18 +95,9 @@ export function Homepage() {
   }, []);
 
   return (
-    <main className="relative isolate overflow-hidden bg-[#fafaf8] text-neutral-950">
-      {/* Cursor glow */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-50 hidden size-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#2f9e74]/8 blur-3xl lg:block"
-        style={{ x: glowX, y: glowY }}
-      />
-
+    <main className="relative isolate overflow-hidden bg-transparent text-neutral-950">
       {/* ─── Hero ─────────────────────────────────────────────────────── */}
       <section className="relative min-h-[calc(100svh-4rem)] px-4 pb-16 pt-14 sm:px-6 lg:px-8">
-        <HeroScene />
-
         <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <motion.div
             initial={{ opacity: 0, y: 28 }}
@@ -271,7 +250,7 @@ export function Homepage() {
       </section>
 
       {/* ─── Stats bar ────────────────────────────────────────────────── */}
-      <section className="border-y border-neutral-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
+      <section className="border-y border-neutral-200 bg-white/60 backdrop-blur-xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
@@ -332,10 +311,12 @@ export function Homepage() {
               >
                 <Link
                   href={cat.href}
-                  className="flex flex-col items-center gap-3 rounded-[1.75rem] border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#2f9e74]/40 hover:shadow-lg"
+                  className="group flex flex-col items-center gap-3 rounded-[1.75rem] border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#2f9e74]/40 hover:shadow-lg"
                 >
-                  <span className="text-3xl">{cat.emoji}</span>
-                  <span className="text-center text-sm font-semibold text-neutral-800">
+                  <div className="grid size-12 place-items-center rounded-2xl bg-[#f6f4ee] transition group-hover:bg-[#2f9e74]/10 group-hover:text-[#2f9e74]">
+                    <cat.icon className="size-6 text-neutral-600 transition group-hover:text-[#2f9e74]" strokeWidth={1.5} />
+                  </div>
+                  <span className="text-center text-sm font-semibold text-neutral-800 transition group-hover:text-neutral-950">
                     {cat.name}
                   </span>
                 </Link>
@@ -349,7 +330,7 @@ export function Homepage() {
       <section
         ref={productsRef}
         id="products"
-        className="bg-[#f6f4ee] px-4 py-16 sm:px-6 lg:px-8"
+        className="bg-white/40 backdrop-blur-lg border-y border-neutral-200/60 px-4 py-16 sm:px-6 lg:px-8"
       >
         <motion.div
           className="mx-auto max-w-7xl"

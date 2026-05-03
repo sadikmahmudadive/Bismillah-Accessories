@@ -41,7 +41,7 @@ export default function OrderConfirmationPage({ params }: PageProps) {
   // Handle auth loading states
   if (authLoading) {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-[#fafaf8]">
+      <main className="flex min-h-[60vh] items-center justify-center bg-transparent">
         <Loader2 className="size-8 animate-spin text-neutral-400" />
       </main>
     );
@@ -49,7 +49,7 @@ export default function OrderConfirmationPage({ params }: PageProps) {
 
   if (!user) {
     return (
-      <main className="bg-[#fafaf8] px-4 py-16 sm:px-6 lg:px-8">
+      <main className="bg-transparent px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-lg text-center">
           <div className="mx-auto grid size-14 place-items-center rounded-full bg-[#d65f5f]/10 text-[#d65f5f]">
             <ShoppingBag className="size-6" />
@@ -90,7 +90,7 @@ export default function OrderConfirmationPage({ params }: PageProps) {
 
   if (authLoading || isLoading) {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-[#fafaf8]">
+      <main className="flex min-h-[60vh] items-center justify-center bg-transparent">
         <Loader2 className="size-8 animate-spin text-neutral-400" />
       </main>
     );
@@ -98,7 +98,7 @@ export default function OrderConfirmationPage({ params }: PageProps) {
 
   if (error || !order) {
     return (
-      <main className="bg-[#fafaf8] px-4 py-16 sm:px-6 lg:px-8">
+      <main className="bg-transparent px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-lg text-center">
           <div className="mx-auto grid size-14 place-items-center rounded-full bg-[#d65f5f]/10 text-[#d65f5f]">
             <ShoppingBag className="size-6" />
@@ -125,7 +125,7 @@ export default function OrderConfirmationPage({ params }: PageProps) {
   };
 
   return (
-    <main className="bg-[#fafaf8] px-4 py-12 sm:px-6 lg:px-8">
+    <main className="bg-transparent px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <motion.div

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function CheckoutPage() {
   return (
     <AuthGate>
-      <main className="bg-[#fafaf8] px-4 py-12 sm:px-6 lg:px-8">
+      <main className="bg-transparent px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="mb-8">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#d65f5f]">

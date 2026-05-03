@@ -33,7 +33,7 @@ const features = [
 
 export default function AuthPage() {
   return (
-    <main className="min-h-[calc(100svh-4rem)] bg-[#fafaf8] px-4 py-14 sm:px-6 lg:px-8">
+    <main className="min-h-[calc(100svh-4rem)] bg-transparent px-4 py-14 sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
         {/* Left — brand panel */}
         <section className="relative overflow-hidden rounded-[2rem] bg-neutral-950 p-8 text-white shadow-2xl lg:sticky lg:top-24">
