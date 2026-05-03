@@ -95,6 +95,39 @@ export async function POST(request: NextRequest) {
 
     const docRef = await db.collection("orders").add(orderData);
 
+    // Deduct stock and log changes
+    try {
+      const { logStockChange } = await import("@/lib/stock");
+      for (const item of items) {
+        const productRef = db.collection("products").doc(item.id);
+        const productSnap = await productRef.get();
+        
+        if (productSnap.exists) {
+          const currentStock = Number(productSnap.data()?.stock) || 0;
+          const newStock = Math.max(0, currentStock - (Number(item.quantity) || 1));
+          
+          await productRef.update({ 
+            stock: newStock,
+            updatedAt: now 
+          });
+
+          await logStockChange(
+            item.id,
+            item.name,
+            "sale",
+            -(Number(item.quantity) || 1),
+            currentStock,
+            newStock,
+            docRef.id,
+            decodedToken.uid
+          );
+        }
+      }
+    } catch (stockError) {
+      console.error("[POST /api/orders] Stock deduction failed:", stockError);
+      // We don't fail the order if stock logging fails, but we should investigate
+    }
+
     // Send confirmation email via Resend if configured
     if (resend && orderData.customerEmail) {
       try {

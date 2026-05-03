@@ -8,18 +8,21 @@ import {
   ReceiptText,
   Package,
   Ticket,
+  History,
 } from "lucide-react";
 
 import { AuthGate } from "@/components/auth/auth-gate";
 import { OrderManager } from "@/components/admin/order-manager";
 import { ProductManager } from "@/components/admin/product-manager";
 import { PromoManager } from "@/components/admin/promo-manager";
+import { AdminOverview } from "@/components/admin/admin-overview";
+import { StockHistory } from "@/components/admin/stock-history";
 import { cn } from "@/lib/utils";
 
-type AdminTab = "products" | "orders" | "promos";
+type AdminTab = "overview" | "products" | "orders" | "promos" | "history";
 
 export function AdminDashboardShell() {
-  const [activeTab, setActiveTab] = useState<AdminTab>("products");
+  const [activeTab, setActiveTab] = useState<AdminTab>("overview");
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -73,6 +76,12 @@ export function AdminDashboardShell() {
 
             <div className="flex rounded-2xl bg-neutral-100 p-1.5">
               <TabButton 
+                active={activeTab === "overview"} 
+                onClick={() => setActiveTab("overview")}
+                icon={LayoutDashboard}
+                label="Overview"
+              />
+              <TabButton 
                 active={activeTab === "products"} 
                 onClick={() => setActiveTab("products")}
                 icon={Package}
@@ -90,6 +99,12 @@ export function AdminDashboardShell() {
                 icon={Ticket}
                 label="Promos"
               />
+              <TabButton 
+                active={activeTab === "history"} 
+                onClick={() => setActiveTab("history")}
+                icon={History}
+                label="History"
+              />
             </div>
           </div>
         </motion.div>
@@ -97,7 +112,17 @@ export function AdminDashboardShell() {
         {/* Main Content Area */}
         <motion.div variants={itemVariants}>
           <AnimatePresence mode="wait">
-            {activeTab === "products" ? (
+            {activeTab === "overview" ? (
+              <motion.div
+                key="overview"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.3 }}
+              >
+                <AdminOverview />
+              </motion.div>
+            ) : activeTab === "products" ? (
               <motion.div
                 key="products"
                 initial={{ opacity: 0, x: -10 }}
@@ -117,7 +142,7 @@ export function AdminDashboardShell() {
               >
                 <OrderManager />
               </motion.div>
-            ) : (
+            ) : activeTab === "promos" ? (
               <motion.div
                 key="promos"
                 initial={{ opacity: 0, y: 10 }}
@@ -126,6 +151,16 @@ export function AdminDashboardShell() {
                 transition={{ duration: 0.3 }}
               >
                 <PromoManager />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="history"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <StockHistory />
               </motion.div>
             )}
           </AnimatePresence>

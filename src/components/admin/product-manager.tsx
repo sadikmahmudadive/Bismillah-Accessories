@@ -608,6 +608,14 @@ export function ProductManager() {
                   </div>
                   <p className="mt-1 text-sm text-neutral-600">
                     {product.category} · ৳{product.price.toLocaleString("en-BD")} · Stock {product.stock}
+                    {product.stock < 5 && (
+                      <span className={cn(
+                        "ml-2 rounded-md px-1.5 py-0.5 text-[10px] font-black uppercase tracking-tighter",
+                        product.stock === 0 ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"
+                      )}>
+                        {product.stock === 0 ? "Sold Out" : "Low Stock"}
+                      </span>
+                    )}
                   </p>
                 </div>
                 <div className="flex gap-2">

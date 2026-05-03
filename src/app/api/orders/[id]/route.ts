@@ -87,13 +87,54 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     const db = getFirestoreDb();
     const docRef = db.collection("orders").doc(id);
-    const doc = await docRef.get();
+    const orderSnap = await docRef.get();
 
-    if (!doc.exists) {
+    if (!orderSnap.exists) {
       return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
     }
 
+    const previousStatus = orderSnap.data()?.status;
+    const items = orderSnap.data()?.items || [];
+
     await docRef.update({ status, updatedAt: new Date() });
+
+    // If changing TO cancelled from any other status, restock items
+    if (status === "cancelled" && previousStatus !== "cancelled") {
+      try {
+        const { logStockChange } = await import("@/lib/stock");
+        const auth = getFirebaseAuth();
+        const decodedToken = await auth.verifyIdToken(token);
+
+        for (const item of items) {
+          const productRef = db.collection("products").doc(item.id);
+          const productSnap = await productRef.get();
+          
+          if (productSnap.exists) {
+            const currentStock = Number(productSnap.data()?.stock) || 0;
+            const restockAmount = Number(item.quantity) || 0;
+            const newStock = currentStock + restockAmount;
+            
+            await productRef.update({ 
+              stock: newStock,
+              updatedAt: new Date() 
+            });
+
+            await logStockChange(
+              item.id,
+              item.name,
+              "cancellation_refund",
+              restockAmount,
+              currentStock,
+              newStock,
+              id,
+              decodedToken.uid
+            );
+          }
+        }
+      } catch (restockError) {
+        console.error("[PATCH /api/orders/:id] Restock failed:", restockError);
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

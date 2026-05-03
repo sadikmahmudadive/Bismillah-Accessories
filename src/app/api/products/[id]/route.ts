@@ -136,10 +136,37 @@ export async function PUT(
       );
     }
 
+    const currentData = docSnap.data();
+    const previousStock = Number(currentData?.stock) || 0;
+    const newStock = Number(body.stock);
+
     await productRef.update({
       ...body,
       updatedAt: new Date(),
     });
+
+    // Log manual stock change if stock was updated
+    if (!isNaN(newStock) && newStock !== previousStock) {
+      try {
+        const { logStockChange } = await import("@/lib/stock");
+        const { getFirebaseAuth } = await import("@/lib/firebase/server-auth");
+        const auth = getFirebaseAuth();
+        const decodedToken = await auth.verifyIdToken(token);
+
+        await logStockChange(
+          id,
+          body.name || currentData?.name || "Unknown Product",
+          "manual_adjustment",
+          newStock - previousStock,
+          previousStock,
+          newStock,
+          undefined,
+          decodedToken.uid
+        );
+      } catch (logError) {
+        console.error("[PUT /api/products/:id] Stock log failed:", logError);
+      }
+    }
 
     return NextResponse.json({
       success: true,
