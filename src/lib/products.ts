@@ -21,6 +21,14 @@ export function createProductSlug(name: string) {
     .replace(/(^-|-$)+/g, "");
 }
 
+export function getBaseUrl() {
+  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;
+  // Vercel auto-populates VERCEL_URL without the protocol
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
+}
+
 function mapProductDoc(snapshot: QueryDocumentSnapshot<DocumentData>) {
   return {
     id: snapshot.id,
@@ -34,7 +42,7 @@ export async function getActiveProducts() {
     try {
       console.log("🏭 Server-side: Fetching products via API");
       // On server side, we can use fetch to call our own API
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      const baseUrl = getBaseUrl();
       const response = await fetch(`${baseUrl}/api/products?status=active&limit=100`, {
         headers: {
           // For server-side calls, we might need to handle auth differently
@@ -104,7 +112,7 @@ export async function getProductBySlug(slug: string) {
   if (typeof window === "undefined") {
     try {
       console.log(`🏭 Server-side: Fetching product slug '${cleanSlug}' via API`);
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      const baseUrl = getBaseUrl();
       const response = await fetch(`${baseUrl}/api/products?status=active&limit=100`, {
         // Use no-store or next: { revalidate } depending on caching needs
         cache: 'no-store',
