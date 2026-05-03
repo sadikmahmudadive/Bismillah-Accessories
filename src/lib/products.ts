@@ -99,31 +99,55 @@ export async function getAdminProducts() {
 }
 
 export async function getProductBySlug(slug: string) {
+  const cleanSlug = slug.trim();
+
   if (typeof window === "undefined") {
-    const { getFirestoreDb } = require("@/lib/firebase/admin");
-    const db = getFirestoreDb();
-    const snap = await db
-      .collection(PRODUCTS_COLLECTION)
-      .where("slug", "==", slug)
-      .limit(1)
-      .get();
-    const doc = snap.docs[0];
-    return doc ? { id: doc.id, ...(doc.data() as any) } : null;
+    try {
+      console.log(`🏭 Server-side: Fetching product slug '${cleanSlug}' via API`);
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      const response = await fetch(`${baseUrl}/api/products?status=active&limit=100`, {
+        // Use no-store or next: { revalidate } depending on caching needs
+        cache: 'no-store',
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (!response.ok) {
+        console.warn(`Server-side API call failed: ${response.status}`);
+        return null;
+      }
+
+      const data = await response.json();
+      if (data.success && data.data) {
+        const product = data.data.find((p: any) => p.slug === cleanSlug);
+        if (product) return product;
+        console.warn(`Product with slug '${cleanSlug}' not found in API response.`);
+      }
+      return null;
+    } catch (error) {
+      console.warn("Server-side product fetch failed:", error);
+      return null;
+    }
   }
 
-  const database = getFirestoreDb();
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { collection, query, where, getDocs } = require("firebase/firestore");
-  const snapshot = await getDocs(
-    query(
-      collection(database, PRODUCTS_COLLECTION),
-      where("slug", "==", slug),
-      where("status", "==", "active")
-    )
-  );
+  try {
+    console.log(`🖥️ Client-side: Fetching product slug '${cleanSlug}' via API`);
+    const response = await fetch('/api/products?status=active&limit=100');
 
-  const product = snapshot.docs.at(0);
-  return product ? mapProductDoc(product) : null;
+    if (!response.ok) {
+      console.warn(`Client-side API call failed: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+    if (data.success && data.data) {
+      const product = data.data.find((p: any) => p.slug === cleanSlug);
+      return product || null;
+    }
+    return null;
+  } catch (error) {
+    console.warn("Client-side product fetch failed:", error);
+    return null;
+  }
 }
 
 export async function getProductById(id: string) {
