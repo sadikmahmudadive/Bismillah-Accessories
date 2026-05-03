@@ -4,8 +4,8 @@ import type { CartItem, Cart } from "@/types/domain";
 
 interface CartStore extends Cart {
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeItem: (productId: string, variantId?: string) => void;
+  updateQuantity: (productId: string, variantId: string | undefined, quantity: number) => void;
   clearCart: () => void;
   getItemCount: () => number;
   getSubtotal: () => number;
@@ -26,7 +26,7 @@ export const useCartStore = create<CartStore>()(
       addItem: (item, quantity = 1) => {
         set((state) => {
           const existingItem = state.items.find(
-            (i) => i.productId === item.productId
+            (i) => i.productId === item.productId && i.variantId === item.variantId
           );
 
           let updatedItems: CartItem[];
@@ -34,7 +34,7 @@ export const useCartStore = create<CartStore>()(
           if (existingItem) {
             // Update quantity if item already exists
             updatedItems = state.items.map((i) =>
-              i.productId === item.productId
+              i.productId === item.productId && i.variantId === item.variantId
                 ? { ...i, quantity: i.quantity + quantity }
                 : i
             );
@@ -57,10 +57,10 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      removeItem: (productId: string) => {
+      removeItem: (productId: string, variantId?: string) => {
         set((state) => {
           const updatedItems = state.items.filter(
-            (i) => i.productId !== productId
+            (i) => !(i.productId === productId && i.variantId === variantId)
           );
           const subtotal = updatedItems.reduce(
             (sum, item) => sum + item.price * item.quantity,
@@ -76,15 +76,15 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      updateQuantity: (productId: string, quantity: number) => {
+      updateQuantity: (productId: string, variantId: string | undefined, quantity: number) => {
         set((state) => {
           if (quantity <= 0) {
             // Remove item if quantity is 0 or less
-            return get().removeItem(productId) as unknown as Cart;
+            return get().removeItem(productId, variantId) as unknown as Cart;
           }
 
           const updatedItems = state.items.map((i) =>
-            i.productId === productId ? { ...i, quantity } : i
+            i.productId === productId && i.variantId === variantId ? { ...i, quantity } : i
           );
 
           const subtotal = updatedItems.reduce(

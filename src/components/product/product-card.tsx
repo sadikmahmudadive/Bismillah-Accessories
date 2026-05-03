@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, ShoppingBag } from "lucide-react";
+import { ArrowUpRight, ShoppingBag, Star } from "lucide-react";
 import { useState } from "react";
 
 import { useCartStore } from "@/lib/store/cart";
@@ -105,6 +105,13 @@ export function ProductCard({
             <h3 className="text-base font-semibold text-neutral-950 line-clamp-2 hover:text-neutral-700 transition">
               {displayName}
             </h3>
+            {product?.averageRating ? (
+              <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-neutral-500">
+                <Star className="size-3 fill-[#b8860b] text-[#b8860b]" />
+                <span>{product.averageRating.toFixed(1)}</span>
+                <span className="text-neutral-400">({product.reviewCount})</span>
+              </div>
+            ) : null}
           </Link>
           {productLink ? (
             <Link

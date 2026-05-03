@@ -6,12 +6,21 @@ export type AppUserProfile = {
   id: string;
   email: string;
   displayName: string;
+  phone?: string;
+  addresses?: string[]; // Simplified: just an array of address strings for now
   role: UserRole;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 };
 
 export type ProductStatus = "draft" | "active" | "archived";
+
+export type ProductVariant = {
+  id: string;
+  name: string;
+  price?: number;
+  stock: number;
+};
 
 export type Product = {
   id: string;
@@ -26,6 +35,9 @@ export type Product = {
   cloudinaryPublicId?: string;
   tags: string[];
   status: ProductStatus;
+  averageRating?: number;
+  reviewCount?: number;
+  variants?: ProductVariant[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
 };
@@ -41,6 +53,7 @@ export type ProductInput = {
   cloudinaryPublicId?: string;
   tags: string[];
   status: ProductStatus;
+  variants?: ProductVariant[];
 };
 
 export type PaymentMethod = "cash_on_delivery" | "bkash_mock";
@@ -59,6 +72,8 @@ export type OrderItem = {
   imageUrl: string;
   price: number;
   quantity: number;
+  variantId?: string;
+  variantName?: string;
 };
 
 export type Order = {
@@ -71,6 +86,8 @@ export type Order = {
   items: OrderItem[];
   subtotal: number;
   deliveryFee: number;
+  promoCode?: string;
+  discountAmount?: number;
   total: number;
   paymentMethod: PaymentMethod;
   status: OrderStatus;
@@ -86,6 +103,8 @@ export type CartItem = {
   imageUrl: string;
   quantity: number;
   category: string;
+  variantId?: string;
+  variantName?: string;
 };
 
 export type Cart = {
@@ -93,4 +112,31 @@ export type Cart = {
   itemCount: number;
   subtotal: number;
   lastUpdated: number;
+};
+
+export type Review = {
+  id: string;
+  productId: string;
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  createdAt: Timestamp;
+};
+
+export type PromoCodeType = "percentage" | "fixed";
+
+export type PromoCode = {
+  id: string;
+  code: string; // e.g. "SAVE10"
+  type: PromoCodeType;
+  value: number; // e.g. 10 (%) or 100 (৳)
+  minOrderAmount?: number;
+  maxDiscountAmount?: number;
+  expiryDate?: Timestamp;
+  usageLimit?: number;
+  usageCount: number;
+  isActive: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 };

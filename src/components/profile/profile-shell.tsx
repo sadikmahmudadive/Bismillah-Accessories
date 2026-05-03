@@ -1,0 +1,359 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  User, 
+  ShoppingBag, 
+  MapPin, 
+  LogOut, 
+  ChevronRight, 
+  Clock, 
+  Package, 
+  CheckCircle2, 
+  Truck, 
+  XCircle,
+  Phone,
+  Save,
+  Loader2
+} from "lucide-react";
+import { useAuth } from "@/components/auth/auth-provider";
+import { AuthGate } from "@/components/auth/auth-gate";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import type { Order } from "@/types/domain";
+
+type ProfileTab = "general" | "orders" | "addresses";
+
+export function ProfileShell() {
+  const { user, profile, isAdmin, signOut, refreshProfile } = useAuth();
+  const [activeTab, setActiveTab] = useState<ProfileTab>("general");
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isOrdersLoading, setIsOrdersLoading] = useState(false);
+
+  // Form state
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [form, setForm] = useState({
+    displayName: "",
+    phone: "",
+    address: ""
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        displayName: profile.displayName || "",
+        phone: profile.phone || "",
+        address: profile.addresses?.[0] || ""
+      });
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    if (activeTab === "orders" && user) {
+      loadUserOrders();
+    }
+  }, [activeTab, user]);
+
+  async function loadUserOrders() {
+    setIsOrdersLoading(true);
+    try {
+      const token = await user?.getIdToken();
+      const res = await fetch("/api/orders/user", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const payload = await res.json();
+      if (res.ok) setOrders(payload.data || []);
+    } catch (err) {
+      console.error("Failed to load orders", err);
+    } finally {
+      setIsOrdersLoading(false);
+    }
+  }
+
+  async function handleUpdateProfile(e: React.FormEvent) {
+    e.preventDefault();
+    if (!user) return;
+    setIsSaving(true);
+    setSaveSuccess(false);
+    try {
+      const token = await user.getIdToken();
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          displayName: form.displayName,
+          phone: form.phone,
+          addresses: form.address ? [form.address] : []
+        })
+      });
+      if (res.ok) {
+        await refreshProfile();
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      }
+    } catch (err) {
+      console.error("Update error", err);
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
+  return (
+    <AuthGate>
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid gap-8 lg:grid-cols-[280px_1fr]"
+        >
+          {/* Sidebar */}
+          <aside className="space-y-6">
+            <div className="rounded-[2.5rem] border border-neutral-200 bg-white p-8 shadow-sm">
+              <div className="flex flex-col items-center text-center">
+                <div className="grid size-20 place-items-center rounded-full bg-gradient-to-br from-neutral-900 to-neutral-700 text-3xl font-black text-white shadow-xl shadow-neutral-950/20">
+                  {profile?.displayName?.[0] || user?.email?.[0] || "?"}
+                </div>
+                <h1 className="mt-5 text-xl font-bold text-neutral-950 truncate w-full">
+                  {profile?.displayName || "Guest User"}
+                </h1>
+                <p className="mt-1 text-sm font-medium text-neutral-500 truncate w-full">
+                  {user?.email}
+                </p>
+                <div className={cn(
+                  "mt-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest",
+                  isAdmin ? "bg-[#2f9e74]/10 text-[#2f9e74]" : "bg-[#f6f4ee] text-neutral-600"
+                )}>
+                  {isAdmin ? "Admin" : (profile?.role || "customer")} Account
+                </div>
+              </div>
+
+              <nav className="mt-10 space-y-1">
+                <TabButton 
+                  active={activeTab === "general"} 
+                  onClick={() => setActiveTab("general")}
+                  icon={User}
+                  label="General Info"
+                />
+                <TabButton 
+                  active={activeTab === "orders"} 
+                  onClick={() => setActiveTab("orders")}
+                  icon={ShoppingBag}
+                  label="Order History"
+                />
+                <TabButton 
+                  active={activeTab === "addresses"} 
+                  onClick={() => setActiveTab("addresses")}
+                  icon={MapPin}
+                  label="Addresses"
+                />
+                <div className="my-4 h-px bg-neutral-100" />
+                <button 
+                  onClick={() => void signOut()}
+                  className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-[#d65f5f] transition hover:bg-[#d65f5f]/5"
+                >
+                  <LogOut className="size-4" />
+                  Sign Out
+                </button>
+              </nav>
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <main className="min-w-0">
+            <AnimatePresence mode="wait">
+              {activeTab === "general" && (
+                <motion.section
+                  key="general"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="rounded-[2.5rem] border border-neutral-200 bg-white p-8 shadow-sm"
+                >
+                  <h2 className="text-2xl font-bold text-neutral-950">Account Settings</h2>
+                  <p className="mt-2 text-sm text-neutral-500">Update your profile information and contact details.</p>
+
+                  <form onSubmit={handleUpdateProfile} className="mt-10 grid gap-6 max-w-xl">
+                    <div className="grid gap-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-neutral-400">Display Name</label>
+                      <input 
+                        value={form.displayName}
+                        onChange={e => setForm({...form, displayName: e.target.value})}
+                        className="h-12 rounded-2xl border border-neutral-200 bg-neutral-50 px-5 text-sm font-bold outline-none focus:border-neutral-950 focus:bg-white transition"
+                      />
+                    </div>
+                    <div className="grid gap-2 text-neutral-400">
+                      <label className="text-xs font-bold uppercase tracking-widest text-neutral-400">Email Address (Read-only)</label>
+                      <div className="flex h-12 items-center rounded-2xl border border-neutral-200 bg-neutral-100 px-5 text-sm font-bold">
+                        {user?.email}
+                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-neutral-400">Phone Number</label>
+                      <input 
+                        value={form.phone}
+                        onChange={e => setForm({...form, phone: e.target.value})}
+                        placeholder="01XXXXXXXXX"
+                        className="h-12 rounded-2xl border border-neutral-200 bg-neutral-50 px-5 text-sm font-bold outline-none focus:border-neutral-950 focus:bg-white transition"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-4 pt-4">
+                      <Button disabled={isSaving} className="h-12 px-8">
+                        {isSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+                        {isSaving ? "Saving..." : "Save Changes"}
+                      </Button>
+                      {saveSuccess && (
+                        <motion.span 
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="flex items-center gap-2 text-sm font-bold text-[#2f9e74]"
+                        >
+                          <CheckCircle2 className="size-4" /> Changes saved!
+                        </motion.span>
+                      )}
+                    </div>
+                  </form>
+                </motion.section>
+              )}
+
+              {activeTab === "orders" && (
+                <motion.section
+                  key="orders"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="space-y-6"
+                >
+                  <div className="rounded-[2.5rem] border border-neutral-200 bg-white p-8 shadow-sm">
+                    <h2 className="text-2xl font-bold text-neutral-950">Purchase History</h2>
+                    <p className="mt-2 text-sm text-neutral-500">Review your past orders and track current shipments.</p>
+                  </div>
+
+                  <div className="grid gap-4">
+                    {isOrdersLoading ? (
+                      [1, 2].map(i => <div key={i} className="h-32 w-full animate-pulse rounded-[2rem] bg-neutral-100" />)
+                    ) : orders.length === 0 ? (
+                      <div className="rounded-[2.5rem] border border-dashed border-neutral-300 bg-white p-20 text-center">
+                        <ShoppingBag className="mx-auto size-12 text-neutral-200" />
+                        <h3 className="mt-6 text-lg font-bold text-neutral-950">No orders yet</h3>
+                        <p className="mt-2 text-sm text-neutral-500">Start shopping to see your history here.</p>
+                      </div>
+                    ) : (
+                      orders.map(order => (
+                        <OrderRow key={order.id} order={order} />
+                      ))
+                    )}
+                  </div>
+                </motion.section>
+              )}
+
+              {activeTab === "addresses" && (
+                <motion.section
+                  key="addresses"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="rounded-[2.5rem] border border-neutral-200 bg-white p-8 shadow-sm"
+                >
+                  <h2 className="text-2xl font-bold text-neutral-950">Saved Addresses</h2>
+                  <p className="mt-2 text-sm text-neutral-500">Manage your delivery locations for faster checkout.</p>
+
+                  <div className="mt-10 grid gap-6 max-w-xl">
+                    <div className="grid gap-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-neutral-400">Default Shipping Address</label>
+                      <textarea 
+                        rows={4}
+                        value={form.address}
+                        onChange={e => setForm({...form, address: e.target.value})}
+                        placeholder="Enter your primary delivery address..."
+                        className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-sm font-bold outline-none focus:border-neutral-950 focus:bg-white transition"
+                      />
+                    </div>
+                    <Button onClick={handleUpdateProfile} disabled={isSaving} className="h-12 px-8 w-fit">
+                      {isSaving ? "Saving..." : "Update Address"}
+                    </Button>
+                  </div>
+                </motion.section>
+              )}
+            </AnimatePresence>
+          </main>
+        </motion.div>
+      </div>
+    </AuthGate>
+  );
+}
+
+function TabButton({ active, onClick, icon: Icon, label }: any) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition-all",
+        active 
+          ? "bg-neutral-950 text-white shadow-lg shadow-neutral-950/15" 
+          : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-950"
+      )}
+    >
+      <Icon className="size-4" />
+      {label}
+      <ChevronRight className={cn("ml-auto size-3.5 opacity-0 transition-opacity", active && "opacity-100")} />
+    </button>
+  );
+}
+
+function OrderRow({ order }: { order: Order }) {
+  const statusConfig = {
+    pending: { color: "bg-amber-100 text-amber-700", icon: Clock },
+    confirmed: { color: "bg-blue-100 text-blue-700", icon: CheckCircle2 },
+    processing: { color: "bg-indigo-100 text-indigo-700", icon: Package },
+    shipped: { color: "bg-purple-100 text-purple-700", icon: Truck },
+    delivered: { color: "bg-emerald-100 text-emerald-700", icon: CheckCircle2 },
+    cancelled: { color: "bg-red-100 text-red-700", icon: XCircle },
+  };
+
+  const config = statusConfig[order.status as keyof typeof statusConfig] || statusConfig.pending;
+
+  return (
+    <article className="group overflow-hidden rounded-[2rem] border border-neutral-200 bg-white transition hover:border-neutral-300 hover:shadow-md">
+      <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <div className="grid size-12 place-items-center rounded-2xl bg-neutral-100 text-neutral-950 group-hover:bg-neutral-950 group-hover:text-white transition-colors">
+            <Package className="size-5" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-neutral-950">Order #{order.id.slice(-6).toUpperCase()}</h4>
+            <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-wide mt-0.5">
+              {new Date(order.createdAt as any).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between sm:gap-10">
+          <div className="text-right">
+            <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Total</p>
+            <p className="mt-1 text-sm font-black text-neutral-950">৳{order.total.toLocaleString()}</p>
+          </div>
+          
+          <div className={cn(
+            "flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-widest",
+            config.color
+          )}>
+            <config.icon className="size-3" />
+            {order.status}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}

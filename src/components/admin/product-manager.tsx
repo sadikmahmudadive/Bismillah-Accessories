@@ -10,6 +10,8 @@ import {
   RefreshCw,
   Save,
   Trash2,
+  Plus,
+  X,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
@@ -47,6 +49,11 @@ export function ProductManager() {
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Variant form state
+  const [vName, setVName] = useState("");
+  const [vPrice, setVPrice] = useState<number | "">("");
+  const [vStock, setVStock] = useState<number>(0);
 
   const activeCount = useMemo(
     () => products.filter((product) => product.status === "active").length,
@@ -110,6 +117,30 @@ export function ProductManager() {
     setTagText(product.tags.join(", "));
     setMessage(null);
     setError(null);
+  }
+
+  function addVariant() {
+    if (!vName.trim()) return;
+    const newVariant = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: vName.trim(),
+      price: vPrice === "" ? undefined : Number(vPrice),
+      stock: Number(vStock),
+    };
+    setForm(prev => ({
+      ...prev,
+      variants: [...(prev.variants || []), newVariant]
+    }));
+    setVName("");
+    setVPrice("");
+    setVStock(0);
+  }
+
+  function removeVariant(id: string) {
+    setForm(prev => ({
+      ...prev,
+      variants: (prev.variants || []).filter(v => v.id !== id)
+    }));
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -458,6 +489,54 @@ export function ProductManager() {
                   <p className="text-xs text-neutral-500">No gallery images</p>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Variants Management */}
+          <div className="rounded-[1.5rem] border border-neutral-200 bg-[#fafaf8] p-4">
+            <h3 className="text-sm font-semibold text-neutral-700">Product Variants</h3>
+            <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto_auto_auto] sm:items-end">
+              <TextField
+                label="Variant Name"
+                value={vName}
+                onChange={setVName}
+                placeholder="iPhone 15 Pro"
+              />
+              <NumberField
+                label="Price Override (Optional)"
+                value={vPrice === "" ? 0 : vPrice}
+                onChange={(val) => setVPrice(val || "")}
+              />
+              <NumberField
+                label="Stock"
+                value={vStock}
+                onChange={setVStock}
+              />
+              <Button type="button" onClick={addVariant} className="h-12 w-12 rounded-2xl p-0">
+                <Plus className="size-5" />
+              </Button>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {form.variants && form.variants.length > 0 ? (
+                form.variants.map((v) => (
+                  <div key={v.id} className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-3 py-2 text-xs font-semibold shadow-sm">
+                    <span className="text-neutral-900">{v.name}</span>
+                    <span className="text-neutral-500">
+                      {v.price ? `৳${v.price}` : "Base Price"} · Qty: {v.stock}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeVariant(v.id)}
+                      className="text-neutral-400 hover:text-red-500"
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-neutral-500">No variants added.</p>
+              )}
             </div>
           </div>
         </div>

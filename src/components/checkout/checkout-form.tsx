@@ -51,7 +51,42 @@ export function CheckoutForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const total = subtotal + DELIVERY_FEE;
+  // Promo state
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{
+    code: string;
+    discountAmount: number;
+  } | null>(null);
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
+
+  const discountAmount = appliedPromo?.discountAmount || 0;
+  const total = subtotal + DELIVERY_FEE - discountAmount;
+
+  async function handleApplyPromo() {
+    if (!promoInput.trim()) return;
+    setPromoError(null);
+    setIsValidatingPromo(true);
+    try {
+      const res = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoInput, subtotal }),
+      });
+      const payload = await res.json();
+      if (!res.ok) throw new Error(payload.error || "Invalid code");
+      
+      setAppliedPromo({
+        code: payload.data.code,
+        discountAmount: payload.data.discountAmount,
+      });
+      setPromoInput("");
+    } catch (err) {
+      setPromoError(err instanceof Error ? err.message : "Failed to apply code");
+    } finally {
+      setIsValidatingPromo(false);
+    }
+  }
 
   function setField<K extends keyof CheckoutFormData>(key: K, value: CheckoutFormData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -105,9 +140,13 @@ export function CheckoutForm() {
             imageUrl: item.imageUrl,
             price: item.price,
             quantity: item.quantity,
+            variantId: item.variantId,
+            variantName: item.variantName,
           })),
           subtotal,
           deliveryFee: DELIVERY_FEE,
+          promoCode: appliedPromo?.code,
+          discountAmount,
           total,
           paymentMethod: form.paymentMethod,
           bkashTransactionId:
@@ -286,9 +325,9 @@ export function CheckoutForm() {
 
         <div className="mt-4 grid gap-2">
           {items.map((item) => (
-            <div key={item.productId} className="flex justify-between text-sm text-neutral-600">
+            <div key={`${item.productId}-${item.variantId || "base"}`} className="flex justify-between text-sm text-neutral-600">
               <span className="truncate flex-1 pr-3">
-                {item.name}
+                {item.name} {item.variantName ? `(${item.variantName})` : ""}
                 <span className="text-neutral-400"> ×{item.quantity}</span>
               </span>
               <span className="font-semibold text-neutral-800 shrink-0">
@@ -300,6 +339,48 @@ export function CheckoutForm() {
 
         <div className="my-4 h-px bg-neutral-100" />
 
+        {/* Promo Code Input */}
+        <div className="mb-4">
+          {!appliedPromo ? (
+            <div className="grid gap-2">
+              <div className="flex gap-2">
+                <input 
+                  type="text"
+                  placeholder="Promo code"
+                  value={promoInput}
+                  onChange={e => setPromoInput(e.target.value.toUpperCase())}
+                  className="h-10 flex-1 rounded-xl border border-neutral-200 bg-[#fafaf8] px-3 text-sm font-bold outline-none focus:border-neutral-950"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-10 rounded-xl px-4"
+                  onClick={handleApplyPromo}
+                  disabled={isValidatingPromo || !promoInput.trim()}
+                >
+                  Apply
+                </Button>
+              </div>
+              {promoError && <p className="text-[10px] font-bold text-[#d65f5f]">{promoError}</p>}
+            </div>
+          ) : (
+            <div className="flex items-center justify-between rounded-xl bg-[#2f9e74]/10 px-3 py-2">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="size-3.5 text-[#2f9e74]" />
+                <span className="text-xs font-bold text-[#2f9e74]">{appliedPromo.code} Applied</span>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setAppliedPromo(null)}
+                className="text-[10px] font-bold text-neutral-500 hover:text-neutral-950 underline"
+              >
+                Remove
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="grid gap-2 text-sm text-neutral-700">
           <div className="flex justify-between">
             <span>Subtotal</span>
@@ -309,6 +390,12 @@ export function CheckoutForm() {
             <span>Delivery fee</span>
             <span className="font-semibold">৳{DELIVERY_FEE}</span>
           </div>
+          {discountAmount > 0 && (
+            <div className="flex justify-between text-[#d65f5f]">
+              <span>Discount</span>
+              <span className="font-semibold">-৳{discountAmount.toLocaleString("en-BD")}</span>
+            </div>
+          )}
           <div className="my-1 h-px bg-neutral-100" />
           <div className="flex justify-between text-base font-semibold text-neutral-950">
             <span>Total</span>

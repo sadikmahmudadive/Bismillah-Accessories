@@ -155,7 +155,7 @@ export function Navbar() {
 
           {/* Account */}
           <Link
-            href="/auth"
+            href={user ? "/profile" : "/auth"}
             aria-label="Account"
             title={user ? profile?.displayName || user.email || "Account" : "Sign in"}
             className="grid size-10 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-700 transition hover:-translate-y-0.5 hover:border-neutral-300 hover:text-neutral-950 hover:shadow-md"

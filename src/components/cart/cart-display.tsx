@@ -66,7 +66,7 @@ export function CartDisplay() {
           <AnimatePresence mode="popLayout">
             {items.map((item) => (
               <motion.article
-                key={item.productId}
+                key={`${item.productId}-${item.variantId || "base"}`}
                 variants={itemVariants}
                 exit="exit"
                 layout
@@ -93,7 +93,7 @@ export function CartDisplay() {
                     {item.name}
                   </h3>
                   <p className="mt-0.5 text-xs font-medium text-neutral-500">
-                    {item.category}
+                    {item.category} {item.variantName ? `· ${item.variantName}` : ""}
                   </p>
                   <p className="mt-1 text-sm font-semibold text-neutral-800">
                     ৳{(item.price * item.quantity).toLocaleString("en-BD")}
@@ -108,7 +108,7 @@ export function CartDisplay() {
                       whileTap={{ scale: 0.9 }}
                       type="button"
                       aria-label="Decrease quantity"
-                      onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                      onClick={() => updateQuantity(item.productId, item.variantId, item.quantity - 1)}
                       className="grid size-7 place-items-center rounded-full transition hover:bg-white"
                     >
                       <Minus className="size-3.5 text-neutral-600" />
@@ -121,7 +121,7 @@ export function CartDisplay() {
                       whileTap={{ scale: 0.9 }}
                       type="button"
                       aria-label="Increase quantity"
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.productId, item.variantId, item.quantity + 1)}
                       className="grid size-7 place-items-center rounded-full transition hover:bg-white"
                     >
                       <Plus className="size-3.5 text-neutral-600" />
@@ -133,7 +133,7 @@ export function CartDisplay() {
                     whileTap={{ scale: 0.9 }}
                     type="button"
                     aria-label={`Remove ${item.name}`}
-                    onClick={() => removeItem(item.productId)}
+                    onClick={() => removeItem(item.productId, item.variantId)}
                     className="grid size-9 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-400 transition hover:border-[#d65f5f]/30 hover:bg-[#d65f5f]/10 hover:text-[#d65f5f]"
                   >
                     <Trash2 className="size-4" />

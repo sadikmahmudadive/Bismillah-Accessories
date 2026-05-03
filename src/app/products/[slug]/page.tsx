@@ -7,6 +7,7 @@ import * as motion from "framer-motion/client";
 
 import { AddToCartSection } from "@/components/product/add-to-cart-section";
 import { ProductGallery } from "@/components/product/product-gallery";
+import { ProductReviews, StarRating } from "@/components/product/product-reviews";
 import { RelatedProducts } from "@/components/product/related-products";
 import { getProductBySlug } from "@/lib/products";
 
@@ -113,10 +114,13 @@ export default async function ProductDetailsPage({
             <h1 className="mt-5 text-4xl font-semibold tracking-tight text-neutral-950 sm:text-5xl">
               {product.name}
             </h1>
-            <p className="mt-4 text-3xl font-semibold text-neutral-900">
-              ৳{product.price.toLocaleString("en-BD")}
-            </p>
-
+            
+            <div className="mt-3 flex items-center gap-3">
+              <StarRating rating={product.averageRating || 0} readonly size="sm" />
+              <span className="text-sm font-semibold text-neutral-600">
+                {product.averageRating ? product.averageRating.toFixed(1) : "No rating"} ({product.reviewCount || 0} reviews)
+              </span>
+            </div>
             <div className="my-8 h-px bg-neutral-100" />
 
             <div className="prose prose-neutral max-w-none">
@@ -164,6 +168,9 @@ export default async function ProductDetailsPage({
             </div>
           </motion.section>
         </div>
+
+        {/* Reviews Section */}
+        <ProductReviews productId={product.id} />
 
         {/* Related Products */}
         <RelatedProducts 

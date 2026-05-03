@@ -31,6 +31,7 @@ type AuthContextValue = {
   signIn: (credentials: AuthCredentials) => Promise<void>;
   signUp: (credentials: AuthCredentials) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
   clearAuthError: () => void;
 };
 
@@ -162,6 +163,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    await loadProfile(user);
+  }, [loadProfile, user]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -172,9 +178,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signUp,
       signOut,
+      refreshProfile,
       clearAuthError: () => setAuthError(null),
     }),
-    [authError, isLoading, profile, signIn, signOut, signUp, user],
+    [authError, isLoading, profile, signIn, signOut, signUp, user, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

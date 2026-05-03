@@ -12,7 +12,7 @@ export function AuthGate({
   children: React.ReactNode;
   requireAdmin?: boolean;
 }) {
-  const { isLoading, user } = useAuth();
+  const { isLoading, user, isAdmin } = useAuth();
 
   if (isLoading) {
     return (
@@ -36,8 +36,17 @@ export function AuthGate({
     );
   }
 
-  // For now, just check if user is signed in
-  // Admin role checking is handled in individual components
+  if (requireAdmin && !isAdmin) {
+    return (
+      <AccessMessage
+        title="Admin access required"
+        message="You do not have the required permissions to view this workspace. Please contact support if you believe this is an error."
+        actionLabel="Go back"
+        actionHref="/"
+      />
+    );
+  }
+
   return children;
 }
 

@@ -191,7 +191,9 @@ export default function OrderConfirmationPage({ params }: PageProps) {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="truncate text-sm font-semibold text-neutral-950">{item.name}</p>
+                    <p className="truncate text-sm font-semibold text-neutral-950">
+                      {item.name} {item.variantName ? `(${item.variantName})` : ""}
+                    </p>
                     <p className="text-xs text-neutral-500">Qty: {item.quantity}</p>
                   </div>
                   <p className="text-sm font-semibold text-neutral-800 shrink-0">
