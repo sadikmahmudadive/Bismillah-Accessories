@@ -55,7 +55,8 @@ export function getFirebaseAuth() {
 export function getFirestoreDb() {
   if (!firestoreDb) {
     const app = getFirebaseClientApp();
-    const forceLongPolling = process.env.NEXT_PUBLIC_FIRESTORE_FORCE_LONG_POLLING === "true";
+    // Default to true or check env var
+    const forceLongPolling = process.env.NEXT_PUBLIC_FIRESTORE_FORCE_LONG_POLLING !== "false";
 
     if (forceLongPolling) {
       // Force long-polling transport to avoid gRPC issues in constrained networks

@@ -29,6 +29,7 @@ import Link from "next/link";
 import { ProductCard } from "@/components/product/product-card";
 import { ButtonLink } from "@/components/ui/button";
 import { ProductCardSkeleton } from "@/components/ui/loader";
+import { OfferBanners } from "@/components/home/offer-banners";
 import type { Product } from "@/types/domain";
 
 const benefits = [
@@ -96,8 +97,13 @@ export function Homepage() {
 
   return (
     <main className="relative isolate overflow-hidden bg-transparent text-neutral-950">
+      {/* ─── Dynamic Banners ────────────────────────────────────────── */}
+      <div className="mx-auto max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">
+        <OfferBanners />
+      </div>
+
       {/* ─── Hero ─────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[calc(100svh-4rem)] px-4 pb-16 pt-14 sm:px-6 lg:px-8">
+      <section className="relative min-h-[50svh] px-4 pb-16 pt-14 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <motion.div
             initial={{ opacity: 0, y: 28 }}

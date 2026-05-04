@@ -10,6 +10,7 @@ import {
   Ticket,
   History,
   MessageSquare,
+  Layout,
 } from "lucide-react";
 
 import { AuthGate } from "@/components/auth/auth-gate";
@@ -19,9 +20,10 @@ import { PromoManager } from "@/components/admin/promo-manager";
 import { AdminOverview } from "@/components/admin/admin-overview";
 import { StockHistory } from "@/components/admin/stock-history";
 import { ReviewManager } from "@/components/admin/review-manager";
+import { BannerManager } from "@/components/admin/banner-manager";
 import { cn } from "@/lib/utils";
 
-type AdminTab = "overview" | "products" | "orders" | "promos" | "history" | "reviews";
+type AdminTab = "overview" | "products" | "orders" | "promos" | "history" | "reviews" | "banners";
 
 export function AdminDashboardShell() {
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
@@ -113,6 +115,12 @@ export function AdminDashboardShell() {
                 icon={MessageSquare}
                 label="Reviews"
               />
+              <TabButton 
+                active={activeTab === "banners"} 
+                onClick={() => setActiveTab("banners")}
+                icon={Layout}
+                label="Storefront"
+              />
             </div>
           </div>
         </motion.div>
@@ -170,7 +178,7 @@ export function AdminDashboardShell() {
               >
                 <StockHistory />
               </motion.div>
-            ) : (
+            ) : activeTab === "reviews" ? (
               <motion.div
                 key="reviews"
                 initial={{ opacity: 0, y: 10 }}
@@ -179,6 +187,16 @@ export function AdminDashboardShell() {
                 transition={{ duration: 0.3 }}
               >
                 <ReviewManager />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="banners"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <BannerManager />
               </motion.div>
             )}
           </AnimatePresence>

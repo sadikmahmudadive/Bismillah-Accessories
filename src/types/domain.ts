@@ -141,3 +141,15 @@ export type PromoCode = {
   createdAt: Timestamp;
   updatedAt: Timestamp;
 };
+
+export type OfferBanner = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  imageUrl: string;
+  link?: string;
+  buttonText?: string;
+  isActive: boolean;
+  order: number;
+  createdAt: Timestamp;
+};
