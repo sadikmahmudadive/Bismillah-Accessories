@@ -15,8 +15,14 @@ import {
   XCircle,
   Phone,
   Save,
-  Loader2
+  Loader2,
+  Navigation,
 } from "lucide-react";
+import dynamic from "next/dynamic";
+const MapPicker = dynamic(() => import("@/components/ui/map-picker").then((mod) => mod.MapPicker), { 
+  ssr: false,
+  loading: () => <div className="h-[300px] w-full animate-pulse rounded-3xl bg-neutral-100 flex items-center justify-center text-neutral-400 text-xs font-bold">Loading Map...</div>
+});
 import { useAuth } from "@/components/auth/auth-provider";
 import { AuthGate } from "@/components/auth/auth-gate";
 import { cn } from "@/lib/utils";
@@ -39,6 +45,10 @@ export function ProfileShell() {
     phone: "",
     address: ""
   });
+
+  // Location states
+  const [showMap, setShowMap] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -102,6 +112,35 @@ export function ProfileShell() {
       setIsSaving(false);
     }
   }
+
+  const handleGps = async () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
+          const data = await res.json();
+          const addr = data.display_name || "";
+          setForm(prev => ({ ...prev, address: addr }));
+        } catch (err) {
+          console.error("Geocoding failed", err);
+          alert("Could not determine your address. Please enter it manually.");
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (err) => {
+        console.error(err);
+        setIsLocating(false);
+        alert("Permission denied or location unavailable.");
+      }
+    );
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -271,18 +310,69 @@ export function ProfileShell() {
 
                   <div className="mt-10 grid gap-6 max-w-xl">
                     <div className="grid gap-2">
-                      <label className="text-xs font-bold uppercase tracking-widest text-neutral-400">Default Shipping Address</label>
-                      <textarea 
-                        rows={4}
-                        value={form.address}
-                        onChange={e => setForm({...form, address: e.target.value})}
-                        placeholder="Enter your primary delivery address..."
-                        className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-sm font-bold outline-none focus:border-neutral-950 focus:bg-white transition"
-                      />
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold uppercase tracking-widest text-neutral-400">Default Shipping Address</label>
+                        <button
+                          type="button"
+                          onClick={() => setShowMap(!showMap)}
+                          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.1em] text-[#2f9e74] hover:underline"
+                        >
+                          <MapPin className="size-3" />
+                          {showMap ? "Hide Map" : "Open Map Picker"}
+                        </button>
+                      </div>
+
+                      <AnimatePresence>
+                        {showMap && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <MapPicker 
+                              onAddressSelect={(addr) => setForm({...form, address: addr})}
+                              className="mb-4"
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      <div className="relative group">
+                        <textarea 
+                          rows={4}
+                          value={form.address}
+                          onChange={e => setForm({...form, address: e.target.value})}
+                          placeholder="Enter your primary delivery address..."
+                          className="w-full rounded-2xl border border-neutral-200 bg-neutral-50 p-5 pr-12 text-sm font-bold outline-none focus:border-neutral-950 focus:bg-white transition"
+                        />
+                        <button
+                          type="button"
+                          title="Use my current location"
+                          onClick={handleGps}
+                          disabled={isLocating}
+                          className="absolute right-4 top-4 text-neutral-400 hover:text-[#2f9e74] disabled:opacity-50 transition-colors"
+                        >
+                          {isLocating ? <Loader2 className="size-4 animate-spin" /> : <Navigation className="size-4" />}
+                        </button>
+                      </div>
                     </div>
-                    <Button onClick={handleUpdateProfile} disabled={isSaving} className="h-12 px-8 w-fit">
-                      {isSaving ? "Saving..." : "Update Address"}
-                    </Button>
+                    
+                    <div className="flex items-center gap-4">
+                      <Button onClick={handleUpdateProfile} disabled={isSaving} className="h-12 px-8 w-fit">
+                        {isSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+                        {isSaving ? "Saving..." : "Update Address"}
+                      </Button>
+                      {saveSuccess && (
+                        <motion.span 
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="flex items-center gap-2 text-sm font-bold text-[#2f9e74]"
+                        >
+                          <CheckCircle2 className="size-4" /> Address updated!
+                        </motion.span>
+                      )}
+                    </div>
                   </div>
                 </motion.section>
               )}

@@ -11,8 +11,15 @@ import {
   Phone,
   ShoppingBag,
   User,
+  Navigation,
 } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useCallback } from "react";
+
+import dynamic from "next/dynamic";
+const MapPicker = dynamic(() => import("@/components/ui/map-picker").then((mod) => mod.MapPicker), { 
+  ssr: false,
+  loading: () => <div className="h-[400px] w-full animate-pulse rounded-3xl bg-neutral-100 flex items-center justify-center text-neutral-400 text-sm font-bold">Loading Map...</div>
+});
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -50,6 +57,10 @@ export function CheckoutForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Location states
+  const [showMap, setShowMap] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
 
   // Promo state
   const [promoInput, setPromoInput] = useState("");
@@ -91,6 +102,35 @@ export function CheckoutForm() {
   function setField<K extends keyof CheckoutFormData>(key: K, value: CheckoutFormData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
+
+  const handleGps = async () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
+          const data = await res.json();
+          const addr = data.display_name || "";
+          setField("address", addr);
+        } catch (err) {
+          console.error("Geocoding failed", err);
+          alert("Could not determine your address. Please enter it manually.");
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (err) => {
+        console.error(err);
+        setIsLocating(false);
+        alert("Permission denied or location unavailable.");
+      }
+    );
+  };
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -236,17 +276,55 @@ export function CheckoutForm() {
               autoComplete="tel"
               required
             />
-            <label className="grid gap-2 text-sm font-semibold text-neutral-700">
-              Delivery address
-              <textarea
-                value={form.address}
-                onChange={(e) => setField("address", e.target.value)}
-                placeholder="House, road, area, district…"
-                rows={3}
-                required
-                className="rounded-2xl border border-neutral-200 bg-[#fafaf8] p-4 text-sm font-medium text-neutral-950 outline-none transition focus:border-neutral-950 placeholder:text-neutral-400"
-              />
-            </label>
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-neutral-700">Delivery address</label>
+                <button
+                  type="button"
+                  onClick={() => setShowMap(!showMap)}
+                  className="flex items-center gap-1.5 text-xs font-bold text-[#2f9e74] hover:underline"
+                >
+                  <MapPin className="size-3.5" />
+                  {showMap ? "Hide Map" : "Open Map Picker"}
+                </button>
+              </div>
+
+              <AnimatePresence>
+                {showMap && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <MapPicker 
+                      onAddressSelect={(addr) => setField("address", addr)}
+                      className="mb-4"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className="relative group">
+                <textarea
+                  value={form.address}
+                  onChange={(e) => setField("address", e.target.value)}
+                  placeholder="House, road, area, district…"
+                  rows={3}
+                  required
+                  className="w-full rounded-2xl border border-neutral-200 bg-[#fafaf8] p-4 pr-12 text-sm font-medium text-neutral-950 outline-none transition focus:border-neutral-950 focus:bg-white placeholder:text-neutral-400"
+                />
+                <button
+                  type="button"
+                  title="Use my current location"
+                  onClick={handleGps}
+                  disabled={isLocating}
+                  className="absolute right-4 top-4 text-neutral-400 hover:text-[#2f9e74] disabled:opacity-50 transition-colors"
+                >
+                  {isLocating ? <Loader2 className="size-4 animate-spin" /> : <Navigation className="size-4" />}
+                </button>
+              </div>
+            </div>
           </div>
         </motion.section>
 
