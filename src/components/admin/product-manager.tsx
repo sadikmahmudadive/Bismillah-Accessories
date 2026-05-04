@@ -486,8 +486,13 @@ export function ProductManager() {
                   placeholder="https://res.cloudinary.com/..."
                 />
                 {form.imageUrl && (
-                  <div className="relative h-20 w-20 overflow-hidden rounded-xl border border-neutral-200">
-                    <Image src={form.imageUrl} alt="Main" fill sizes="80px" className="object-cover" />
+                  <div className="relative h-20 w-20 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50">
+                    <img 
+                      src={form.imageUrl} 
+                      alt="Main" 
+                      className="h-full w-full object-cover" 
+                      onError={(e) => (e.currentTarget.style.display = 'none')}
+                    />
                   </div>
                 )}
               </div>
@@ -510,8 +515,13 @@ export function ProductManager() {
                 {form.gallery && form.gallery.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {form.gallery.map((url, i) => (
-                      <div key={i} className="group relative h-16 w-16 overflow-hidden rounded-xl border border-neutral-200">
-                        <Image src={url} alt={`Gallery ${i}`} fill sizes="64px" className="object-cover" />
+                      <div key={i} className="group relative h-16 w-16 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50">
+                        <img 
+                          src={url} 
+                          alt={`Gallery ${i}`} 
+                          className="h-full w-full object-cover" 
+                          onError={(e) => (e.currentTarget.style.display = 'none')}
+                        />
                         <button
                           type="button"
                           onClick={() => removeGalleryImage(i)}
@@ -638,12 +648,11 @@ export function ProductManager() {
               >
                 <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#f6f4ee]">
                   {product.imageUrl ? (
-                    <Image
+                    <img
                       src={product.imageUrl}
                       alt={product.name}
-                      fill
-                      sizes="80px"
-                      className="object-cover"
+                      className="h-full w-full object-cover"
+                      onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=No+Image')}
                     />
                   ) : null}
                 </div>
