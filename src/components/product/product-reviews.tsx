@@ -273,7 +273,7 @@ export function ProductReviews({ productId }: { productId: string }) {
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <h4 className="font-bold text-neutral-900">{review.userName}</h4>
                           <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                            {new Date(review.createdAt).toLocaleDateString("en-BD", { month: "short", day: "numeric", year: "numeric" })}
+                            {new Date((review.createdAt as any)?.toDate?.() || review.createdAt).toLocaleDateString("en-BD", { month: "short", day: "numeric", year: "numeric" })}
                           </span>
                         </div>
                         <div className="mt-1.5 flex items-center gap-3">

@@ -121,7 +121,7 @@ export type Review = {
   userName: string;
   rating: number;
   comment: string;
-  createdAt: Timestamp;
+  createdAt: Timestamp | string | Date;
 };
 
 export type PromoCodeType = "percentage" | "fixed";

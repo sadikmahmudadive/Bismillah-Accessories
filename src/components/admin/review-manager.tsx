@@ -151,7 +151,7 @@ export function ReviewManager() {
                             <Package className="size-3" />
                             <span>{review.productName || "Deleted Product"}</span>
                             <span>•</span>
-                            <span>{new Date(review.createdAt).toLocaleDateString()}</span>
+                            <span>{new Date((review.createdAt as any)?.toDate?.() || review.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
                         
