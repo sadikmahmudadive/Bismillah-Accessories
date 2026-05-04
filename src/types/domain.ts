@@ -121,6 +121,7 @@ export type Review = {
   userName: string;
   rating: number;
   comment: string;
+  isVerified?: boolean;
   createdAt: Timestamp | string | Date;
 };
 

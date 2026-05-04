@@ -109,6 +109,11 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
     router.replace("/products", { scroll: false });
   };
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div className="mt-8">
       {/* Top Controls */}
@@ -174,7 +179,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
       <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start">
         {/* Sidebar Filters */}
         <AnimatePresence>
-          {(showFilters || (typeof window !== 'undefined' && window.innerWidth >= 1024)) && (
+          {(showFilters || (mounted && window.innerWidth >= 1024)) && (
             <motion.aside
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
