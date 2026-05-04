@@ -17,6 +17,7 @@ import {
 import { useAuth } from "@/components/auth/auth-provider";
 import { ButtonLink } from "@/components/ui/button";
 import { OrderProducts } from "@/components/product/order-products";
+import { OrderStatusTracker } from "@/components/orders/order-status-tracker";
 import type { Order } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
@@ -38,30 +39,9 @@ export default function OrderConfirmationPage({ params }: PageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Handle auth loading states
-  if (authLoading) {
-    return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-transparent">
-        <Loader2 className="size-8 animate-spin text-neutral-400" />
-      </main>
-    );
-  }
-
-  if (!user) {
-    return (
-      <main className="bg-transparent px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-lg text-center">
-          <div className="mx-auto grid size-14 place-items-center rounded-full bg-[#d65f5f]/10 text-[#d65f5f]">
-            <ShoppingBag className="size-6" />
-          </div>
-          <h1 className="mt-5 text-2xl font-semibold text-neutral-950">Sign in required</h1>
-          <p className="mt-2 text-sm text-neutral-600">You must be signed in to view this order.</p>
-        </div>
-      </main>
-    );
-  }
-
   useEffect(() => {
+    if (!user || !id) return;
+    
     let cancelled = false;
 
     async function fetchOrder() {
@@ -88,7 +68,30 @@ export default function OrderConfirmationPage({ params }: PageProps) {
     return () => { cancelled = true; };
   }, [user, id]);
 
-  if (authLoading || isLoading) {
+  // Handle auth loading states
+  if (authLoading) {
+    return (
+      <main className="flex min-h-[60vh] items-center justify-center bg-transparent">
+        <Loader2 className="size-8 animate-spin text-neutral-400" />
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main className="bg-transparent px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-lg text-center">
+          <div className="mx-auto grid size-14 place-items-center rounded-full bg-[#d65f5f]/10 text-[#d65f5f]">
+            <ShoppingBag className="size-6" />
+          </div>
+          <h1 className="mt-5 text-2xl font-semibold text-neutral-950">Sign in required</h1>
+          <p className="mt-2 text-sm text-neutral-600">You must be signed in to view this order.</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (isLoading) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center bg-transparent">
         <Loader2 className="size-8 animate-spin text-neutral-400" />
@@ -146,14 +149,17 @@ export default function OrderConfirmationPage({ params }: PageProps) {
           <p className="mt-2 text-sm text-neutral-600">
             Thank you, <strong>{order.customerName}</strong>. We received your order.
           </p>
-          <div className="mt-3 inline-flex items-center gap-2">
+          <div className="mt-3 flex items-center justify-center gap-2">
             <span className="text-xs font-semibold text-neutral-400">Order ID:</span>
             <code className="rounded-lg bg-neutral-100 px-2 py-0.5 text-xs font-mono text-neutral-700">
               {id}
             </code>
-            <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", statusMeta.color)}>
-              {statusMeta.label}
-            </span>
+          </div>
+
+          <div className="mt-8 overflow-x-auto pb-4">
+            <div className="min-w-[600px] px-4">
+              <OrderStatusTracker status={order.status as any} />
+            </div>
           </div>
         </motion.div>
 
