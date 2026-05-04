@@ -71,7 +71,7 @@ export function OfferBanners() {
   };
 
   return (
-    <section className="relative group overflow-hidden rounded-[2.5rem] bg-neutral-950 shadow-2xl sm:aspect-[21/9]">
+    <section className="relative group overflow-hidden rounded-[2.5rem] bg-neutral-950 shadow-2xl aspect-[4/5] sm:aspect-[21/9]">
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={currentIndex}
