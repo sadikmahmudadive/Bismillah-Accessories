@@ -27,8 +27,8 @@ export async function GET(
 
     // Calculate distribution
     const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    reviews.forEach(r => {
-      const rating = Math.round(Number(r.rating)) as keyof typeof distribution;
+    (reviews as any[]).forEach(r => {
+      const rating = Math.round(Number(r.rating || 0)) as keyof typeof distribution;
       if (distribution[rating] !== undefined) distribution[rating]++;
     });
 
