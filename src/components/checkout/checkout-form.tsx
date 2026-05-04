@@ -353,7 +353,7 @@ export function CheckoutForm() {
                 />
                 <Button 
                   type="button" 
-                  variant="outline" 
+                  variant="secondary" 
                   size="sm" 
                   className="h-10 rounded-xl px-4"
                   onClick={handleApplyPromo}

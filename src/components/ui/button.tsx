@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const buttonBase =
-  "inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50";
 
 const variants = {
   primary:
@@ -17,14 +17,22 @@ const variants = {
     "text-neutral-700 hover:bg-neutral-100 hover:text-neutral-950 focus-visible:outline-neutral-400",
 } as const;
 
+const sizes = {
+  sm: "h-9 px-4 text-xs",
+  md: "h-11 px-5 text-sm",
+} as const;
+
 type ButtonVariant = keyof typeof variants;
+type ButtonSize = keyof typeof sizes;
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
+  size?: ButtonSize;
 };
 
 type ButtonLinkProps = ComponentPropsWithoutRef<typeof Link> & {
   variant?: ButtonVariant;
+  size?: ButtonSize;
   showArrow?: boolean;
 };
 
@@ -33,6 +41,7 @@ const MotionLink = motion.create(Link);
 export function Button({
   className,
   variant = "primary",
+  size = "md",
   ...props
 }: ButtonProps) {
   return (
@@ -40,7 +49,7 @@ export function Button({
       whileHover={{ y: -2, scale: 1.02 }}
       whileTap={{ scale: 0.98, y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className={cn(buttonBase, variants[variant], className)}
+      className={cn(buttonBase, variants[variant], sizes[size], className)}
       {...(props as any)}
     />
   );
@@ -49,6 +58,7 @@ export function Button({
 export function ButtonLink({
   className,
   variant = "primary",
+  size = "md",
   showArrow = false,
   children,
   ...props
@@ -58,7 +68,7 @@ export function ButtonLink({
       whileHover={{ y: -2, scale: 1.02 }}
       whileTap={{ scale: 0.98, y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className={cn(buttonBase, variants[variant], className)}
+      className={cn(buttonBase, variants[variant], sizes[size], className)}
       {...(props as any)}
     >
       {children}
