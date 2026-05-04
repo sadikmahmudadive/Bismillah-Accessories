@@ -25,6 +25,7 @@ type AnalyticsData = {
     totalProducts: number;
     totalUsers: number;
     totalReviews: number;
+    lowStockCount: number;
   };
   recentOrders: Array<{
     id: string;
@@ -34,6 +35,13 @@ type AnalyticsData = {
     createdAt: string;
   }>;
   statusCounts: Record<string, number>;
+  lowStockProducts: Array<{
+    id: string;
+    name: string;
+    stock: number;
+    category?: string;
+    imageUrl?: string;
+  }>;
 };
 
 export function AdminOverview() {
@@ -127,7 +135,7 @@ export function AdminOverview() {
           </div>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {data.lowStockProducts.map((product: any) => (
+            {data.lowStockProducts.map((product) => (
               <div key={product.id} className="flex items-center gap-4 rounded-2xl border border-[#d65f5f]/10 bg-white p-4 shadow-sm">
                 <div className="relative size-12 overflow-hidden rounded-xl bg-neutral-100">
                   {product.imageUrl && <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />}
