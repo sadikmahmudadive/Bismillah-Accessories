@@ -3,6 +3,8 @@ import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
   type User,
 } from "firebase/auth";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
@@ -87,6 +89,34 @@ export async function createCustomerAccount({
 export async function signInCustomer({ email, password }: AuthCredentials) {
   const auth = getFirebaseAuth();
   const credential = await signInWithEmailAndPassword(auth, email, password);
+  return credential.user;
+}
+
+export async function signInWithGoogle() {
+  const auth = getFirebaseAuth();
+  const provider = new GoogleAuthProvider();
+  const credential = await signInWithPopup(auth, provider);
+  
+  // Try to create/update profile
+  const database = getFirestoreDb();
+  const userRef = doc(database, "users", credential.user.uid);
+  const userSnap = await getDoc(userRef);
+  
+  if (!userSnap.exists()) {
+    try {
+      await setDoc(userRef, {
+        id: credential.user.uid,
+        email: credential.user.email,
+        displayName: credential.user.displayName || "Customer",
+        role: "customer",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+    } catch (e) {
+      console.warn("Failed to save social profile to Firestore", e);
+    }
+  }
+  
   return credential.user;
 }
 

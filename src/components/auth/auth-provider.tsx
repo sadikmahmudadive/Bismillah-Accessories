@@ -17,6 +17,7 @@ import {
   getUserProfile,
   signInCustomer,
   signOutCustomer,
+  signInWithGoogle as firebaseSignInWithGoogle,
   type AuthCredentials,
 } from "@/lib/firebase/auth";
 import { getFirebaseAuth } from "@/lib/firebase/client";
@@ -30,6 +31,7 @@ type AuthContextValue = {
   authError: string | null;
   signIn: (credentials: AuthCredentials) => Promise<void>;
   signUp: (credentials: AuthCredentials) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   clearAuthError: () => void;
@@ -147,6 +149,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [loadProfile],
   );
 
+  const loginWithGoogle = useCallback(async () => {
+    setAuthError(null);
+    setIsLoading(true);
+    try {
+      const nextUser = await firebaseSignInWithGoogle();
+      await loadProfile(nextUser);
+    } catch (error) {
+      setAuthError(getFriendlyAuthError(error));
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loadProfile]);
+
   const signOut = useCallback(async () => {
     setAuthError(null);
     setIsLoading(true);
@@ -177,11 +193,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authError,
       signIn,
       signUp,
+      loginWithGoogle,
       signOut,
       refreshProfile,
       clearAuthError: () => setAuthError(null),
     }),
-    [authError, isLoading, profile, signIn, signOut, signUp, user, refreshProfile],
+    [authError, isLoading, profile, signIn, signOut, signUp, loginWithGoogle, user, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
