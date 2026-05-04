@@ -14,7 +14,8 @@ import {
   Loader2,
   ExternalLink,
   RefreshCw,
-  Layout
+  Layout,
+  CloudUpload
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ export function BannerManager() {
   
   // New/Edit State
   const [editingBanner, setEditingBanner] = useState<Partial<OfferBanner> | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     void loadBanners();
@@ -48,6 +50,34 @@ export function BannerManager() {
       console.error("Load banners error", err);
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleImageUpload(file: File | null) {
+    if (!file || !user) return;
+    setIsUploading(true);
+    try {
+      const token = await user.getIdToken();
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+
+      const response = await fetch("/api/cloudinary/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: uploadData,
+      });
+
+      const payload = await response.json();
+      if (response.ok && payload.imageUrl) {
+        setEditingBanner(prev => prev ? ({ ...prev, imageUrl: payload.imageUrl }) : null);
+      } else {
+        alert(payload.error || "Upload failed");
+      }
+    } catch (err) {
+      console.error("Upload error", err);
+      alert("Something went wrong during upload");
+    } finally {
+      setIsUploading(false);
     }
   }
 
@@ -289,15 +319,41 @@ export function BannerManager() {
                   </div>
 
                   <div className="grid gap-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Image URL</label>
-                    <div className="relative">
-                      <ImageIcon className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
-                      <input 
-                        value={editingBanner.imageUrl || ""}
-                        onChange={e => setEditingBanner({ ...editingBanner, imageUrl: e.target.value })}
-                        className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 pl-11 pr-4 text-sm font-bold outline-none transition focus:border-neutral-950 focus:bg-white"
-                        placeholder="https://images.unsplash.com/..."
-                      />
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Banner Image</label>
+                    <div className="space-y-3">
+                      <div className="relative">
+                        <label className={cn(
+                          "flex h-24 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-neutral-200 bg-neutral-50 transition-all hover:border-neutral-950 hover:bg-white",
+                          isUploading && "pointer-events-none opacity-60"
+                        )}>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={(e) => handleImageUpload(e.target.files?.[0] || null)}
+                          />
+                          {isUploading ? (
+                            <Loader2 className="size-6 animate-spin text-neutral-400" />
+                          ) : (
+                            <CloudUpload className="size-6 text-neutral-400" />
+                          )}
+                          <span className="text-xs font-bold text-neutral-500">
+                            {isUploading ? "Uploading..." : "Click to upload file"}
+                          </span>
+                        </label>
+                      </div>
+
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-4">
+                          <ImageIcon className="size-4 text-neutral-400" />
+                        </div>
+                        <input 
+                          value={editingBanner.imageUrl || ""}
+                          onChange={e => setEditingBanner({ ...editingBanner, imageUrl: e.target.value })}
+                          className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 pl-11 pr-4 text-sm font-bold outline-none transition focus:border-neutral-950 focus:bg-white"
+                          placeholder="...or paste Image URL"
+                        />
+                      </div>
                     </div>
                   </div>
 
