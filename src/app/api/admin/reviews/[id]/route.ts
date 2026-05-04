@@ -3,10 +3,10 @@ import { getFirestoreDb, verifyAdminIdToken } from "@/lib/firebase/admin";
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     const authHeader = request.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
@@ -48,7 +48,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("[DELETE /api/admin/reviews/:id]", error);
+    console.error(`[DELETE /api/admin/reviews/${(await context.params).id}]`, error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 }
