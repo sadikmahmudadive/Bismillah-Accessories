@@ -30,6 +30,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { ButtonLink } from "@/components/ui/button";
 import { ProductCardSkeleton } from "@/components/ui/loader";
 import { OfferBanners } from "@/components/home/offer-banners";
+import { AnimatedHeroTitle } from "@/components/home/animated-hero-title";
 import type { Product } from "@/types/domain";
 
 const benefits = [
@@ -121,12 +122,7 @@ export function Homepage() {
               Bangladesh&apos;s premium accessory store
             </motion.div>
 
-            <h1 className="mt-6 max-w-2xl text-5xl font-bold leading-[1.05] tracking-tight text-neutral-950 sm:text-6xl lg:text-7xl">
-              Bismillah{" "}
-              <span className="bg-gradient-to-r from-[#2f9e74] to-[#1a6b4a] bg-clip-text text-transparent">
-                Accessories
-              </span>
-            </h1>
+            <AnimatedHeroTitle />
 
             <p className="mt-6 max-w-xl text-lg leading-8 text-neutral-600">
               Premium mobile accessories, everyday tech essentials, and
