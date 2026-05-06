@@ -111,7 +111,7 @@ export default async function ProductDetailsPage({
               </span>
             </div>
 
-            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-neutral-950 sm:text-5xl">
+            <h1 className="mt-5 text-3xl font-semibold tracking-tight text-neutral-950 sm:text-4xl lg:text-5xl">
               {product.name}
             </h1>
             
@@ -149,7 +149,7 @@ export default async function ProductDetailsPage({
               <AddToCartSection product={product} />
             </div>
 
-            <div className="mt-10 grid gap-3 sm:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
               {[
                 { icon: Truck, label: "Fast delivery" },
                 { icon: ShieldCheck, label: "Quality checked" },

@@ -256,7 +256,7 @@ export function CheckoutForm() {
         {/* Delivery */}
         <motion.section
           variants={itemVariants}
-          className="rounded-[2rem] border border-neutral-200 bg-white p-6 shadow-sm"
+          className="rounded-[2rem] border border-neutral-200 bg-white p-6 shadow-sm sm:p-8"
         >
           <div className="inline-flex items-center gap-2 rounded-full bg-[#f6f4ee] px-3 py-1 text-sm font-semibold text-neutral-700">
             <MapPin className="size-4 text-[#2f9e74]" />
@@ -337,7 +337,7 @@ export function CheckoutForm() {
         {/* Payment method */}
         <motion.section
           variants={itemVariants}
-          className="rounded-[2rem] border border-neutral-200 bg-white p-6 shadow-sm"
+          className="rounded-[2rem] border border-neutral-200 bg-white p-6 shadow-sm sm:p-8"
         >
           <div className="inline-flex items-center gap-2 rounded-full bg-[#f6f4ee] px-3 py-1 text-sm font-semibold text-neutral-700">
             <CreditCard className="size-4 text-[#b8860b]" />

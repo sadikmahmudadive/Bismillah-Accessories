@@ -202,7 +202,7 @@ export function ProfileShell() {
         >
           {/* Sidebar */}
           <aside className="space-y-6">
-            <div className="rounded-[2.5rem] border border-neutral-200 bg-white p-8 shadow-sm">
+            <div className="rounded-[2.5rem] border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
               <div className="flex flex-col items-center text-center">
                 <div className="relative group">
                   <div className="grid size-24 place-items-center rounded-full bg-gradient-to-br from-neutral-900 to-neutral-700 text-3xl font-black text-white shadow-xl shadow-neutral-950/20 overflow-hidden border-4 border-white">
@@ -337,7 +337,7 @@ export function ProfileShell() {
                   exit={{ opacity: 0, x: -10 }}
                   className="space-y-6"
                 >
-                  <div className="rounded-[2.5rem] border border-neutral-200 bg-white p-8 shadow-sm">
+                  <div className="rounded-[2.5rem] border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
                     <h2 className="text-2xl font-bold text-neutral-950">Purchase History</h2>
                     <p className="mt-2 text-sm text-neutral-500">Review your past orders and track current shipments.</p>
                   </div>

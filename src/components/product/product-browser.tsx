@@ -190,7 +190,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
               )}
             >
               {/* Categories */}
-              <div>
+              <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm lg:bg-transparent lg:p-0 lg:border-none lg:shadow-none">
                 <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-400">
                   <LayoutGrid className="size-3.5" /> Sub-categories
                 </h3>
@@ -204,8 +204,8 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
                       }}
                       className={cn(
                         "rounded-xl px-4 py-2 text-left text-sm font-bold transition-all",
-                        category === cat 
-                          ? "bg-neutral-950 text-white shadow-lg shadow-neutral-950/15" 
+                        category === cat
+                          ? "bg-neutral-950 text-white shadow-lg shadow-neutral-950/15"
                           : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-950"
                       )}
                     >
@@ -216,13 +216,13 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
               </div>
 
               {/* Price Range */}
-              <div>
+              <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm lg:bg-transparent lg:p-0 lg:border-none lg:shadow-none">
                 <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-400">
                   <ArrowUpDown className="size-3.5" /> Price Range
                 </h3>
                 <div className="mt-4 space-y-4">
                   <div className="flex items-center justify-between gap-3">
-                    <input 
+                    <input
                       type="number"
                       placeholder="Min"
                       value={priceRange[0] || ""}
@@ -234,7 +234,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
                       className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm font-bold outline-none focus:border-neutral-950"
                     />
                     <span className="text-neutral-300">—</span>
-                    <input 
+                    <input
                       type="number"
                       placeholder="Max"
                       value={priceRange[1] || ""}
@@ -264,7 +264,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
               </div>
 
               {/* Ratings */}
-              <div>
+              <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm lg:bg-transparent lg:p-0 lg:border-none lg:shadow-none">
                 <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-400">
                   <Star className="size-3.5" /> Minimum Rating
                 </h3>
@@ -278,8 +278,8 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
                       }}
                       className={cn(
                         "flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all",
-                        minRating === rating 
-                          ? "bg-neutral-950 text-white shadow-lg shadow-neutral-950/15" 
+                        minRating === rating
+                          ? "bg-neutral-950 text-white shadow-lg shadow-neutral-950/15"
                           : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-950"
                       )}
                     >

@@ -89,15 +89,17 @@ export function ProductsGrid({
         transition={{ duration: 0.5 }}
         className="lg:col-span-1"
       >
-        <ProductFilters
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-        />
+        <div className="sticky top-24">
+          <ProductFilters
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
+        </div>
       </motion.div>
 
       {/* Products Grid */}

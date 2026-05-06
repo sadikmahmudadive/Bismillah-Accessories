@@ -69,54 +69,54 @@ export function AdminDashboardShell() {
                 <LayoutDashboard className="size-3.5 text-[#2f9e74]" />
                 Admin Workspace
               </div>
-              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-neutral-950 sm:text-5xl">
+              <h1 className="mt-5 text-3xl font-semibold tracking-tight text-neutral-950 sm:text-4xl lg:text-5xl">
                 Store Operations
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-neutral-600">
-                Manage your product inventory, track customer orders, and handle fulfillment 
+                Manage your product inventory, track customer orders, and handle fulfillment
                 all from one central dashboard. Your data is synced in real-time with Firestore.
               </p>
             </div>
 
-            <div className="flex rounded-2xl bg-neutral-100 p-1.5">
-              <TabButton 
-                active={activeTab === "overview"} 
+            <div className="flex flex-wrap items-center justify-center gap-2 rounded-2xl bg-neutral-100 p-1.5 sm:flex-nowrap">
+              <TabButton
+                active={activeTab === "overview"}
                 onClick={() => setActiveTab("overview")}
                 icon={LayoutDashboard}
                 label="Overview"
               />
-              <TabButton 
-                active={activeTab === "products"} 
+              <TabButton
+                active={activeTab === "products"}
                 onClick={() => setActiveTab("products")}
                 icon={Package}
                 label="Inventory"
               />
-              <TabButton 
-                active={activeTab === "orders"} 
+              <TabButton
+                active={activeTab === "orders"}
                 onClick={() => setActiveTab("orders")}
                 icon={ReceiptText}
                 label="Orders"
               />
-              <TabButton 
-                active={activeTab === "promos"} 
+              <TabButton
+                active={activeTab === "promos"}
                 onClick={() => setActiveTab("promos")}
                 icon={Ticket}
                 label="Promos"
               />
-              <TabButton 
-                active={activeTab === "history"} 
+              <TabButton
+                active={activeTab === "history"}
                 onClick={() => setActiveTab("history")}
                 icon={History}
                 label="History"
               />
-              <TabButton 
-                active={activeTab === "reviews"} 
+              <TabButton
+                active={activeTab === "reviews"}
                 onClick={() => setActiveTab("reviews")}
                 icon={MessageSquare}
                 label="Reviews"
               />
-              <TabButton 
-                active={activeTab === "banners"} 
+              <TabButton
+                active={activeTab === "banners"}
                 onClick={() => setActiveTab("banners")}
                 icon={Layout}
                 label="Storefront"

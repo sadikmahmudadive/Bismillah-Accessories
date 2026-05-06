@@ -86,9 +86,9 @@ export function AdminOverview() {
   return (
     <div className="grid gap-8">
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard 
-          title="Total Revenue" 
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Total Revenue"
           value={`৳${data.stats.totalRevenue.toLocaleString()}`}
           icon={TrendingUp}
           trend="+12.5%"
@@ -157,7 +157,7 @@ export function AdminOverview() {
         </section>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_0.4fr]">
+      <div className="grid gap-8 grid-cols-1 lg:grid-cols-[1fr_0.4fr]">
         {/* Recent Orders */}
         <section className="rounded-[2.5rem] border border-neutral-200 bg-white p-8 shadow-sm">
           <div className="flex items-center justify-between">
