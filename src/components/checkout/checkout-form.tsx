@@ -27,7 +27,8 @@ import { useCartStore } from "@/lib/store/cart";
 import type { PaymentMethod } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
-const DELIVERY_FEE = 99;
+const DELIVERY_FEE_DHAKA = 80;
+const DELIVERY_FEE_OUTSIDE = 120;
 
 type CheckoutFormData = {
   customerName: string;
@@ -72,7 +73,12 @@ export function CheckoutForm() {
   const [promoError, setPromoError] = useState<string | null>(null);
 
   const discountAmount = appliedPromo?.discountAmount || 0;
-  const total = subtotal + DELIVERY_FEE - discountAmount;
+
+  const deliveryFee = form.address.toLowerCase().includes("dhaka")
+    ? DELIVERY_FEE_DHAKA
+    : DELIVERY_FEE_OUTSIDE;
+
+  const total = subtotal + deliveryFee - discountAmount;
 
   async function handleApplyPromo() {
     if (!promoInput.trim()) return;
@@ -184,7 +190,7 @@ export function CheckoutForm() {
             variantName: item.variantName,
           })),
           subtotal,
-          deliveryFee: DELIVERY_FEE,
+          deliveryFee: deliveryFee,
           promoCode: appliedPromo?.code,
           discountAmount,
           total,
@@ -466,7 +472,7 @@ export function CheckoutForm() {
           </div>
           <div className="flex justify-between">
             <span>Delivery fee</span>
-            <span className="font-semibold">৳{DELIVERY_FEE}</span>
+            <span className="font-semibold">৳{deliveryFee}</span>
           </div>
           {discountAmount > 0 && (
             <div className="flex justify-between text-[#d65f5f]">

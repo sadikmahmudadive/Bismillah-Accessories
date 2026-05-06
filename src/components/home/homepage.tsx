@@ -332,7 +332,7 @@ export function Homepage() {
       <section
         ref={productsRef}
         id="products"
-        className="bg-white/40 backdrop-blur-lg border-y border-neutral-200/60 px-4 py-16 sm:px-6 lg:px-8"
+        className="relative bg-white/40 backdrop-blur-lg border-y border-neutral-200/60 px-4 py-16 sm:px-6 lg:px-8"
       >
         <motion.div
           className="mx-auto max-w-7xl"
