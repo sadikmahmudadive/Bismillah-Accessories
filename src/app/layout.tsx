@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s | Bismillah Accessories",
   },
   description:
-    "Premium mobile accessories, everyday tech essentials, and gift-ready add-ons.",
+    "Elevate your everyday tech with curated premium accessories. Fast, reliable delivery across Bangladesh.",
   keywords: ["accessories", "mobile cases", "tech gear", "Bismillah Accessories"],
 };
 

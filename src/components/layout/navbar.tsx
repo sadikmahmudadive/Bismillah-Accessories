@@ -158,9 +158,19 @@ export function Navbar() {
             href={user ? "/profile" : "/auth"}
             aria-label="Account"
             title={user ? profile?.displayName || user.email || "Account" : "Sign in"}
-            className="grid size-10 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-700 transition hover:-translate-y-0.5 hover:border-neutral-300 hover:text-neutral-950 hover:shadow-md"
+            className="grid size-10 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-700 transition hover:-translate-y-0.5 hover:border-neutral-300 hover:text-neutral-950 hover:shadow-md overflow-hidden"
           >
-            <User className="size-4" />
+            {user && profile?.photoUrl ? (
+              <img
+                src={profile.photoUrl}
+                alt="Profile"
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.classList.add('hidden');
+                }}
+              />
+            ) : null}
+            <User className={cn("size-4", user && profile?.photoUrl ? "hidden" : "grid")} />
           </Link>
 
           {/* Favorites */}

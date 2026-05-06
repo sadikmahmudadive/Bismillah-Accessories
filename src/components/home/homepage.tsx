@@ -125,8 +125,8 @@ export function Homepage() {
             <AnimatedHeroTitle />
 
             <p className="mt-6 max-w-xl text-lg leading-8 text-neutral-600">
-              Premium mobile accessories, everyday tech essentials, and
-              gift-ready add-ons — with fast delivery across Bangladesh.
+              Elevate your everyday tech with curated premium accessories.
+              Fast, reliable delivery across Bangladesh.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">

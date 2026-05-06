@@ -6,6 +6,7 @@ export type AppUserProfile = {
   id: string;
   email: string;
   displayName: string;
+  photoUrl?: string;
   phone?: string;
   addresses?: string[]; // Simplified: just an array of address strings for now
   role: UserRole;

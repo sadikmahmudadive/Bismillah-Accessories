@@ -19,7 +19,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { displayName, phone, addresses } = body;
+    const { displayName, phone, addresses, photoUrl } = body;
 
     const db = getFirestoreDb();
     const userRef = db.collection("users").doc(decodedToken.uid);
@@ -31,6 +31,7 @@ export async function PATCH(request: NextRequest) {
     if (displayName !== undefined) updateData.displayName = String(displayName).trim();
     if (phone !== undefined) updateData.phone = String(phone).trim();
     if (addresses !== undefined) updateData.addresses = addresses;
+    if (photoUrl !== undefined) updateData.photoUrl = photoUrl;
 
     await userRef.set(updateData, { merge: true });
 
