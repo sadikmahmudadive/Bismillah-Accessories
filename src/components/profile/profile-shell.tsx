@@ -17,6 +17,8 @@ import {
   Save,
   Loader2,
   Navigation,
+  CloudUpload,
+  Camera
 } from "lucide-react";
 import dynamic from "next/dynamic";
 const MapPicker = dynamic(() => import("@/components/ui/map-picker").then((mod) => mod.MapPicker), { 
@@ -43,8 +45,10 @@ export function ProfileShell() {
   const [form, setForm] = useState({
     displayName: "",
     phone: "",
-    address: ""
+    address: "",
+    photoUrl: ""
   });
+  const [isUploading, setIsUploading] = useState(false);
 
   // Location states
   const [showMap, setShowMap] = useState(false);
@@ -55,7 +59,8 @@ export function ProfileShell() {
       setForm({
         displayName: profile.displayName || "",
         phone: profile.phone || "",
-        address: profile.addresses?.[0] || ""
+        address: profile.addresses?.[0] || "",
+        photoUrl: profile.photoUrl || ""
       });
     }
   }, [profile]);
@@ -98,7 +103,8 @@ export function ProfileShell() {
         body: JSON.stringify({
           displayName: form.displayName,
           phone: form.phone,
-          addresses: form.address ? [form.address] : []
+          addresses: form.address ? [form.address] : [],
+          photoUrl: form.photoUrl
         })
       });
       if (res.ok) {
@@ -110,6 +116,44 @@ export function ProfileShell() {
       console.error("Update error", err);
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  async function handleImageUpload(file: File | null) {
+    if (!file || !user) return;
+    setIsUploading(true);
+    try {
+      const token = await user.getIdToken();
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+
+      const response = await fetch("/api/cloudinary/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: uploadData,
+      });
+
+      const payload = await response.json();
+      if (response.ok && payload.imageUrl) {
+        setForm(prev => ({ ...prev, photoUrl: payload.imageUrl }));
+        // Auto-save the new photo URL immediately for better UX
+        await fetch("/api/profile", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ photoUrl: payload.imageUrl })
+        });
+        await refreshProfile();
+      } else {
+        alert(payload.error || "Upload failed");
+      }
+    } catch (err) {
+      console.error("Upload error", err);
+      alert("Something went wrong during upload");
+    } finally {
+      setIsUploading(false);
     }
   }
 
@@ -160,8 +204,27 @@ export function ProfileShell() {
           <aside className="space-y-6">
             <div className="rounded-[2.5rem] border border-neutral-200 bg-white p-8 shadow-sm">
               <div className="flex flex-col items-center text-center">
-                <div className="grid size-20 place-items-center rounded-full bg-gradient-to-br from-neutral-900 to-neutral-700 text-3xl font-black text-white shadow-xl shadow-neutral-950/20">
-                  {profile?.displayName?.[0] || user?.email?.[0] || "?"}
+                <div className="relative group">
+                  <div className="grid size-24 place-items-center rounded-full bg-gradient-to-br from-neutral-900 to-neutral-700 text-3xl font-black text-white shadow-xl shadow-neutral-950/20 overflow-hidden border-4 border-white">
+                    {form.photoUrl ? (
+                      <img src={form.photoUrl} alt="Profile" className="h-full w-full object-cover" />
+                    ) : (
+                      profile?.displayName?.[0] || user?.email?.[0] || "?"
+                    )}
+                  </div>
+                  <label className="absolute bottom-0 right-0 grid size-8 place-items-center rounded-full bg-white text-neutral-950 shadow-lg cursor-pointer hover:scale-110 transition active:scale-95 border border-neutral-100">
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={(e) => handleImageUpload(e.target.files?.[0] || null)}
+                    />
+                    {isUploading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Camera className="size-4" />
+                    )}
+                  </label>
                 </div>
                 <h1 className="mt-5 text-xl font-bold text-neutral-950 truncate w-full">
                   {profile?.displayName || "Guest User"}
