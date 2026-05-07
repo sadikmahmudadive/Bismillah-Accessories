@@ -194,14 +194,14 @@ export function ProfileShell() {
   return (
     <AuthGate>
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="grid gap-8 lg:grid-cols-[280px_1fr]"
         >
           {/* Sidebar */}
-          <aside className="space-y-6">
+          <aside className="space-y-6 lg:col-start-1 lg:row-start-1">
             <div className="rounded-[2.5rem] border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
               <div className="flex flex-col items-center text-center">
                 <div className="relative group">
@@ -213,10 +213,10 @@ export function ProfileShell() {
                     )}
                   </div>
                   <label className="absolute bottom-0 right-0 grid size-8 place-items-center rounded-full bg-white text-neutral-950 shadow-lg cursor-pointer hover:scale-110 transition active:scale-95 border border-neutral-100">
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      className="hidden" 
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
                       onChange={(e) => handleImageUpload(e.target.files?.[0] || null)}
                     />
                     {isUploading ? (
@@ -239,36 +239,35 @@ export function ProfileShell() {
                   {isAdmin ? "Admin" : (profile?.role || "customer")} Account
                 </div>
               </div>
-
-              <nav className="mt-10 space-y-1">
-                <TabButton 
-                  active={activeTab === "general"} 
-                  onClick={() => setActiveTab("general")}
-                  icon={User}
-                  label="General Info"
-                />
-                <TabButton 
-                  active={activeTab === "orders"} 
-                  onClick={() => setActiveTab("orders")}
-                  icon={ShoppingBag}
-                  label="Order History"
-                />
-                <TabButton 
-                  active={activeTab === "addresses"} 
-                  onClick={() => setActiveTab("addresses")}
-                  icon={MapPin}
-                  label="Addresses"
-                />
-                <div className="my-4 h-px bg-neutral-100" />
-                <button 
-                  onClick={() => void signOut()}
-                  className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-[#d65f5f] transition hover:bg-[#d65f5f]/5"
-                >
-                  <LogOut className="size-4" />
-                  Sign Out
-                </button>
-              </nav>
             </div>
+            <nav className="mt-10 space-y-1">
+              <TabButton
+                active={activeTab === "general"}
+                onClick={() => setActiveTab("general")}
+                icon={User}
+                label="General Info"
+              />
+              <TabButton
+                active={activeTab === "orders"}
+                onClick={() => setActiveTab("orders")}
+                icon={ShoppingBag}
+                label="Order History"
+              />
+              <TabButton
+                active={activeTab === "addresses"}
+                onClick={() => setActiveTab("addresses")}
+                icon={MapPin}
+                label="Addresses"
+              />
+              <div className="my-4 h-px bg-neutral-100" />
+              <button
+                onClick={() => void signOut()}
+                className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-[#d65f5f] transition hover:bg-[#d65f5f]/5"
+              >
+                <LogOut className="size-4" />
+                Sign Out
+              </button>
+            </nav>
           </aside>
 
           {/* Main Content */}
