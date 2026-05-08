@@ -34,6 +34,7 @@ export function FavoriteButton({
       <div 
         className={cn(
           withBackground && "grid place-items-center rounded-full bg-white/80 p-2 shadow-sm backdrop-blur",
+          "flex items-center justify-center",
           className
         )}
       >
@@ -59,7 +60,8 @@ export function FavoriteButton({
       whileTap={{ scale: 0.85 }}
       onClick={toggleFavorite}
       className={cn(
-        withBackground && "grid place-items-center rounded-full bg-white/80 p-2 shadow-sm backdrop-blur transition hover:bg-white",
+        "grid place-items-center transition-all",
+        withBackground && "rounded-full bg-white/80 p-2 shadow-sm backdrop-blur hover:bg-white",
         className
       )}
       aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}

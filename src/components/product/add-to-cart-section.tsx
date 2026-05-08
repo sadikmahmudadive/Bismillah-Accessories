@@ -68,16 +68,12 @@ export function AddToCartSection({ product }: { product: Product }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <p className="text-3xl font-semibold text-neutral-900">
-        ৳{currentPrice.toLocaleString("en-BD")}
-      </p>
-
+    <div className="flex flex-col gap-10">
       {/* Variant Selection */}
       {product.variants && product.variants.length > 0 && (
-        <div className="grid gap-3">
-          <label className="text-xs font-bold uppercase tracking-wider text-neutral-400">
-            Select Option
+        <div className="grid gap-4">
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">
+            Choose Specification
           </label>
           <div className="flex flex-wrap gap-2">
             {product.variants.map((variant) => (
@@ -86,10 +82,10 @@ export function AddToCartSection({ product }: { product: Product }) {
                 type="button"
                 onClick={() => setSelectedVariantId(variant.id)}
                 className={cn(
-                  "rounded-xl border px-4 py-2 text-sm font-semibold transition-all",
+                  "rounded-2xl border-2 px-6 py-3 text-xs font-black uppercase tracking-widest transition-all duration-300",
                   selectedVariantId === variant.id
-                    ? "border-neutral-950 bg-neutral-950 text-white shadow-md"
-                    : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50"
+                    ? "border-neutral-950 bg-neutral-950 text-white shadow-xl shadow-neutral-950/20"
+                    : "border-neutral-100 bg-neutral-50 text-neutral-500 hover:border-neutral-200 hover:bg-white"
                 )}
               >
                 {variant.name}
@@ -99,54 +95,65 @@ export function AddToCartSection({ product }: { product: Product }) {
         </div>
       )}
 
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <Button
-          type="button"
+      <div className="flex flex-col gap-4">
+        {/* Main Add to Cart */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           disabled={outOfStock || isAdding}
           onClick={handleAddToCart}
-          className="flex-1"
+          className={cn(
+            "group relative flex h-16 w-full items-center justify-center gap-3 overflow-hidden rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all duration-500",
+            outOfStock
+              ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
+              : "bg-neutral-950 text-white shadow-2xl shadow-neutral-950/20 hover:shadow-neutral-950/40"
+          )}
         >
+          {/* Liquid background effect on hover */}
+          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+          
           {isAdding ? (
-            <>
-              <Loader2 className="size-4 animate-spin" />
-              Adding…
-            </>
+            <Loader2 className="size-5 animate-spin" />
           ) : justAdded ? (
             <>
-              <motion.span
+              <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="grid size-6 place-items-center rounded-full bg-[#2f9e74] text-white"
               >
                 <Check className="size-4" />
-              </motion.span>
-              Added to cart
+              </motion.div>
+              <span>Bagged</span>
             </>
           ) : (
             <>
-              <ShoppingBag className="size-4" />
-              {outOfStock ? "Out of stock" : "Add to cart"}
+              <ShoppingBag className="size-5" />
+              <span>{outOfStock ? "Out of Stock" : "Secure Item"}</span>
             </>
           )}
-        </Button>
+        </motion.button>
 
-        <div className="flex flex-1 gap-3">
-          <Button
-            type="button"
-            variant="secondary"
+        {/* Secondary Actions */}
+        <div className="flex items-center gap-4">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             disabled={outOfStock}
             onClick={handleBuyNow}
-            className="flex-1"
+            className="flex h-16 flex-1 items-center justify-center gap-3 rounded-full border-2 border-neutral-100 bg-white text-xs font-black uppercase tracking-[0.2em] text-neutral-950 transition-all hover:border-neutral-950"
           >
-            <Zap className="size-4" />
-            Buy now
-          </Button>
-          <FavoriteButton 
-            product={product} 
-            className="h-12 w-12 shrink-0 rounded-[1.25rem]" 
-            iconClassName="size-5"
-            withBackground={true}
-          />
+            <Zap className="size-5 text-[#2f9e74]" />
+            Direct Checkout
+          </motion.button>
+
+          <div className="shrink-0">
+            <FavoriteButton 
+              product={product} 
+              className="h-16 w-16 rounded-full border-2 border-neutral-100 bg-white transition-all hover:border-[#d65f5f] hover:text-[#d65f5f]" 
+              iconClassName="size-6"
+              withBackground={false}
+            />
+          </div>
         </div>
       </div>
     </div>
