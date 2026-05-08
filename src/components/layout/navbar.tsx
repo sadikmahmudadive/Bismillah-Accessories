@@ -36,30 +36,35 @@ export function Navbar() {
   const favCount = useFavoritesStore((state) => state.itemCount);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/6 bg-[rgba(250,250,248,0.82)] backdrop-blur-2xl">
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-black/5 bg-white/70 backdrop-blur-3xl transition-all duration-300">
+      <div className="mx-auto flex h-20 w-full items-center justify-between px-6 sm:px-12 lg:px-24">
         {/* Logo */}
         <Link
           href="/"
-          className="group flex items-center gap-3 text-sm font-bold text-neutral-950"
+          className="group flex items-center gap-4 text-sm font-bold text-neutral-950"
           aria-label="Bismillah Accessories home"
         >
-          <motion.span
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.96 }}
-            className="grid size-9 place-items-center rounded-full bg-gradient-to-br from-neutral-900 to-neutral-700 text-sm font-black text-white shadow-lg shadow-neutral-950/20"
+          <motion.div
+            whileHover={{ scale: 1.05, rotate: -5 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative flex size-11 items-center justify-center rounded-2xl bg-neutral-950 text-xs font-black text-white shadow-2xl shadow-neutral-950/20"
           >
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             BA
-          </motion.span>
-          <span className="hidden font-bold sm:inline">
-            Bismillah{" "}
-            <span className="text-[#2f9e74]">Accessories</span>
-          </span>
+          </motion.div>
+          <div className="flex flex-col leading-none">
+            <span className="text-lg font-[900] tracking-tighter sm:text-xl">
+              BISMILLAH
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2f9e74]">
+              Accessories
+            </span>
+          </div>
         </Link>
 
         {/* Desktop nav */}
         <nav
-          className="hidden items-center gap-1 rounded-full border border-neutral-200 bg-white/70 p-1 shadow-sm md:flex"
+          className="hidden items-center gap-1 rounded-2xl border border-neutral-100 bg-neutral-50/50 p-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] md:flex"
           aria-label="Main navigation"
         >
           {navItems.map((item) => {

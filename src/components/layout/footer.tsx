@@ -11,59 +11,87 @@ const footerLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-neutral-200/60 bg-white/60 backdrop-blur-xl">
-      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.1fr_0.9fr_0.9fr] lg:px-8">
-        <div>
-          <Link href="/" className="flex items-center gap-3 font-semibold">
-            <span className="grid size-10 place-items-center rounded-full bg-neutral-950 text-sm font-bold text-white">
+    <footer className="border-t border-black/5 bg-white py-24 text-neutral-950">
+      <div className="mx-auto flex w-full flex-col gap-16 px-6 sm:px-12 lg:px-24 lg:flex-row lg:justify-between lg:gap-24">
+        <div className="max-w-md">
+          <Link href="/" className="group flex items-center gap-4 text-sm font-bold text-neutral-950">
+            <div className="relative flex size-11 items-center justify-center rounded-2xl bg-neutral-950 text-xs font-black text-white shadow-2xl shadow-neutral-950/20">
               BA
-            </span>
-            Bismillah Accessories
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-lg font-[900] tracking-tighter sm:text-xl uppercase">
+                BISMILLAH
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2f9e74]">
+                Accessories
+              </span>
+            </div>
           </Link>
-          <p className="mt-4 max-w-sm text-sm leading-6 text-neutral-600">
-            Premium mobile accessories, everyday tech essentials, and gift-ready
-            add-ons designed for fast shopping and reliable delivery.
+          <p className="mt-8 text-lg font-medium leading-relaxed text-neutral-500">
+            Curating world-class tech essentials for those who demand excellence in every detail. 
+            Designed for performance, crafted for style.
           </p>
-        </div>
-
-        <div>
-          <h2 className="text-sm font-semibold text-neutral-950">Explore</h2>
-          <div className="mt-4 grid gap-3">
-            {footerLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-sm text-neutral-600 transition hover:text-neutral-950"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h2 className="text-sm font-semibold text-neutral-950">Contact</h2>
-          <div className="mt-4 grid gap-3 text-sm text-neutral-600">
-            <span className="flex items-center gap-2">
-              <MapPin className="size-4 text-[#2f9e74]" />
-              Dhaka, Bangladesh
-            </span>
-            <span className="flex items-center gap-2">
-              <Phone className="size-4 text-[#d65f5f]" />
-              Customer support ready
-            </span>
-            <span className="flex items-center gap-2">
-              <Mail className="size-4 text-[#b8860b]" />
-              hello@bismillahaccessories.com
-            </span>
-          </div>
-          <div className="mt-5 flex gap-2">
+          <div className="mt-10 flex gap-3">
             <SocialLink label="Instagram" href="https://instagram.com">
               <FaInstagram className="size-4" />
             </SocialLink>
             <SocialLink label="Facebook" href="https://facebook.com">
               <FaFacebookF className="size-4" />
             </SocialLink>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-12 sm:grid-cols-2 md:gap-24">
+          <div>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Navigate</h2>
+            <div className="mt-8 grid gap-4">
+              {footerLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="text-sm font-bold text-neutral-600 transition hover:text-[#2f9e74]"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Connect</h2>
+            <div className="mt-8 grid gap-6 text-sm font-bold text-neutral-600">
+              <div className="flex items-center gap-4">
+                <div className="grid size-10 place-items-center rounded-xl bg-neutral-50 text-[#2f9e74]">
+                  <MapPin className="size-4" />
+                </div>
+                <span>Dhaka, BD</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="grid size-10 place-items-center rounded-xl bg-neutral-50 text-[#d65f5f]">
+                  <Phone className="size-4" />
+                </div>
+                <span>Support Ready</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="grid size-10 place-items-center rounded-xl bg-neutral-50 text-[#b8860b]">
+                  <Mail className="size-4" />
+                </div>
+                <span>hello@ba.com</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-24 w-full px-6 sm:px-12 lg:px-24">
+        <div className="h-px w-full bg-neutral-100" />
+        <div className="mt-12 flex flex-col items-center justify-between gap-6 sm:flex-row">
+          <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
+            © {new Date().getFullYear()} Bismillah Accessories. All Rights Reserved.
+          </p>
+          <div className="flex gap-8">
+            <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-neutral-950">Privacy</Link>
+            <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-neutral-950">Terms</Link>
           </div>
         </div>
       </div>

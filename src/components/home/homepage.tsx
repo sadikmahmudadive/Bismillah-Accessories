@@ -89,8 +89,8 @@ export function Homepage() {
       </div>
 
       {/* ─── The Philosophy (Storytelling Section 1) ────────────────── */}
-      <section className="relative px-4 py-24 sm:px-6 lg:px-8 lg:py-40">
-        <div className="mx-auto max-w-7xl">
+      <section className="relative px-6 py-24 sm:px-12 lg:px-24 lg:py-48">
+        <div className="mx-auto w-full">
           <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -101,11 +101,11 @@ export function Homepage() {
               <p className="text-sm font-black uppercase tracking-[0.3em] text-[#2f9e74]">
                 Our Philosophy
               </p>
-              <h2 className="mt-8 text-5xl font-[900] leading-[0.9] tracking-tighter sm:text-7xl lg:text-8xl">
+              <h2 className="mt-8 text-6xl font-[900] leading-[0.9] tracking-tighter sm:text-8xl lg:text-9xl">
                 Accessories <br /> 
                 <span className="text-neutral-200">Reimagined.</span>
               </h2>
-              <p className="mt-10 max-w-xl text-xl font-medium leading-relaxed text-neutral-500 lg:text-2xl">
+              <p className="mt-10 max-w-xl text-lg font-medium leading-relaxed text-neutral-500 lg:text-2xl lg:leading-[1.4]">
                 We believe tech should be as beautiful as it is functional. Our curated collection brings world-class protection and charging to your fingertips.
               </p>
               <div className="mt-12">
@@ -138,19 +138,19 @@ export function Homepage() {
         {/* Subtle background texture or glow */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(47,158,116,0.08),transparent_70%)]" />
         
-        <div className="relative mx-auto max-w-7xl px-8">
+        <div className="relative mx-auto w-full px-6 sm:px-12 lg:px-24">
           <div className="flex flex-col items-center text-center">
             <motion.p 
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              className="text-sm font-black uppercase tracking-[0.4em] text-[#2f9e74]"
+              className="text-xs font-black uppercase tracking-[0.4em] text-[#2f9e74]"
             >
               Excellence in every detail
             </motion.p>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              className="mt-8 text-4xl font-[900] tracking-tighter sm:text-6xl lg:text-7xl"
+              className="mt-8 text-5xl font-[900] leading-[1] tracking-tighter sm:text-7xl lg:text-8xl"
             >
               Engineered for <br className="sm:hidden" /> Performance.
             </motion.h2>
@@ -178,8 +178,8 @@ export function Homepage() {
       </section>
 
       {/* ─── Shop by Category ─────────────────────────────────────────── */}
-      <section className="px-4 py-24 sm:px-6 lg:px-8 lg:py-40">
-        <div className="mx-auto max-w-7xl">
+      <section className="px-6 py-24 sm:px-12 lg:px-24 lg:py-48">
+        <div className="mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -231,10 +231,10 @@ export function Homepage() {
       <section
         ref={productsRef}
         id="products"
-        className="px-4 py-24 sm:px-6 lg:px-8 bg-neutral-50 border-t border-neutral-100"
+        className="px-6 py-24 sm:px-12 lg:px-24 bg-neutral-50 border-t border-neutral-100 lg:py-48"
       >
         <motion.div
-          className="mx-auto max-w-7xl"
+          className="mx-auto w-full"
           style={{ opacity: productsOpacity, y: productsY }}
         >
           <div className="flex flex-col justify-between gap-8 sm:flex-row sm:items-end">
