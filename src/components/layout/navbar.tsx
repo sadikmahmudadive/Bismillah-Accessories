@@ -341,14 +341,23 @@ export function Navbar() {
                 <ButtonLink href="/products" className="w-full" onClick={() => setIsOpen(false)}>
                   Shop now
                 </ButtonLink>
-                <ButtonLink
-                  href="/auth"
-                  variant="secondary"
-                  className="w-full"
+                <Link
+                  href={user ? "/profile" : "/auth"}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-2xl border border-neutral-200 px-4 py-3 text-sm font-semibold transition hover:bg-neutral-50",
+                    pathname === (user ? "/profile" : "/auth") && "border-neutral-950 bg-neutral-950 text-white"
+                  )}
                   onClick={() => setIsOpen(false)}
                 >
-                  {user ? "My account" : "Sign in"}
-                </ButtonLink>
+                  <div className="grid size-6 place-items-center rounded-full bg-neutral-100 overflow-hidden text-neutral-600">
+                    {user && profile?.photoUrl ? (
+                      <img src={profile.photoUrl} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <User className="size-3.5" />
+                    )}
+                  </div>
+                  {user ? profile?.displayName || "My account" : "Sign in"}
+                </Link>
                 {user && (
                   <button
                     type="button"
