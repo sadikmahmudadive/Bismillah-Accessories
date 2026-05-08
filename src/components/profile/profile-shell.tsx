@@ -29,6 +29,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { AuthGate } from "@/components/auth/auth-gate";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { OrderStatusTracker } from "@/components/orders/order-status-tracker";
 import type { Order } from "@/types/domain";
 
 type ProfileTab = "general" | "orders" | "addresses";
@@ -526,6 +527,15 @@ function OrderRow({ order }: { order: Order }) {
             exit={{ height: 0, opacity: 0 }}
             className="border-t border-neutral-100 bg-white"
           >
+            {/* Status Tracker */}
+            <div className="border-b border-neutral-50 bg-[#fafaf8]/50 px-8 py-6">
+              <div className="overflow-x-auto pb-2">
+                <div className="min-w-[500px]">
+                  <OrderStatusTracker status={order.status as any} />
+                </div>
+              </div>
+            </div>
+
             <div className="grid gap-8 p-8 md:grid-cols-2">
               {/* Items Detail */}
               <div className="space-y-4">
