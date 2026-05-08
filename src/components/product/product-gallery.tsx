@@ -23,9 +23,9 @@ export function ProductGallery({
     : [mainImage];
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Main Image */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.75rem] bg-[#f6f4ee]">
+    <div className="flex w-full flex-col gap-8 lg:flex-row-reverse lg:items-start lg:gap-10">
+      {/* Main Image Viewport */}
+      <div className="relative aspect-square w-full flex-1 overflow-hidden rounded-[2.5rem] bg-[#fcfcfc] transition-all duration-700 hover:shadow-[inset_0_0_60px_rgba(0,0,0,0.03)] lg:aspect-auto lg:h-[70vh]">
         {activeImage ? (
           <AnimatePresence mode="wait">
             <motion.div
@@ -33,45 +33,47 @@ export function ProductGallery({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="absolute inset-0"
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 p-8 sm:p-16"
             >
               <Image
                 src={activeImage}
                 alt={productName}
                 fill
                 priority
-                sizes="(min-width: 1024px) 52vw, 100vw"
-                className="object-cover transition duration-700 hover:scale-105"
+                sizes="(min-width: 1024px) 45vw, 100vw"
+                className="object-contain transition-transform duration-[2s] hover:scale-110"
               />
             </motion.div>
           </AnimatePresence>
         ) : (
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_25%,rgba(47,158,116,0.26),transparent_36%),linear-gradient(135deg,#f8faf8,#ece8de_48%,#f7f7f3)]" />
+          <div className="absolute inset-0 bg-neutral-50" />
         )}
       </div>
 
-      {/* Thumbnails */}
+      {/* Vertical Thumbnails */}
       {allImages.length > 1 && (
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="flex shrink-0 gap-3 overflow-x-auto pb-4 scrollbar-hide lg:flex-col lg:overflow-x-visible lg:pb-0">
           {allImages.map((img, idx) => (
             <button
               key={idx}
               onClick={() => setActiveImage(img)}
               className={cn(
-                "relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 transition-all",
+                "group relative size-20 shrink-0 overflow-hidden rounded-2xl border-2 transition-all duration-300 lg:size-24",
                 activeImage === img
-                  ? "border-neutral-950 opacity-100"
-                  : "border-transparent opacity-60 hover:opacity-100"
+                  ? "border-[#2f9e74] bg-white shadow-xl shadow-[#2f9e74]/10"
+                  : "border-transparent bg-neutral-50 opacity-60 hover:opacity-100 hover:bg-white"
               )}
             >
-              <Image
-                src={img}
-                alt={`${productName} thumbnail ${idx + 1}`}
-                fill
-                sizes="80px"
-                className="object-cover"
-              />
+              <div className="absolute inset-0 p-3">
+                <Image
+                  src={img}
+                  alt={`${productName} thumbnail ${idx + 1}`}
+                  fill
+                  sizes="96px"
+                  className="object-contain transition-transform duration-500 group-hover:scale-110"
+                />
+              </div>
             </button>
           ))}
         </div>

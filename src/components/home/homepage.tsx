@@ -134,8 +134,11 @@ export function Homepage() {
       </section>
 
       {/* ─── Innovation Grid (Storytelling Section 2) ────────────────── */}
-      <section className="bg-neutral-950 py-24 text-white sm:py-32 lg:py-48 rounded-[4rem] mx-4 sm:mx-6 lg:mx-8">
-        <div className="mx-auto max-w-7xl px-8">
+      <section className="relative flex min-h-screen flex-col justify-center bg-neutral-950 py-24 text-white sm:py-32 lg:py-48 w-full overflow-hidden">
+        {/* Subtle background texture or glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(47,158,116,0.08),transparent_70%)]" />
+        
+        <div className="relative mx-auto max-w-7xl px-8">
           <div className="flex flex-col items-center text-center">
             <motion.p 
               initial={{ opacity: 0 }}
@@ -279,49 +282,46 @@ export function Homepage() {
       </section>
 
       {/* ─── CTA Banner ───────────────────────────────────────────────── */}
-      <section className="px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden rounded-[4rem] bg-neutral-950 px-8 py-20 text-center sm:px-20 lg:py-32"
-          >
-            {/* Background glow */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-              <div className="absolute -left-32 -top-32 size-[500px] rounded-full bg-[#2f9e74]/10 blur-[120px]" />
-              <div className="absolute -bottom-32 -right-32 size-[500px] rounded-full bg-[#2f9e74]/10 blur-[120px]" />
-            </div>
-
-            <div className="relative">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-2 text-xs font-black uppercase tracking-widest text-white/60 backdrop-blur-md">
-                <Sparkles className="size-3.5 text-[#2f9e74]" />
-                Limited offer
-              </div>
-              <h2 className="mt-10 text-4xl font-[900] leading-[1.1] tracking-tighter text-white sm:text-6xl lg:text-7xl">
-                Complimentary Delivery <br className="hidden sm:block" />
-                on Orders Above ৳999
-              </h2>
-              <p className="mx-auto mt-10 max-w-2xl text-lg font-medium text-white/50 lg:text-xl lg:leading-relaxed">
-                Elevate your experience with free nationwide shipping on all curated premium selections.
-              </p>
-              <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-                <Link
-                  href="/products"
-                  className="inline-flex h-16 items-center gap-3 rounded-full bg-[#2f9e74] px-12 text-sm font-black uppercase tracking-widest text-white shadow-2xl shadow-[#2f9e74]/40 transition-all hover:scale-105 hover:bg-[#1a6b4a]"
-                >
-                  Shop now <ArrowRight className="size-4" />
-                </Link>
-                <Link
-                  href="/auth"
-                  className="inline-flex h-16 items-center gap-3 rounded-full border border-white/10 bg-white/5 px-12 text-sm font-black uppercase tracking-widest text-white backdrop-blur-md transition hover:bg-white/10"
-                >
-                  Join the Circle
-                </Link>
-              </div>
-            </div>
-          </motion.div>
+      <section className="relative flex min-h-[80svh] flex-col justify-center overflow-hidden bg-neutral-950 px-8 py-24 text-center w-full sm:min-h-screen">
+        {/* Background glow */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-32 -top-32 size-[800px] rounded-full bg-[#2f9e74]/10 blur-[160px]" />
+          <div className="absolute -bottom-32 -right-32 size-[800px] rounded-full bg-[#2f9e74]/10 blur-[160px]" />
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="relative mx-auto max-w-7xl"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-2 text-xs font-black uppercase tracking-widest text-white/60 backdrop-blur-md">
+            <Sparkles className="size-3.5 text-[#2f9e74]" />
+            Limited offer
+          </div>
+          <h2 className="mt-10 text-4xl font-[900] leading-[1.1] tracking-tighter text-white sm:text-6xl lg:text-8xl">
+            Complimentary Delivery <br className="hidden sm:block" />
+            on Orders Above ৳999
+          </h2>
+          <p className="mx-auto mt-10 max-w-2xl text-lg font-medium text-white/50 lg:text-2xl lg:leading-relaxed">
+            Elevate your experience with free nationwide shipping on all curated premium selections.
+          </p>
+          <div className="mt-16 flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
+            <Link
+              href="/products"
+              className="group/btn relative inline-flex h-16 items-center gap-4 overflow-hidden rounded-full bg-[#2f9e74] px-12 text-sm font-black uppercase tracking-widest text-white shadow-2xl shadow-[#2f9e74]/40 transition-all hover:scale-105 active:scale-95"
+            >
+              <span className="relative">Shop now</span>
+              <ArrowRight className="relative size-4" />
+            </Link>
+            <Link
+              href="/auth"
+              className="inline-flex h-16 items-center gap-3 rounded-full border border-white/10 bg-white/5 px-12 text-sm font-black uppercase tracking-widest text-white backdrop-blur-md transition hover:bg-white/10"
+            >
+              Join the Circle
+            </Link>
+          </div>
+        </motion.div>
       </section>
     </main>
   );

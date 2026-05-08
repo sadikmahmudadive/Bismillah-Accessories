@@ -3,8 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, ShoppingBag, Star } from "lucide-react";
+import { ArrowUpRight, ShoppingBag, Star, Sparkles } from "lucide-react";
 import { useState } from "react";
+
+import { cn } from "@/lib/utils";
 
 import { useCartStore } from "@/lib/store/cart";
 import { FavoriteButton } from "@/components/product/favorite-button";
@@ -65,80 +67,110 @@ export function ProductCard({
 
   return (
     <motion.article
-      whileHover={{ y: -6 }}
-      transition={{ type: "spring", stiffness: 260, damping: 22 }}
-      className="group rounded-[1.75rem] border border-neutral-200 bg-white p-3 shadow-sm transition hover:shadow-2xl hover:shadow-neutral-950/10"
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="group relative flex flex-col overflow-hidden rounded-[2.5rem] bg-white transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)]"
     >
-      <Link href={productLink || "#"} className="block">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[1.35rem] bg-neutral-100">
-          {displayImage ? (
-            <Image
-              src={displayImage}
-              alt={displayName}
-              fill
-              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-              className="object-cover transition duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `radial-gradient(circle at 30% 20%, ${accent}55, transparent 34%), linear-gradient(135deg, #f8faf8, #ece8de 48%, #f7f7f3)`,
-              }}
-            />
-          )}
-          <div className="absolute bottom-3 left-3 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-neutral-700 backdrop-blur">
-            {displayCategory}
+      <div className="relative aspect-[1/1.1] overflow-hidden rounded-[2.2rem] bg-[#fdfdfd] m-2 transition-all duration-700 group-hover:shadow-[inset_0_0_40px_rgba(0,0,0,0.02)]">
+        <Link href={productLink || "#"} className="block h-full w-full p-6">
+          <div className="relative h-full w-full">
+            {displayImage ? (
+              <Image
+                src={displayImage}
+                alt={displayName}
+                fill
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                className="object-contain transition-all duration-1000 ease-[0.16,1,0.3,1] group-hover:scale-110 group-hover:rotate-2"
+              />
+            ) : (
+              <div
+                className="absolute inset-0 rounded-2xl"
+                style={{
+                  background: `radial-gradient(circle at 30% 20%, ${accent}55, transparent 34%), linear-gradient(135deg, #f8faf8, #ece8de 48%, #f7f7f3)`,
+                }}
+              />
+            )}
           </div>
-          {product && (
-            <FavoriteButton 
-              product={product} 
-              className="absolute right-3 top-3" 
-            />
-          )}
-        </div>
-      </Link>
+        </Link>
+        
+        {/* Specular Highlight Glow on Hover */}
+        <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100 bg-[radial-gradient(circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.6),transparent_60%)]" />
 
-      <div className="p-3">
-        <div className="flex items-start justify-between gap-3">
-          <Link href={productLink || "#"} className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-neutral-950 line-clamp-2 hover:text-neutral-700 transition">
-              {displayName}
-            </h3>
-            {product?.averageRating ? (
-              <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-neutral-500">
-                <Star className="size-3 fill-[#b8860b] text-[#b8860b]" />
-                <span>{product.averageRating.toFixed(1)}</span>
-                <span className="text-neutral-400">({product.reviewCount})</span>
-              </div>
-            ) : null}
-          </Link>
-          {productLink ? (
-            <Link
-              href={productLink}
-              aria-label={`View ${displayName}`}
-              title={`View ${displayName}`}
-              className="grid size-8 shrink-0 place-items-center rounded-full bg-neutral-100 text-neutral-700 transition hover:bg-neutral-950 hover:text-white"
-            >
-              <ArrowUpRight className="size-4" />
-            </Link>
-          ) : null}
+        {/* Floating Category Badge */}
+        <div className="absolute left-5 top-5 overflow-hidden rounded-full border border-neutral-200/50 bg-white/60 px-3 py-1 text-[9px] font-[900] uppercase tracking-[0.2em] text-neutral-500 backdrop-blur-xl">
+          {displayCategory}
         </div>
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <span className="text-sm font-semibold text-neutral-700">
-            ৳{displayPrice.toLocaleString("en-BD")}
-          </span>
+
+        {product && (
+          <FavoriteButton 
+            product={product} 
+            className="absolute right-5 top-5 scale-90 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100" 
+          />
+        )}
+
+        {/* Quick Add Overlay - Liquid Motion */}
+        <div className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-center p-5 transition-all duration-700 ease-[0.16,1,0.3,1] group-hover:translate-y-0">
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleAddToCart}
             disabled={isAdding || !product || product.stock === 0}
-            aria-label={`Add ${displayName} to cart`}
-            className="size-10 px-0 rounded-full bg-neutral-950 text-white hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center"
+            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-neutral-950 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all duration-500 hover:bg-[#2f9e74] hover:shadow-[#2f9e74]/40"
           >
             <ShoppingBag className={`size-4 ${isAdding ? "animate-pulse" : ""}`} />
+            {isAdding ? "Processing..." : "Add to Cart"}
           </motion.button>
         </div>
+      </div>
+
+      <div className="flex flex-col px-8 pb-8 pt-4">
+        <Link href={productLink || "#"} className="group/title">
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="text-xl font-[800] leading-tight tracking-tight text-neutral-950 transition-colors duration-300 group-hover/title:text-[#2f9e74]">
+              {displayName}
+            </h3>
+            <span className="mt-1 text-base font-[900] tracking-tighter text-neutral-950">
+              ৳{displayPrice.toLocaleString("en-BD")}
+            </span>
+          </div>
+          
+          <div className="mt-4 flex items-center justify-between">
+            {product?.averageRating ? (
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-neutral-400">
+                <div className="flex items-center gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      className={cn(
+                        "size-2.5",
+                        i < Math.floor(product.averageRating ?? 0) 
+                          ? "fill-[#b8860b] text-[#b8860b]" 
+                          : "fill-neutral-200 text-neutral-200"
+                      )} 
+                    />
+                  ))}
+                </div>
+                <span>{product.averageRating.toFixed(1)}</span>
+                <span className="text-neutral-200">|</span>
+                <span>{product.reviewCount} Reviews</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-neutral-400">
+                <Sparkles className="size-3 text-[#2f9e74]" />
+                <span>Certified Authentic</span>
+              </div>
+            )}
+            
+            <div className="translate-x-4 opacity-0 transition-all duration-500 group-hover:translate-x-0 group-hover:opacity-100">
+               <div className="grid size-8 place-items-center rounded-full bg-[#f6f4ee] text-[#2f9e74]">
+                  <ArrowUpRight className="size-4" />
+               </div>
+            </div>
+          </div>
+        </Link>
       </div>
     </motion.article>
   );

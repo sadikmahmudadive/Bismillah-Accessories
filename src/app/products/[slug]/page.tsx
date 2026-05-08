@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, PackageCheck, ShieldCheck, Truck } from "lucide-react";
+import { ArrowLeft, PackageCheck, ShieldCheck, Truck, Sparkles } from "lucide-react";
 import * as motion from "framer-motion/client";
+
+import { cn } from "@/lib/utils";
 
 import { AddToCartSection } from "@/components/product/add-to-cart-section";
 import { ProductGallery } from "@/components/product/product-gallery";
@@ -58,8 +60,9 @@ export default async function ProductDetailsPage({
   }
 
   return (
-    <main className="bg-transparent px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
+    <main className="relative isolate min-h-screen bg-white text-neutral-950">
+      {/* ─── Breadcrumb & Navigation ─────────────────────────────── */}
+      <div className="absolute left-6 top-6 z-10 sm:left-12 sm:top-12 lg:left-24">
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -67,117 +70,147 @@ export default async function ProductDetailsPage({
         >
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-600 transition hover:text-neutral-950"
+            className="group inline-flex items-center gap-3 text-xs font-black uppercase tracking-widest text-neutral-400 transition hover:text-neutral-950"
           >
-            <ArrowLeft className="size-4" />
-            Back to products
+            <div className="grid size-10 place-items-center rounded-full border border-neutral-100 bg-white shadow-sm transition group-hover:border-neutral-950 group-hover:bg-neutral-950 group-hover:text-white">
+              <ArrowLeft className="size-4" />
+            </div>
+            Back to Collection
           </Link>
         </motion.div>
+      </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-          {/* Left: Image Gallery */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="overflow-hidden rounded-[2.25rem] border border-neutral-200 bg-white/70 backdrop-blur-xl p-3 shadow-sm lg:sticky lg:top-24"
-          >
+      <div className="flex flex-col lg:flex-row">
+        {/* Left: Immersive Image Gallery */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="relative w-full lg:min-h-screen lg:w-3/5"
+        >
+          <div className="flex h-full items-center justify-center bg-[#fdfdfd] p-6 py-24 sm:p-12 lg:p-24">
             <ProductGallery 
               mainImage={product.imageUrl} 
               gallery={product.gallery || []} 
               productName={product.name} 
             />
-          </motion.section>
+          </div>
+          
+          {/* Subtle Branding Watermark */}
+          <div className="absolute bottom-12 left-12 hidden lg:block">
+            <p className="text-4xl font-[900] tracking-tighter text-neutral-100 select-none">
+              BISMILLAH <br /> ACCESSORIES
+            </p>
+          </div>
+        </motion.section>
 
-          {/* Right: Details */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="rounded-[2.25rem] border border-neutral-200 bg-white/70 backdrop-blur-xl p-6 shadow-sm sm:p-8"
-          >
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-[#f6f4ee] px-3 py-1 text-sm font-semibold text-neutral-700">
-                {product.category}
-              </span>
-              <span
-                className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                  product.stock > 0
-                    ? "bg-[#2f9e74]/10 text-[#257a5a]"
-                    : "bg-red-50 text-red-600"
-                }`}
-              >
-                {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
-              </span>
+        {/* Right: Premium Details Showroom */}
+        <motion.section
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full border-t border-neutral-100 bg-white px-6 py-24 sm:px-12 lg:min-h-screen lg:w-2/5 lg:border-l lg:border-t-0 lg:px-20 lg:py-32"
+        >
+          <div className="flex flex-wrap gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-neutral-100 bg-neutral-50 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-neutral-500">
+              <Sparkles className="size-3 text-[#2f9e74]" />
+              {product.category}
             </div>
-
-            <h1 className="mt-5 text-3xl font-semibold tracking-tight text-neutral-950 sm:text-4xl lg:text-5xl">
-              {product.name}
-            </h1>
-            
-            <div className="mt-3 flex items-center gap-3">
-              <StarRating rating={product.averageRating || 0} readonly size="sm" />
-              <span className="text-sm font-semibold text-neutral-600">
-                {product.averageRating ? product.averageRating.toFixed(1) : "No rating"} ({product.reviewCount || 0} reviews)
-              </span>
+            <div className={cn(
+              "inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-widest",
+              product.stock > 0
+                ? "bg-[#2f9e74]/10 text-[#257a5a]"
+                : "bg-red-50 text-red-600"
+            )}>
+              {product.stock > 0 ? "In Stock" : "Limited Stock"}
             </div>
-            <div className="my-8 h-px bg-neutral-100" />
+          </div>
 
-            <div className="prose prose-neutral max-w-none">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400">
-                Product Description
-              </h2>
-              <p className="mt-3 text-base leading-8 text-neutral-600">
-                {product.description}
+          <h1 className="mt-10 text-4xl font-[900] leading-[1] tracking-tighter text-neutral-950 sm:text-6xl lg:text-7xl">
+            {product.name}
+          </h1>
+          
+          <div className="mt-8 flex items-center justify-between">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <StarRating rating={product.averageRating || 0} readonly size="sm" />
+                <span className="text-xs font-black uppercase tracking-widest text-neutral-400">
+                  {product.reviewCount || 0} REVIEWS
+                </span>
+              </div>
+              <p className="text-3xl font-[900] tracking-tighter text-neutral-950">
+                ৳{product.price.toLocaleString("en-BD")}
               </p>
             </div>
+          </div>
 
-            {product.tags.length > 0 ? (
-              <div className="mt-6 flex flex-wrap gap-2">
-                {product.tags.map((tag: string) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-neutral-200 px-3 py-1 text-xs font-semibold text-neutral-500"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            ) : null}
+          <div className="my-12 h-px bg-neutral-100" />
 
-            <div className="mt-10">
-              <AddToCartSection product={product} />
-            </div>
+          <div className="prose prose-neutral max-w-none">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">
+              The Engineering
+            </h2>
+            <p className="mt-6 text-lg font-medium leading-relaxed text-neutral-500">
+              {product.description}
+            </p>
+          </div>
 
-            <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
-              {[
-                { icon: Truck, label: "Fast delivery" },
-                { icon: ShieldCheck, label: "Quality checked" },
-                { icon: PackageCheck, label: "COD ready" },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-2xl bg-[#f6f4ee] p-4 text-center transition hover:bg-[#f0eee4]"
+          {product.tags.length > 0 ? (
+            <div className="mt-10 flex flex-wrap gap-2">
+              {product.tags.map((tag: string) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-neutral-100 px-4 py-1.5 text-[9px] font-black uppercase tracking-widest text-neutral-400 transition hover:border-neutral-950 hover:text-neutral-950"
                 >
-                  <item.icon className="mx-auto mb-3 size-5 text-[#2f9e74]" />
-                  <p className="text-xs font-bold text-neutral-700">
-                    {item.label}
-                  </p>
-                </div>
+                  #{tag}
+                </span>
               ))}
             </div>
-          </motion.section>
-        </div>
+          ) : null}
 
-        {/* Reviews Section */}
-        <ProductReviews productId={product.id} />
+          <div className="mt-16">
+            <AddToCartSection product={product} />
+          </div>
 
-        {/* Related Products */}
-        <RelatedProducts 
-          currentProductId={product.id} 
-          category={product.category} 
-        />
+          {/* Value Props */}
+          <div className="mt-16 grid grid-cols-3 gap-4">
+            {[
+              { icon: Truck, label: "Fast Express" },
+              { icon: ShieldCheck, label: "Quality First" },
+              { icon: PackageCheck, label: "Secure COD" },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="group flex flex-col items-center gap-3 rounded-[2rem] border border-neutral-100 bg-neutral-50 p-6 transition-all hover:bg-white hover:shadow-2xl hover:shadow-neutral-950/5"
+              >
+                <div className="grid size-12 place-items-center rounded-full bg-white text-[#2f9e74] shadow-sm transition group-hover:bg-neutral-950 group-hover:text-white">
+                  <item.icon className="size-5" />
+                </div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-neutral-600">
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </motion.section>
       </div>
+
+      {/* Reviews Section */}
+      <section className="bg-white px-6 py-32 sm:px-12 lg:px-24">
+        <div className="mx-auto max-w-5xl">
+           <ProductReviews productId={product.id} />
+        </div>
+      </section>
+
+      {/* Related Products */}
+      <section className="border-t border-neutral-100 bg-neutral-50 px-6 py-32 sm:px-12 lg:px-24">
+        <div className="mx-auto max-w-7xl">
+          <RelatedProducts 
+            currentProductId={product.id} 
+            category={product.category} 
+          />
+        </div>
+      </section>
     </main>
   );
 }

@@ -118,41 +118,41 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
     <div className="mt-8">
       {/* Top Controls */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative flex-1 max-w-xl">
-          <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
+        <div className="relative flex-1">
+          <Search className="absolute left-6 top-1/2 size-5 -translate-y-1/2 text-neutral-400" />
           <input
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
               pushParams({ q: e.target.value });
             }}
-            placeholder="Search premium accessories..."
-            className="h-12 w-full rounded-full border border-neutral-200 bg-white pl-12 pr-12 text-sm font-semibold text-neutral-950 outline-none transition focus:border-neutral-950 focus:shadow-sm"
+            placeholder="Search our precision crafted collection..."
+            className="h-16 w-full rounded-2xl border border-neutral-100 bg-neutral-50 pl-16 pr-12 text-lg font-bold text-neutral-950 outline-none transition focus:border-[#2f9e74] focus:bg-white focus:shadow-2xl focus:shadow-[#2f9e74]/5"
           />
           {query && (
             <button 
               onClick={() => { setQuery(""); pushParams({ q: "" }); }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-950"
+              className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-950"
             >
-              <X className="size-4" />
+              <X className="size-5" />
             </button>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-bold transition-all",
+              "flex h-16 items-center gap-3 rounded-2xl border px-8 text-sm font-black uppercase tracking-widest transition-all",
               showFilters || category !== "All" || minRating > 0 || priceRange[0] > 0 || priceRange[1] < 10000
-                ? "border-neutral-950 bg-neutral-950 text-white"
-                : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300"
+                ? "border-neutral-950 bg-neutral-950 text-white shadow-xl shadow-neutral-950/20"
+                : "border-neutral-100 bg-neutral-50 text-neutral-700 hover:border-neutral-200 hover:bg-white"
             )}
           >
             <SlidersHorizontal className="size-4" />
             Filters
             {(category !== "All" || minRating > 0 || priceRange[0] > 0) && (
-              <span className="ml-1 size-2 rounded-full bg-[#2f9e74]" />
+              <span className="ml-1 size-2 rounded-full bg-[#2f9e74] shadow-[0_0_8px_#2f9e74]" />
             )}
           </button>
 
@@ -164,12 +164,12 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
                 setSortBy(val);
                 pushParams({ sort: val });
               }}
-              className="h-12 appearance-none rounded-full border border-neutral-200 bg-white pl-6 pr-10 text-sm font-bold text-neutral-700 outline-none transition hover:border-neutral-300 focus:border-neutral-950"
+              className="h-16 appearance-none rounded-2xl border border-neutral-100 bg-neutral-50 pl-8 pr-12 text-xs font-black uppercase tracking-widest text-neutral-700 outline-none transition hover:border-neutral-200 hover:bg-white focus:border-neutral-950"
             >
-              <option value="newest">Newest First</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="top-rated">Top Rated</option>
+              <option value="newest">Sort: Newest First</option>
+              <option value="price-asc">Sort: Price ↑</option>
+              <option value="price-desc">Sort: Price ↓</option>
+              <option value="top-rated">Sort: Top Rated</option>
             </select>
             <ChevronDown className="absolute right-4 top-1/2 size-4 -translate-y-1/2 text-neutral-400 pointer-events-none" />
           </div>
@@ -312,9 +312,9 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
 
         {/* Product Grid */}
         <div className="flex-1 min-w-0">
-          <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm font-medium text-neutral-500">
-              Showing <span className="font-bold text-neutral-950">{filteredAndSortedProducts.length}</span> products
+          <div className="mb-8 flex items-center justify-between">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-neutral-400">
+              Discovered <span className="text-neutral-950">{filteredAndSortedProducts.length}</span> curated pieces
             </p>
           </div>
 
@@ -322,7 +322,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
             {filteredAndSortedProducts.length > 0 ? (
               <motion.div
                 layout
-                className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+                className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
               >
                 {filteredAndSortedProducts.map((product, i) => (
                   <motion.div
