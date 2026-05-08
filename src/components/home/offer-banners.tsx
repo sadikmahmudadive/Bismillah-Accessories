@@ -43,7 +43,7 @@ export function OfferBanners() {
   };
 
   if (isLoading) {
-    return <div className="h-[300px] w-full animate-pulse rounded-[2.5rem] bg-neutral-100 sm:h-[450px]" />;
+    return <div className="h-[calc(100vh-64px)] min-h-[600px] w-full animate-pulse bg-neutral-100" />;
   }
 
   if (banners.length === 0) return null;
@@ -71,7 +71,7 @@ export function OfferBanners() {
   };
 
   return (
-    <section className="relative group overflow-hidden rounded-[2.5rem] bg-neutral-950 shadow-2xl aspect-[4/5] sm:aspect-[21/9]">
+    <section className="relative group overflow-hidden bg-neutral-950 shadow-2xl h-[calc(100vh-64px)] min-h-[600px] w-full">
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={currentIndex}
@@ -87,15 +87,21 @@ export function OfferBanners() {
           }}
           className="absolute inset-0"
         >
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <img 
+          {/* Background Image with Ken Burns Effect */}
+          <div className="absolute inset-0 overflow-hidden">
+            <motion.img 
+              key={`img-${currentIndex}`}
+              initial={{ scale: 1.15, opacity: 0 }}
+              animate={{ scale: 1, opacity: 0.55 }}
+              transition={{ duration: 8, ease: "linear" }}
               src={currentBanner.imageUrl} 
               alt={currentBanner.title}
-              className="h-full w-full object-cover opacity-60 transition-transform duration-[10s] ease-linear scale-110 group-hover:scale-100"
+              className="h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/40 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent" />
+            {/* Multi-layered Gradients for Depth */}
+            <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-neutral-950/20" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(47,158,116,0.1),transparent_50%)]" />
           </div>
 
           {/* Content */}
@@ -111,10 +117,10 @@ export function OfferBanners() {
             </motion.div>
             
             <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mt-6 max-w-2xl text-4xl font-black leading-tight text-white sm:text-6xl"
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="mt-6 max-w-4xl text-5xl font-[900] leading-[0.95] tracking-tighter text-white sm:text-7xl lg:text-8xl"
             >
               {currentBanner.title}
             </motion.h2>
@@ -123,8 +129,8 @@ export function OfferBanners() {
               <motion.p 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="mt-4 max-w-lg text-lg font-medium text-white/70"
+                transition={{ delay: 0.55, duration: 0.8 }}
+                className="mt-6 max-w-xl text-lg font-medium text-white/60 sm:text-xl lg:text-2xl"
               >
                 {currentBanner.subtitle}
               </motion.p>
@@ -133,15 +139,18 @@ export function OfferBanners() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="mt-10"
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="mt-12"
             >
               <Link 
                 href={currentBanner.link || "/products"}
-                className="inline-flex items-center gap-3 rounded-full bg-[#2f9e74] px-10 py-4 text-sm font-black text-white shadow-xl shadow-[#2f9e74]/30 transition-all hover:scale-105 hover:bg-[#1a6b4a]"
+                className="group/btn relative inline-flex items-center gap-4 overflow-hidden rounded-full bg-white px-12 py-5 text-sm font-black uppercase tracking-widest text-neutral-950 transition-all hover:scale-105 active:scale-95"
               >
-                {currentBanner.buttonText || "Shop Now"}
-                <ArrowRight className="size-4" />
+                <div className="absolute inset-0 bg-[#2f9e74] translate-y-full transition-transform duration-500 group-hover/btn:translate-y-0" />
+                <span className="relative transition-colors duration-500 group-hover/btn:text-white">
+                  {currentBanner.buttonText || "Shop Now"}
+                </span>
+                <ArrowRight className="relative size-4 transition-colors duration-500 group-hover/btn:text-white" />
               </Link>
             </motion.div>
           </div>
@@ -151,7 +160,7 @@ export function OfferBanners() {
       {/* Controls */}
       {banners.length > 1 && (
         <>
-          <div className="absolute bottom-10 left-8 z-10 flex gap-2 sm:left-20">
+          <div className="absolute bottom-12 left-8 z-10 flex gap-3 sm:left-20">
             {banners.map((_, idx) => (
               <button
                 key={idx}
@@ -159,26 +168,28 @@ export function OfferBanners() {
                   setDirection(idx > currentIndex ? 1 : -1);
                   setCurrentIndex(idx);
                 }}
-                className={cn(
-                  "h-1 rounded-full transition-all duration-500",
-                  idx === currentIndex ? "w-10 bg-[#2f9e74]" : "w-4 bg-white/20"
-                )}
-              />
+                className="group relative h-8 w-6 flex items-center justify-center"
+              >
+                <div className={cn(
+                  "h-1 rounded-full transition-all duration-700 ease-[0.16,1,0.3,1]",
+                  idx === currentIndex ? "w-6 bg-[#2f9e74] shadow-[0_0_10px_rgba(47,158,116,0.5)]" : "w-1.5 bg-white/20 group-hover:bg-white/40"
+                )} />
+              </button>
             ))}
           </div>
 
-          <div className="absolute bottom-10 right-8 z-10 flex gap-3 sm:right-20">
+          <div className="absolute bottom-12 right-8 z-10 flex gap-3 sm:right-20">
             <button
               onClick={() => paginate(-1)}
-              className="grid size-12 place-items-center rounded-full bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20"
+              className="grid size-14 place-items-center rounded-full border border-white/10 bg-white/5 text-white backdrop-blur-xl transition-all hover:bg-white/10 hover:scale-110 active:scale-95"
             >
-              <ChevronLeft className="size-5" />
+              <ChevronLeft className="size-6" />
             </button>
             <button
               onClick={() => paginate(1)}
-              className="grid size-12 place-items-center rounded-full bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20"
+              className="grid size-14 place-items-center rounded-full border border-white/10 bg-white/5 text-white backdrop-blur-xl transition-all hover:bg-white/10 hover:scale-110 active:scale-95"
             >
-              <ChevronRight className="size-5" />
+              <ChevronRight className="size-6" />
             </button>
           </div>
         </>

@@ -2,14 +2,11 @@
 
 import {
   motion,
-  useMotionValue,
   useScroll,
-  useSpring,
   useTransform,
 } from "framer-motion";
 import {
   ArrowRight,
-  Award,
   CreditCard,
   HardDrive,
   Headphones,
@@ -18,7 +15,6 @@ import {
   ShieldCheck,
   Smartphone,
   Sparkles,
-  Star,
   Truck,
   Watch,
   Zap,
@@ -30,7 +26,6 @@ import { ProductCard } from "@/components/product/product-card";
 import { ButtonLink } from "@/components/ui/button";
 import { ProductCardSkeleton } from "@/components/ui/loader";
 import { OfferBanners } from "@/components/home/offer-banners";
-import { AnimatedHeroTitle } from "@/components/home/animated-hero-title";
 import type { Product } from "@/types/domain";
 
 const benefits = [
@@ -40,20 +35,10 @@ const benefits = [
   { icon: PackageCheck, label: "Easy returns", sub: "7-day policy" },
 ];
 
-const stats = [
-  { value: "500+", label: "Products" },
-  { value: "10k+", label: "Happy customers" },
-  { value: "4.9★", label: "Average rating" },
-  { value: "48h", label: "Avg delivery" },
-];
-
 const categories = [
-  { name: "Phone Cases", icon: Smartphone, href: "/products?category=Phone+Case" },
-  { name: "Charging", icon: Zap, href: "/products?category=Charging" },
-  { name: "Protection", icon: Shield, href: "/products?category=Protection" },
-  { name: "Audio", icon: Headphones, href: "/products?category=Audio" },
-  { name: "Smart Watch", icon: Watch, href: "/products?category=Watch" },
-  { name: "Storage", icon: HardDrive, href: "/products?category=Storage" },
+  { name: "Phone Cases", icon: Smartphone, href: "/products?category=Phone+Case", img: "https://images.unsplash.com/photo-1592890288564-76628a30a657?q=80&w=1000&auto=format&fit=crop" },
+  { name: "Charging", icon: Zap, href: "/products?category=Charging", img: "https://images.unsplash.com/photo-1615526675159-e248c3021d3f?q=80&w=1000&auto=format&fit=crop" },
+  { name: "Audio", icon: Headphones, href: "/products?category=Audio", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop" },
 ];
 
 export function Homepage() {
@@ -97,187 +82,92 @@ export function Homepage() {
   }, []);
 
   return (
-    <main className="relative isolate overflow-hidden bg-transparent text-neutral-950">
-      {/* ─── Dynamic Banners ────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">
+    <main className="relative isolate overflow-hidden bg-white text-neutral-950">
+      {/* ─── Hero Banners ────────────────────────────────────────── */}
+      <div className="w-full">
         <OfferBanners />
       </div>
 
-      {/* ─── Hero ─────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[50svh] px-4 pb-16 pt-14 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-          <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-          >
-            {/* Badge */}
+      {/* ─── The Philosophy (Storytelling Section 1) ────────────────── */}
+      <section className="relative px-4 py-24 sm:px-6 lg:px-8 lg:py-40">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
             <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.15, duration: 0.5 }}
-              className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/80 px-4 py-1.5 text-sm font-semibold text-neutral-700 shadow-sm backdrop-blur"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             >
-              <Sparkles className="size-3.5 text-[#b8860b]" />
-              Bangladesh&apos;s premium accessory store
-            </motion.div>
-
-            <AnimatedHeroTitle />
-
-            <p className="mt-6 max-w-xl text-lg leading-8 text-neutral-600">
-              Elevate your everyday tech with curated premium accessories.
-              Fast, reliable delivery across Bangladesh.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/products" showArrow>
-                Browse products
-              </ButtonLink>
-              <ButtonLink href="/auth" variant="secondary">
-                Create account
-              </ButtonLink>
-            </div>
-
-            {/* Benefit chips */}
-            <div className="mt-10 grid max-w-xl grid-cols-2 gap-3 sm:grid-cols-4">
-              {benefits.map((item, i) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.07 }}
-                  whileHover={{ y: -4, scale: 1.03 }}
-                  className="rounded-2xl border border-neutral-200 bg-white/80 p-3.5 shadow-sm backdrop-blur"
-                >
-                  <item.icon className="size-5 text-[#2f9e74]" />
-                  <p className="mt-2.5 text-sm font-semibold leading-5 text-neutral-800">
-                    {item.label}
-                  </p>
-                  <p className="text-xs text-neutral-500">{item.sub}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Hero card */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 28 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
-            className="relative hidden lg:block"
-          >
-            <div className="rounded-[2rem] border border-white/80 bg-white/85 p-4 shadow-[0_32px_96px_rgba(0,0,0,0.14)] backdrop-blur-2xl">
-              <div className="rounded-[1.6rem] border border-neutral-100 bg-[#f6f4ee] p-5">
-                {/* Card header */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
-                      Store status
-                    </p>
-                    <p className="mt-1 text-2xl font-bold text-neutral-950">
-                      Live & ready
-                    </p>
-                  </div>
-                  <span className="flex items-center gap-1.5 rounded-full bg-[#2f9e74]/15 px-3 py-1.5 text-xs font-bold text-[#257a5a]">
-                    <span className="size-2 rounded-full bg-[#2f9e74] animate-pulse" />
-                    Online
-                  </span>
-                </div>
-
-                {/* Stats */}
-                <div className="mt-5 grid grid-cols-2 gap-3">
-                  {stats.map((s) => (
-                    <div
-                      key={s.label}
-                      className="rounded-2xl bg-white px-4 py-3 shadow-sm"
-                    >
-                      <p className="text-xl font-bold text-neutral-950">
-                        {s.value}
-                      </p>
-                      <p className="text-xs text-neutral-500">{s.label}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Recent activity */}
-                <div className="mt-4 space-y-2">
-                  {[
-                    { text: "New order placed — Phone Case", time: "2m ago" },
-                    { text: "Charging Cable sold out", time: "14m ago" },
-                    { text: "bKash payment confirmed", time: "31m ago" },
-                  ].map((item) => (
-                    <div
-                      key={item.text}
-                      className="flex items-center justify-between rounded-xl bg-white px-3 py-2.5 shadow-sm"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className="size-2 rounded-full bg-[#2f9e74]" />
-                        <span className="text-xs font-medium text-neutral-700">
-                          {item.text}
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-neutral-400">
-                        {item.time}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Floating review badge */}
-            <motion.div
-              animate={{ y: [0, -6, 0] }}
-              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-              className="absolute -bottom-4 -left-6 flex items-center gap-2.5 rounded-2xl bg-white px-4 py-3 shadow-xl"
-            >
-              <div className="flex -space-x-1.5">
-                {["#2f9e74", "#b8860b", "#d65f5f"].map((c) => (
-                  <span
-                    key={c}
-                    className="grid size-7 place-items-center rounded-full border-2 border-white text-[10px] font-bold text-white"
-                    style={{ background: c }}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-              <div>
-                <p className="text-xs font-bold text-neutral-950">4.9 / 5.0</p>
-                <p className="text-[11px] text-neutral-500">from 2.4k reviews</p>
+              <p className="text-sm font-black uppercase tracking-[0.3em] text-[#2f9e74]">
+                Our Philosophy
+              </p>
+              <h2 className="mt-8 text-5xl font-[900] leading-[0.9] tracking-tighter sm:text-7xl lg:text-8xl">
+                Accessories <br /> 
+                <span className="text-neutral-200">Reimagined.</span>
+              </h2>
+              <p className="mt-10 max-w-xl text-xl font-medium leading-relaxed text-neutral-500 lg:text-2xl">
+                We believe tech should be as beautiful as it is functional. Our curated collection brings world-class protection and charging to your fingertips.
+              </p>
+              <div className="mt-12">
+                <ButtonLink href="/products" showArrow className="h-16 px-10 text-lg">
+                  Explore the collection
+                </ButtonLink>
               </div>
             </motion.div>
-          </motion.div>
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              className="relative aspect-square overflow-hidden rounded-[3rem] bg-neutral-100 shadow-2xl shadow-neutral-950/10"
+            >
+              <img 
+                src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1000&auto=format&fit=crop" 
+                alt="Premium tech" 
+                className="h-full w-full object-cover transition-transform duration-[10s] hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* ─── Stats bar ────────────────────────────────────────────────── */}
-      <section className="border-y border-neutral-200 bg-white/60 backdrop-blur-xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {[
-              { icon: Award, label: "Premium Quality", value: "100%" },
-              { icon: Truck, label: "Delivery Coverage", value: "Nationwide" },
-              { icon: Star, label: "Customer Rating", value: "4.9 / 5" },
-              { icon: Zap, label: "Order Processing", value: "Same day" },
-            ].map((item, i) => (
+      {/* ─── Innovation Grid (Storytelling Section 2) ────────────────── */}
+      <section className="bg-neutral-950 py-24 text-white sm:py-32 lg:py-48 rounded-[4rem] mx-4 sm:mx-6 lg:mx-8">
+        <div className="mx-auto max-w-7xl px-8">
+          <div className="flex flex-col items-center text-center">
+            <motion.p 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              className="text-sm font-black uppercase tracking-[0.4em] text-[#2f9e74]"
+            >
+              Excellence in every detail
+            </motion.p>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="mt-8 text-4xl font-[900] tracking-tighter sm:text-6xl lg:text-7xl"
+            >
+              Engineered for <br className="sm:hidden" /> Performance.
+            </motion.h2>
+          </div>
+
+          <div className="mt-24 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {benefits.map((item, i) => (
               <motion.div
                 key={item.label}
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className="flex items-center gap-3"
+                transition={{ delay: i * 0.1 }}
+                className="group relative overflow-hidden rounded-[2.5rem] bg-white/5 p-10 backdrop-blur-sm transition-colors hover:bg-white/10"
               >
-                <div className="grid size-10 shrink-0 place-items-center rounded-full bg-[#f6f4ee]">
-                  <item.icon className="size-4 text-[#2f9e74]" />
+                <div className="grid size-14 place-items-center rounded-2xl bg-[#2f9e74] text-white shadow-[0_0_20px_rgba(47,158,116,0.4)]">
+                  <item.icon className="size-6" />
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-neutral-950">
-                    {item.value}
-                  </p>
-                  <p className="text-xs text-neutral-500">{item.label}</p>
-                </div>
+                <h3 className="mt-8 text-2xl font-bold">{item.label}</h3>
+                <p className="mt-4 text-neutral-400 font-medium leading-relaxed">{item.sub}</p>
+                <div className="mt-8 h-1 w-0 bg-[#2f9e74] transition-all duration-500 group-hover:w-full" />
               </motion.div>
             ))}
           </div>
@@ -285,42 +175,48 @@ export function Homepage() {
       </section>
 
       {/* ─── Shop by Category ─────────────────────────────────────────── */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8">
+      <section className="px-4 py-24 sm:px-6 lg:px-8 lg:py-40">
         <div className="mx-auto max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.55 }}
+            className="text-center sm:text-left"
           >
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e74]">
-              Categories
+            <p className="text-sm font-black uppercase tracking-[0.4em] text-[#2f9e74]">
+              Collections
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-              Shop by type
+            <h2 className="mt-8 text-5xl font-[900] tracking-tighter sm:text-7xl">
+              Curated Selection.
             </h2>
           </motion.div>
 
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((cat, i) => (
               <motion.div
                 key={cat.name}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.06, duration: 0.4 }}
-                whileHover={{ y: -6, scale: 1.04 }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
+                className="group relative h-[450px] overflow-hidden rounded-[3rem]"
               >
-                <Link
-                  href={cat.href}
-                  className="group flex flex-col items-center gap-3 rounded-[1.75rem] border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#2f9e74]/40 hover:shadow-lg"
-                >
-                  <div className="grid size-12 place-items-center rounded-2xl bg-[#f6f4ee] transition group-hover:bg-[#2f9e74]/10 group-hover:text-[#2f9e74]">
-                    <cat.icon className="size-6 text-neutral-600 transition group-hover:text-[#2f9e74]" strokeWidth={1.5} />
+                <Link href={cat.href} className="block h-full w-full">
+                  <div className="absolute inset-0 transition-transform duration-1000 group-hover:scale-110">
+                     <img 
+                        src={cat.img} 
+                        alt={cat.name} 
+                        className="h-full w-full object-cover grayscale-[0.5] transition-all duration-700 group-hover:grayscale-0" 
+                     />
                   </div>
-                  <span className="text-center text-sm font-semibold text-neutral-800 transition group-hover:text-neutral-950">
-                    {cat.name}
-                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute bottom-10 left-10 text-white">
+                    <cat.icon className="size-10 mb-6 opacity-80" strokeWidth={1} />
+                    <h3 className="text-4xl font-black tracking-tight">{cat.name}</h3>
+                    <div className="mt-6 flex items-center gap-3 text-xs font-black uppercase tracking-widest opacity-0 transition-all duration-500 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0">
+                      Explore Series <ArrowRight className="size-4" />
+                    </div>
+                  </div>
                 </Link>
               </motion.div>
             ))}
@@ -332,27 +228,27 @@ export function Homepage() {
       <section
         ref={productsRef}
         id="products"
-        className="relative bg-white/40 backdrop-blur-lg border-y border-neutral-200/60 px-4 py-16 sm:px-6 lg:px-8"
+        className="px-4 py-24 sm:px-6 lg:px-8 bg-neutral-50 border-t border-neutral-100"
       >
         <motion.div
           className="mx-auto max-w-7xl"
           style={{ opacity: productsOpacity, y: productsY }}
         >
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="flex flex-col justify-between gap-8 sm:flex-row sm:items-end">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e74]">
-                Featured
+              <p className="text-sm font-black uppercase tracking-[0.4em] text-[#2f9e74]">
+                The Shop
               </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-                Bestsellers
+              <h2 className="mt-8 text-4xl font-[900] tracking-tighter sm:text-6xl">
+                New Arrivals.
               </h2>
             </div>
-            <ButtonLink href="/products" variant="secondary" showArrow>
+            <ButtonLink href="/products" variant="secondary" showArrow className="h-14">
               View all products
             </ButtonLink>
           </div>
 
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {isLoadingProducts ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />
@@ -370,17 +266,12 @@ export function Homepage() {
                 </motion.div>
               ))
             ) : (
-              <div className="col-span-full rounded-[2rem] border border-dashed border-neutral-300 bg-white py-16 text-center">
-                <p className="text-neutral-500">
+              <div className="col-span-full rounded-[3rem] border-2 border-dashed border-neutral-200 bg-white py-24 text-center">
+                <p className="text-lg font-bold text-neutral-400">
                   {productsError
-                    ? "Failed to load products"
-                    : "No products yet — add some in the admin panel."}
+                    ? "Connectivity issue. Please refresh."
+                    : "Fresh arrivals are on the way."}
                 </p>
-                <div className="mt-6 flex justify-center gap-3">
-                  <ButtonLink href="/admin" variant="secondary">
-                    Open admin
-                  </ButtonLink>
-                </div>
               </div>
             )}
           </div>
@@ -388,45 +279,44 @@ export function Homepage() {
       </section>
 
       {/* ─── CTA Banner ───────────────────────────────────────────────── */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8">
+      <section className="px-4 py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative overflow-hidden rounded-[2.5rem] bg-neutral-950 px-8 py-14 text-center sm:px-16"
+            className="relative overflow-hidden rounded-[4rem] bg-neutral-950 px-8 py-20 text-center sm:px-20 lg:py-32"
           >
             {/* Background glow */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
-              <div className="absolute -left-32 -top-32 size-96 rounded-full bg-[#2f9e74]/20 blur-3xl" />
-              <div className="absolute -bottom-32 -right-32 size-96 rounded-full bg-[#b8860b]/15 blur-3xl" />
+              <div className="absolute -left-32 -top-32 size-[500px] rounded-full bg-[#2f9e74]/10 blur-[120px]" />
+              <div className="absolute -bottom-32 -right-32 size-[500px] rounded-full bg-[#2f9e74]/10 blur-[120px]" />
             </div>
 
             <div className="relative">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white/80">
-                <Sparkles className="size-3.5 text-[#b8860b]" />
-                Limited time offer
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-2 text-xs font-black uppercase tracking-widest text-white/60 backdrop-blur-md">
+                <Sparkles className="size-3.5 text-[#2f9e74]" />
+                Limited offer
               </div>
-              <h2 className="mt-6 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-                Free delivery on orders <br className="hidden sm:block" />
-                over ৳999
+              <h2 className="mt-10 text-4xl font-[900] leading-[1.1] tracking-tighter text-white sm:text-6xl lg:text-7xl">
+                Complimentary Delivery <br className="hidden sm:block" />
+                on Orders Above ৳999
               </h2>
-              <p className="mx-auto mt-4 max-w-lg text-base text-white/70">
-                Shop now and enjoy free home delivery on any order above ৳999.
-                Valid for Cash on Delivery and bKash payments.
+              <p className="mx-auto mt-10 max-w-2xl text-lg font-medium text-white/50 lg:text-xl lg:leading-relaxed">
+                Elevate your experience with free nationwide shipping on all curated premium selections.
               </p>
-              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <Link
                   href="/products"
-                  className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-neutral-950 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
+                  className="inline-flex h-16 items-center gap-3 rounded-full bg-[#2f9e74] px-12 text-sm font-black uppercase tracking-widest text-white shadow-2xl shadow-[#2f9e74]/40 transition-all hover:scale-105 hover:bg-[#1a6b4a]"
                 >
                   Shop now <ArrowRight className="size-4" />
                 </Link>
                 <Link
                   href="/auth"
-                  className="inline-flex h-12 items-center gap-2 rounded-full border border-white/25 px-6 text-sm font-semibold text-white transition hover:bg-white/10"
+                  className="inline-flex h-16 items-center gap-3 rounded-full border border-white/10 bg-white/5 px-12 text-sm font-black uppercase tracking-widest text-white backdrop-blur-md transition hover:bg-white/10"
                 >
-                  Create account
+                  Join the Circle
                 </Link>
               </div>
             </div>
