@@ -57,7 +57,7 @@ export type ProductInput = {
   variants?: ProductVariant[];
 };
 
-export type PaymentMethod = "cash_on_delivery" | "bkash_mock";
+export type PaymentMethod = "cash_on_delivery" | "bkash";
 
 export type OrderStatus =
   | "pending"

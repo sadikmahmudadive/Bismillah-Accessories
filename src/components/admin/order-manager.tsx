@@ -357,7 +357,7 @@ function OrderRow({ order, isExpanded, onToggle, onStatusUpdate, isUpdating }: a
                       <CreditCard className="size-3.5" /> Payment
                     </h5>
                     <div className="mt-3 flex items-center gap-2 text-sm font-bold text-neutral-900">
-                      {order.paymentMethod === "bkash_mock" ? (
+                      {order.paymentMethod === "bkash" ? (
                         <>
                           <span className="text-[#e2136e]">bKash</span>
                           {order.bkashTransactionId && (

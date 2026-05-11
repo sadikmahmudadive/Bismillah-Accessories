@@ -253,7 +253,7 @@ export default function OrderConfirmationPage({ params }: PageProps) {
               className="rounded-[2rem] border border-neutral-200 bg-white p-5 shadow-sm"
             >
               <div className="inline-flex items-center gap-2 rounded-full bg-[#f6f4ee] px-3 py-1 text-sm font-semibold text-neutral-700">
-                {order.paymentMethod === "bkash_mock" ? (
+                {order.paymentMethod === "bkash" ? (
                   <CreditCard className="size-4 text-[#e2136e]" />
                 ) : (
                   <Banknote className="size-4 text-[#b8860b]" />
@@ -261,7 +261,7 @@ export default function OrderConfirmationPage({ params }: PageProps) {
                 Payment
               </div>
               <p className="mt-3 text-sm font-semibold text-neutral-950">
-                {order.paymentMethod === "bkash_mock" ? "bKash (simulated)" : "Cash on Delivery"}
+                {order.paymentMethod === "bkash" ? "bKash" : "Cash on Delivery"}
               </p>
               {order.bkashTransactionId && (
                 <p className="mt-1 text-xs text-neutral-500">

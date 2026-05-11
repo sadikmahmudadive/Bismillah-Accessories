@@ -13,7 +13,7 @@ import {
   User,
   Navigation,
 } from "lucide-react";
-import { FormEvent, useState, useCallback } from "react";
+import { FormEvent, useState } from "react";
 
 import dynamic from "next/dynamic";
 const MapPicker = dynamic(() => import("@/components/ui/map-picker").then((mod) => mod.MapPicker), { 
@@ -109,6 +109,53 @@ export function CheckoutForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  async function finalizeOrder(trxId?: string) {
+    setIsSubmitting(true);
+    try {
+      if (!user) throw new Error("Unauthorized");
+      const token = await user.getIdToken();
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          customerName: form.customerName.trim(),
+          customerEmail: user.email,
+          phone: form.phone.trim(),
+          address: form.address.trim(),
+          items: items.map((item) => ({
+            productId: item.productId,
+            name: item.name,
+            imageUrl: item.imageUrl,
+            price: item.price,
+            quantity: item.quantity,
+            variantId: item.variantId,
+            variantName: item.variantName,
+          })),
+          subtotal,
+          deliveryFee,
+          promoCode: appliedPromo?.code,
+          discountAmount,
+          total,
+          paymentMethod: form.paymentMethod,
+          bkashTransactionId: trxId,
+        }),
+      });
+
+      const payload = await response.json();
+      if (!response.ok || !payload.success) throw new Error(payload.error || "Order creation failed");
+
+      clearCart();
+      router.push(`/orders/${payload.orderId}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save order");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   const handleGps = async () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser");
@@ -157,64 +204,19 @@ export function CheckoutForm() {
       return;
     }
 
+
     if (
-      form.paymentMethod === "bkash_mock" &&
+      form.paymentMethod === "bkash" &&
       (!form.bkashNumber.trim() || !form.bkashTransactionId.trim())
     ) {
       setError("Please provide your bKash number and transaction ID.");
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      const token = await user.getIdToken();
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          customerName: form.customerName.trim(),
-          customerEmail: user.email,
-          phone: form.phone.trim(),
-          address: form.address.trim(),
-          items: items.map((item) => ({
-            productId: item.productId,
-            name: item.name,
-            imageUrl: item.imageUrl,
-            price: item.price,
-            quantity: item.quantity,
-            variantId: item.variantId,
-            variantName: item.variantName,
-          })),
-          subtotal,
-          deliveryFee: deliveryFee,
-          promoCode: appliedPromo?.code,
-          discountAmount,
-          total,
-          paymentMethod: form.paymentMethod,
-          bkashTransactionId:
-            form.paymentMethod === "bkash_mock"
-              ? form.bkashTransactionId.trim()
-              : undefined,
-        }),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok || !payload.success) {
-        throw new Error(payload.error || "Failed to place order. Please try again.");
-      }
-
-      clearCart();
-      router.push(`/orders/${payload.orderId}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Use finalizeOrder for all payment methods
+    await finalizeOrder(
+      form.paymentMethod === "bkash" ? form.bkashTransactionId.trim() : undefined
+    );
   }
 
   if (items.length === 0) {
@@ -251,6 +253,7 @@ export function CheckoutForm() {
       onSubmit={handleSubmit}
       className="grid gap-6 lg:grid-cols-[1fr_0.5fr] lg:items-start"
     >
+
       {/* Left col: delivery + payment */}
       <div className="grid gap-5">
         {/* Delivery */}
@@ -353,18 +356,18 @@ export function CheckoutForm() {
               description="Pay when your order arrives"
             />
             <PaymentOption
-              selected={form.paymentMethod === "bkash_mock"}
-              onSelect={() => setField("paymentMethod", "bkash_mock")}
+              selected={form.paymentMethod === "bkash"}
+              onSelect={() => setField("paymentMethod", "bkash")}
               icon={
                 <span className="text-base font-bold text-[#e2136e]">b</span>
               }
               label="bKash"
-              description="Mobile payment (simulated)"
+              description="Pay securely with bKash"
             />
           </div>
 
           <AnimatePresence>
-            {form.paymentMethod === "bkash_mock" && (
+            {form.paymentMethod === "bkash" && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -383,7 +386,7 @@ export function CheckoutForm() {
                     value={form.bkashNumber}
                     onChange={(v) => setField("bkashNumber", v)}
                     placeholder="01XXXXXXXXX"
-                    required={form.paymentMethod === "bkash_mock"}
+                    required={form.paymentMethod === "bkash"}
                   />
                   <FormField
                     label="Transaction ID"
@@ -391,7 +394,7 @@ export function CheckoutForm() {
                     value={form.bkashTransactionId}
                     onChange={(v) => setField("bkashTransactionId", v)}
                     placeholder="e.g. 8N6RT4HI9O"
-                    required={form.paymentMethod === "bkash_mock"}
+                    required={form.paymentMethod === "bkash"}
                   />
                 </div>
               </motion.div>
@@ -506,7 +509,7 @@ export function CheckoutForm() {
           ) : (
             <>
               <CheckCircle2 className="size-4" />
-              Place order
+              {form.paymentMethod === "bkash" ? "Pay with bKash" : "Place order"}
             </>
           )}
         </Button>

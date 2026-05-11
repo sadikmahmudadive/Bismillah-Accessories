@@ -613,7 +613,7 @@ function OrderRow({ order }: { order: Order }) {
                     <div className="grid size-8 place-items-center rounded-lg bg-white shadow-sm">
                       <ShoppingBag className="size-4 text-[#2f9e74]" />
                     </div>
-                    {order.paymentMethod === "bkash_mock" ? (
+                    {order.paymentMethod === "bkash" ? (
                       <div className="flex items-center gap-2">
                         <span className="text-[#e2136e]">bKash</span>
                         {order.bkashTransactionId && (

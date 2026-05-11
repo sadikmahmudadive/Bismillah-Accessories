@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!["cash_on_delivery", "bkash_mock"].includes(paymentMethod as string)) {
+    if (!["cash_on_delivery", "bkash"].includes(paymentMethod as string)) {
       return NextResponse.json(
         { success: false, error: "Invalid payment method" },
         { status: 400 }
