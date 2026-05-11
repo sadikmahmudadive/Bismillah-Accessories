@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { OfferBanner } from "@/types/domain";
 
@@ -85,19 +86,26 @@ export function OfferBanners() {
             opacity: { duration: 0.4 },
             scale: { duration: 0.5 }
           }}
-          className="absolute inset-0"
+          className="absolute inset-0 will-change-transform"
         >
           {/* Background Image with Ken Burns Effect */}
           <div className="absolute inset-0 overflow-hidden">
-            <motion.img 
-              key={`img-${currentIndex}`}
-              initial={{ scale: 1.15, opacity: 0 }}
+            <motion.div
+              key={`img-container-${currentIndex}`}
+              initial={{ scale: 1.1, opacity: 0 }}
               animate={{ scale: 1, opacity: 0.55 }}
-              transition={{ duration: 8, ease: "linear" }}
-              src={currentBanner.imageUrl} 
-              alt={currentBanner.title}
-              className="h-full w-full object-cover"
-            />
+              transition={{ duration: 6, ease: "easeOut" }}
+              className="relative h-full w-full"
+            >
+              <Image 
+                src={currentBanner.imageUrl} 
+                alt={currentBanner.title}
+                fill
+                priority={currentIndex === 0}
+                sizes="100vw"
+                className="h-full w-full object-cover"
+              />
+            </motion.div>
             {/* Multi-layered Gradients for Depth */}
             <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/60 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-neutral-950/20" />

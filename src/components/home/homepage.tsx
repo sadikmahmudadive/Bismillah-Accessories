@@ -4,6 +4,8 @@ import {
   motion,
   useScroll,
   useTransform,
+  LazyMotion,
+  domMax
 } from "framer-motion";
 import {
   ArrowRight,
@@ -21,6 +23,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 import { ProductCard } from "@/components/product/product-card";
 import { ButtonLink } from "@/components/ui/button";
@@ -120,11 +123,13 @@ export function Homepage() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="relative aspect-square overflow-hidden rounded-[3rem] bg-neutral-100 shadow-2xl shadow-neutral-950/10"
+              className="relative aspect-square overflow-hidden rounded-[3rem] bg-neutral-100 shadow-2xl shadow-neutral-950/10 will-change-transform"
             >
-              <img 
+              <Image 
                 src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1000&auto=format&fit=crop" 
                 alt="Premium tech" 
+                fill
+                priority
                 className="h-full w-full object-cover transition-transform duration-[10s] hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -205,10 +210,11 @@ export function Homepage() {
                 className="group relative h-[450px] overflow-hidden rounded-[3rem]"
               >
                 <Link href={cat.href} className="block h-full w-full">
-                  <div className="absolute inset-0 transition-transform duration-1000 group-hover:scale-110">
-                     <img 
+                  <div className="absolute inset-0 transition-transform duration-1000 group-hover:scale-110 will-change-transform">
+                     <Image 
                         src={cat.img} 
                         alt={cat.name} 
+                        fill
                         className="h-full w-full object-cover grayscale-[0.5] transition-all duration-700 group-hover:grayscale-0" 
                      />
                   </div>

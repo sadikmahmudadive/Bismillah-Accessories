@@ -9,7 +9,7 @@ export function AnimatedBackground() {
     if (!containerRef.current) return;
     
     const particlesContainer = containerRef.current;
-    const particleCount = 80;
+    const particleCount = 20; // Reduced for performance
     
     // Create particles
     for (let i = 0; i < particleCount; i++) {
@@ -79,55 +79,52 @@ export function AnimatedBackground() {
         }, delay * 1000);
     }
     
-    // Mouse interaction
+    // Mouse interaction with throttling
+    let lastTime = 0;
+    const throttleDelay = 60; // ms
+
     const handleMouseMove = (e: MouseEvent) => {
-        // Create particles at mouse position
+        const now = Date.now();
+        
+        // Update CSS variables for spheres (efficient)
+        const moveX = (e.clientX / window.innerWidth - 0.5) * 50;
+        const moveY = (e.clientY / window.innerHeight - 0.5) * 50;
+        particlesContainer.style.setProperty('--mouse-x', `${moveX}px`);
+        particlesContainer.style.setProperty('--mouse-y', `${moveY}px`);
+
+        if (now - lastTime < throttleDelay) return;
+        lastTime = now;
+        
         const mouseX = (e.clientX / window.innerWidth) * 100;
         const mouseY = (e.clientY / window.innerHeight) * 100;
         
-        // Create temporary particle
         const particle = document.createElement('div');
         particle.className = 'particle';
         
-        // Small size
         const size = Math.random() * 4 + 2;
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
-        
-        // Position at mouse
         particle.style.left = `${mouseX}%`;
         particle.style.top = `${mouseY}%`;
-        particle.style.opacity = '0.6';
+        particle.style.opacity = '0.4';
         
         particlesContainer.appendChild(particle);
         
-        // Animate outward
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             if (!particlesContainer.contains(particle)) return;
-            particle.style.transition = 'all 2s ease-out';
-            particle.style.left = `${mouseX + (Math.random() * 10 - 5)}%`;
-            particle.style.top = `${mouseY + (Math.random() * 10 - 5)}%`;
+            particle.style.transition = 'all 1.5s ease-out';
+            particle.style.transform = `translate(${(Math.random() * 60 - 30)}px, ${(Math.random() * 60 - 30)}px)`;
             particle.style.opacity = '0';
             
-            // Remove after animation
             setTimeout(() => {
                 if (particlesContainer.contains(particle)) {
                   particle.remove();
                 }
-            }, 2000);
-        }, 10);
-        
-        // Subtle movement of gradient spheres
-        const spheres = document.querySelectorAll('.gradient-sphere');
-        const moveX = (e.clientX / window.innerWidth - 0.5) * 50;
-        const moveY = (e.clientY / window.innerHeight - 0.5) * 50;
-        
-        spheres.forEach(sphere => {
-            (sphere as HTMLElement).style.transform = `translate(${moveX}px, ${moveY}px)`;
+            }, 1500);
         });
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousemove', handleMouseMove, { passive: true });
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
@@ -177,15 +174,15 @@ export function AnimatedBackground() {
 
       {/* Wrapper to isolate CSS animation from JS transform */}
       <div className="absolute inset-0 pointer-events-none" style={{ animation: 'float1 25s infinite ease-in-out' }}>
-        <div className="gradient-sphere absolute h-[60vh] w-[60vw] rounded-full bg-[#2f9e74] opacity-[0.07] blur-[100px] transition-transform duration-300 ease-out" />
+        <div className="gradient-sphere absolute h-[60vh] w-[60vw] rounded-full bg-[#2f9e74] opacity-[0.07] blur-[100px] transition-transform duration-500 ease-out will-change-transform" style={{ transform: 'translate(var(--mouse-x, 0px), var(--mouse-y, 0px))' }} />
       </div>
       
       <div className="absolute inset-0 pointer-events-none" style={{ animation: 'float2 30s infinite ease-in-out' }}>
-        <div className="gradient-sphere absolute h-[70vh] w-[50vw] rounded-full bg-[#b8860b] opacity-[0.06] blur-[120px] transition-transform duration-300 ease-out" />
+        <div className="gradient-sphere absolute h-[70vh] w-[50vw] rounded-full bg-[#b8860b] opacity-[0.06] blur-[120px] transition-transform duration-500 ease-out will-change-transform" style={{ transform: 'translate(var(--mouse-x, 0px), var(--mouse-y, 0px))' }} />
       </div>
 
       <div className="absolute inset-0 pointer-events-none" style={{ animation: 'float3 20s infinite ease-in-out' }}>
-        <div className="gradient-sphere absolute h-[50vh] w-[40vw] rounded-full bg-[#3b82f6] opacity-[0.04] blur-[100px] transition-transform duration-300 ease-out" />
+        <div className="gradient-sphere absolute h-[50vh] w-[40vw] rounded-full bg-[#3b82f6] opacity-[0.04] blur-[100px] transition-transform duration-500 ease-out will-change-transform" style={{ transform: 'translate(var(--mouse-x, 0px), var(--mouse-y, 0px))' }} />
       </div>
 
       {/* Very Subtle Noise Overlay for premium matte feel */}
