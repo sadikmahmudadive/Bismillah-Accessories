@@ -128,7 +128,7 @@ export function OfferBanners() {
               initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-6 max-w-4xl text-5xl font-[900] leading-[0.95] tracking-tighter text-white sm:text-7xl lg:text-8xl"
+              className="mt-6 max-w-4xl text-3xl font-[900] leading-[1] tracking-tighter text-white sm:text-6xl md:text-7xl lg:text-8xl"
             >
               {currentBanner.title}
             </motion.h2>

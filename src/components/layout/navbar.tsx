@@ -64,7 +64,7 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <nav
-          className="hidden items-center gap-1 rounded-2xl border border-neutral-100 bg-neutral-50/50 p-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] md:flex"
+          className="hidden items-center gap-1 rounded-2xl border border-neutral-100 bg-neutral-50/50 p-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] lg:flex"
           aria-label="Main navigation"
         >
           {navItems.map((item) => {
@@ -110,7 +110,7 @@ export function Navbar() {
         </nav>
 
         {/* Desktop actions */}
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           {/* Search */}
           <AnimatePresence>
             {searchOpen ? (
@@ -240,7 +240,7 @@ export function Navbar() {
         </div>
 
         {/* Mobile hamburger */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           {/* Mobile favorites */}
           <Link
             href="/favorites"
@@ -309,7 +309,7 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-t border-neutral-200 bg-white shadow-xl md:hidden"
+            className="overflow-hidden border-t border-neutral-200 bg-white shadow-xl lg:hidden"
           >
             <div className="grid gap-1.5 px-4 py-4">
               {navItems.map((item) => (

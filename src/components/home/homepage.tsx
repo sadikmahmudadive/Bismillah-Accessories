@@ -92,9 +92,9 @@ export function Homepage() {
       </div>
 
       {/* ─── The Philosophy (Storytelling Section 1) ────────────────── */}
-      <section className="relative px-6 py-24 sm:px-12 lg:px-24 lg:py-48">
-        <div className="mx-auto w-full">
-          <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
+      <section className="relative px-6 py-20 sm:px-12 lg:px-24 lg:py-40 overflow-hidden">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="grid gap-12 xl:grid-cols-2 xl:items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -104,11 +104,11 @@ export function Homepage() {
               <p className="text-sm font-black uppercase tracking-[0.3em] text-[#2f9e74]">
                 Our Philosophy
               </p>
-              <h2 className="mt-8 text-6xl font-[900] leading-[0.9] tracking-tighter sm:text-8xl lg:text-9xl">
-                Accessories <br /> 
+              <h2 className="mt-6 break-words text-4xl font-[900] leading-[1] tracking-tighter sm:text-6xl md:text-7xl xl:text-8xl 2xl:text-9xl">
+                Accessories <br className="hidden sm:block" /> 
                 <span className="text-neutral-200">Reimagined.</span>
               </h2>
-              <p className="mt-10 max-w-xl text-lg font-medium leading-relaxed text-neutral-500 lg:text-2xl lg:leading-[1.4]">
+              <p className="mt-8 max-w-xl text-base font-medium leading-relaxed text-neutral-500 sm:text-lg lg:text-2xl lg:leading-[1.4]">
                 We believe tech should be as beautiful as it is functional. Our curated collection brings world-class protection and charging to your fingertips.
               </p>
               <div className="mt-12">
@@ -123,7 +123,7 @@ export function Homepage() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="relative aspect-square overflow-hidden rounded-[3rem] bg-neutral-100 shadow-2xl shadow-neutral-950/10 will-change-transform"
+              className="relative aspect-square w-full max-w-md mx-auto xl:max-w-none overflow-hidden rounded-[2.5rem] sm:rounded-[3rem] bg-neutral-100 shadow-2xl shadow-neutral-950/10 will-change-transform"
             >
               <Image 
                 src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1000&auto=format&fit=crop" 
@@ -155,9 +155,9 @@ export function Homepage() {
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              className="mt-8 text-5xl font-[900] leading-[1] tracking-tighter sm:text-7xl lg:text-8xl"
+              className="mt-6 text-4xl font-[900] leading-[1] tracking-tighter sm:text-6xl lg:text-8xl"
             >
-              Engineered for <br className="sm:hidden" /> Performance.
+              Engineered for Performance.
             </motion.h2>
           </div>
 
@@ -194,7 +194,7 @@ export function Homepage() {
             <p className="text-sm font-black uppercase tracking-[0.4em] text-[#2f9e74]">
               Collections
             </p>
-            <h2 className="mt-8 text-5xl font-[900] tracking-tighter sm:text-7xl">
+            <h2 className="mt-6 text-4xl font-[900] tracking-tighter sm:text-6xl lg:text-7xl">
               Curated Selection.
             </h2>
           </motion.div>
@@ -219,9 +219,9 @@ export function Homepage() {
                      />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  <div className="absolute bottom-10 left-10 text-white">
-                    <cat.icon className="size-10 mb-6 opacity-80" strokeWidth={1} />
-                    <h3 className="text-4xl font-black tracking-tight">{cat.name}</h3>
+                  <div className="absolute bottom-6 left-6 right-6 text-white sm:bottom-10 sm:left-10">
+                    <cat.icon className="size-8 mb-4 opacity-80 sm:size-10 sm:mb-6" strokeWidth={1} />
+                    <h3 className="text-3xl font-black tracking-tight sm:text-4xl">{cat.name}</h3>
                     <div className="mt-6 flex items-center gap-3 text-xs font-black uppercase tracking-widest opacity-0 transition-all duration-500 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0">
                       Explore Series <ArrowRight className="size-4" />
                     </div>
@@ -248,7 +248,7 @@ export function Homepage() {
               <p className="text-sm font-black uppercase tracking-[0.4em] text-[#2f9e74]">
                 The Shop
               </p>
-              <h2 className="mt-8 text-4xl font-[900] tracking-tighter sm:text-6xl">
+              <h2 className="mt-6 text-3xl font-[900] tracking-tighter sm:text-5xl lg:text-6xl">
                 New Arrivals.
               </h2>
             </div>
@@ -305,7 +305,7 @@ export function Homepage() {
             <Sparkles className="size-3.5 text-[#2f9e74]" />
             Limited offer
           </div>
-          <h2 className="mt-10 text-4xl font-[900] leading-[1.1] tracking-tighter text-white sm:text-6xl lg:text-8xl">
+          <h2 className="mt-8 text-3xl font-[900] leading-[1.1] tracking-tighter text-white sm:text-5xl lg:text-7xl xl:text-8xl">
             Complimentary Delivery <br className="hidden sm:block" />
             on Orders Above ৳999
           </h2>
