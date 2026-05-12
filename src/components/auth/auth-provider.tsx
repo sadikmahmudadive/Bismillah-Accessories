@@ -98,17 +98,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     };
 
-    try {
-      unsubscribe = onAuthStateChanged(getFirebaseAuth(), async (nextUser) => {
-        await loadProfile(nextUser);
-        setIsLoading(false);
-      });
-    } catch (error) {
-      window.setTimeout(() => handleAuthSetupError(error), 0);
-    }
+    const setupAuth = () => {
+      try {
+        unsubscribe = onAuthStateChanged(getFirebaseAuth(), async (nextUser) => {
+          await loadProfile(nextUser);
+          if (isActive) setIsLoading(false);
+        });
+      } catch (error) {
+        window.setTimeout(() => handleAuthSetupError(error), 0);
+      }
+    };
+
+    // Delay auth setup to move third-party iframe out of critical load path
+    const timer = setTimeout(setupAuth, 1500);
 
     return () => {
       isActive = false;
+      clearTimeout(timer);
       unsubscribe?.();
     };
   }, [loadProfile]);
