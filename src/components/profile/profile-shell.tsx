@@ -127,6 +127,7 @@ export function ProfileShell() {
       const token = await user.getIdToken();
       const uploadData = new FormData();
       uploadData.append("file", file);
+      uploadData.append("type", "profile");
 
       const response = await fetch("/api/cloudinary/upload", {
         method: "POST",

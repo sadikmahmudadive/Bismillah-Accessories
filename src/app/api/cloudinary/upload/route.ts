@@ -59,12 +59,15 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log(`[Cloudinary upload] Processing file: ${file.name}, size: ${file.size} bytes, type: ${file.type}`);
+    const type = formData.get("type") as string || "products";
+    const folder = `bismillah-accessories/${type}`;
+
+    console.log(`[Cloudinary upload] Processing file: ${file.name}, size: ${file.size} bytes, type: ${file.type}, target: ${folder}`);
 
     const bytes = Buffer.from(await file.arrayBuffer());
     console.log(`[Cloudinary upload] File converted to buffer, size: ${bytes.length} bytes`);
 
-    const uploadResult = await uploadToCloudinary(bytes, file.type);
+    const uploadResult = await uploadToCloudinary(bytes, file.type, folder);
     console.log(`[Cloudinary upload] Upload successful: ${uploadResult.secure_url}`);
 
     return NextResponse.json({
@@ -79,33 +82,26 @@ export async function POST(request: Request) {
   }
 }
 
-function uploadToCloudinary(file: Buffer, mimeType: string) {
-  console.log("[Cloudinary upload] Getting Cloudinary client");
+function uploadToCloudinary(file: Buffer, mimeType: string, folder: string) {
+  console.log(`[Cloudinary upload] Uploading to folder: ${folder}`);
 
   try {
     const cloudinary = getCloudinaryClient();
     console.log("[Cloudinary upload] Cloudinary client obtained");
 
-    // Use the simpler upload method with data URI
-    console.log("[Cloudinary upload] Starting upload with data URI");
-
-    // Create data URI with correct mime type
-    const dataUri = `data:${mimeType};base64,${file.toString('base64')}`;
-
     return new Promise<{
       secure_url: string;
       public_id: string;
     }>((resolve, reject) => {
-      cloudinary.uploader.upload(
-        dataUri,
+      const uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder: "bismillah-accessories/products",
+          folder: folder,
           resource_type: "image",
         },
         (error, result) => {
           if (error) {
             console.error("[Cloudinary upload] Upload error:", error);
-            reject(error);
+            reject(new Error(error.message || "Cloudinary upload failed"));
             return;
           }
 
@@ -122,6 +118,9 @@ function uploadToCloudinary(file: Buffer, mimeType: string) {
           });
         }
       );
+
+      // Write the buffer to the stream and end it
+      uploadStream.end(file);
     });
   } catch (configError) {
     console.error("[Cloudinary upload] Config error:", configError);
