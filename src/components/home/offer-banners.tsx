@@ -111,7 +111,7 @@ export function OfferBanners({ initialBanners }: OfferBannersProps) {
                 priority={currentIndex === 0}
                 sizes="100vw"
                 className="h-full w-full object-cover"
-                loading={currentIndex === 0 ? "eager" : "lazy"}
+                suppressHydrationWarning
               />
             </motion.div>
             {/* Multi-layered Gradients for Depth */}

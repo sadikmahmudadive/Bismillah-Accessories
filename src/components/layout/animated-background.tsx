@@ -87,48 +87,59 @@ export function AnimatedBackground() {
         }, delay * 1000);
     }
     
-    // Mouse interaction with throttling
+    // Mouse interaction with throttling and cached dimensions
     let lastTime = 0;
     const throttleDelay = 60; // ms
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    const handleResize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
 
     const handleMouseMove = (e: MouseEvent) => {
         const now = Date.now();
         
         // Update CSS variables for spheres (efficient)
-        const moveX = (e.clientX / window.innerWidth - 0.5) * 50;
-        const moveY = (e.clientY / window.innerHeight - 0.5) * 50;
+        const moveX = (e.clientX / width - 0.5) * 50;
+        const moveY = (e.clientY / height - 0.5) * 50;
         particlesContainer.style.setProperty('--mouse-x', `${moveX}px`);
         particlesContainer.style.setProperty('--mouse-y', `${moveY}px`);
 
         if (now - lastTime < throttleDelay) return;
         lastTime = now;
         
-        const mouseX = (e.clientX / window.innerWidth) * 100;
-        const mouseY = (e.clientY / window.innerHeight) * 100;
-        
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        
-        const size = Math.random() * 4 + 2;
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.left = `${mouseX}%`;
-        particle.style.top = `${mouseY}%`;
-        particle.style.opacity = '0.4';
-        
-        particlesContainer.appendChild(particle);
+        const mouseX = (e.clientX / width) * 100;
+        const mouseY = (e.clientY / height) * 100;
         
         requestAnimationFrame(() => {
-            if (!particlesContainer.contains(particle)) return;
-            particle.style.transition = 'all 1.5s ease-out';
-            particle.style.transform = `translate(${(Math.random() * 60 - 30)}px, ${(Math.random() * 60 - 30)}px)`;
-            particle.style.opacity = '0';
-            
-            setTimeout(() => {
-                if (particlesContainer.contains(particle)) {
-                  particle.remove();
-                }
-            }, 1500);
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          
+          const size = Math.random() * 4 + 2;
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          particle.style.left = `${mouseX}%`;
+          particle.style.top = `${mouseY}%`;
+          particle.style.opacity = '0.4';
+          
+          particlesContainer.appendChild(particle);
+          
+          // Animate and remove
+          setTimeout(() => {
+              if (!particlesContainer.contains(particle)) return;
+              particle.style.transition = 'all 1.5s ease-out';
+              particle.style.transform = `translate(${(Math.random() * 60 - 30)}px, ${(Math.random() * 60 - 30)}px)`;
+              particle.style.opacity = '0';
+              
+              setTimeout(() => {
+                  if (particlesContainer.contains(particle)) {
+                    particle.remove();
+                  }
+              }, 1500);
+          }, 10);
         });
     };
 
