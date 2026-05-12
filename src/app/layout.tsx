@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { AnimatedBackground } from "@/components/layout/animated-background";
@@ -45,6 +46,7 @@ export default function RootLayout({
           <div className="flex-1">{children}</div>
           <Footer />
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
