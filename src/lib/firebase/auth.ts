@@ -1,13 +1,5 @@
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  updateProfile,
-  GoogleAuthProvider,
-  signInWithPopup,
-  type User,
-} from "firebase/auth";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { type User } from "firebase/auth";
+import { type Firestore } from "firebase/firestore";
 
 import { getFirebaseAuth, getFirestoreDb } from "@/lib/firebase/client";
 import type { AppUserProfile } from "@/types/domain";
@@ -23,8 +15,12 @@ export async function createCustomerAccount({
   password,
   displayName,
 }: AuthCredentials) {
-  const auth = getFirebaseAuth();
-  const database = getFirestoreDb();
+  const auth = await getFirebaseAuth();
+  const database = await getFirestoreDb();
+  
+  const { createUserWithEmailAndPassword, updateProfile } = await import("firebase/auth");
+  const { doc, serverTimestamp, setDoc } = await import("firebase/firestore");
+  
   const credential = await createUserWithEmailAndPassword(auth, email, password);
   const cleanName = displayName?.trim() || email.split("@")[0] || "Customer";
 
@@ -87,18 +83,21 @@ export async function createCustomerAccount({
 }
 
 export async function signInCustomer({ email, password }: AuthCredentials) {
-  const auth = getFirebaseAuth();
+  const auth = await getFirebaseAuth();
+  const { signInWithEmailAndPassword } = await import("firebase/auth");
   const credential = await signInWithEmailAndPassword(auth, email, password);
   return credential.user;
 }
 
 export async function signInWithGoogle() {
-  const auth = getFirebaseAuth();
+  const auth = await getFirebaseAuth();
+  const { GoogleAuthProvider, signInWithPopup } = await import("firebase/auth");
   const provider = new GoogleAuthProvider();
   const credential = await signInWithPopup(auth, provider);
   
   // Try to create/update profile
-  const database = getFirestoreDb();
+  const database = await getFirestoreDb();
+  const { doc, getDoc, serverTimestamp, setDoc } = await import("firebase/firestore");
   const userRef = doc(database, "users", credential.user.uid);
   const userSnap = await getDoc(userRef);
   
@@ -121,11 +120,14 @@ export async function signInWithGoogle() {
 }
 
 export async function signOutCustomer() {
-  await firebaseSignOut(getFirebaseAuth());
+  const { signOut: firebaseSignOut } = await import("firebase/auth");
+  const auth = await getFirebaseAuth();
+  await firebaseSignOut(auth);
 }
 
 export async function getUserProfile(user: User) {
-  const database = getFirestoreDb();
+  const database = await getFirestoreDb();
+  const { doc, getDoc } = await import("firebase/firestore");
   
   try {
     const snapshot = await getDoc(doc(database, "users", user.uid));

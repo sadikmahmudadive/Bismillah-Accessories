@@ -1,6 +1,6 @@
 "use client";
 
-import { onAuthStateChanged, type User } from "firebase/auth";
+import { type User } from "firebase/auth";
 import {
   createContext,
   useCallback,
@@ -98,9 +98,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     };
 
-    const setupAuth = () => {
+    const setupAuth = async () => {
       try {
-        unsubscribe = onAuthStateChanged(getFirebaseAuth(), async (nextUser) => {
+        const { onAuthStateChanged } = await import("firebase/auth");
+        const auth = await getFirebaseAuth();
+        
+        unsubscribe = onAuthStateChanged(auth, async (nextUser) => {
           await loadProfile(nextUser);
           if (isActive) setIsLoading(false);
         });
