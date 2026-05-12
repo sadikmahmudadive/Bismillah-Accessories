@@ -83,47 +83,41 @@ export async function POST(request: Request) {
 }
 
 function uploadToCloudinary(file: Buffer, mimeType: string, folder: string) {
-  console.log(`[Cloudinary upload] Uploading to folder: ${folder}`);
+  const cloudinary = getCloudinaryClient();
+  const timestamp = Math.floor(Date.now() / 1000);
+  
+  console.log(`[Cloudinary upload] Starting stream upload. Folder: ${folder}, TS: ${timestamp}`);
 
-  try {
-    const cloudinary = getCloudinaryClient();
-    console.log("[Cloudinary upload] Cloudinary client obtained");
-
-    return new Promise<{
-      secure_url: string;
-      public_id: string;
-    }>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: folder,
-          resource_type: "image",
-        },
-        (error, result) => {
-          if (error) {
-            console.error("[Cloudinary upload] Upload error:", error);
-            reject(new Error(error.message || "Cloudinary upload failed"));
-            return;
-          }
-
-          if (!result) {
-            console.error("[Cloudinary upload] No result returned");
-            reject(new Error("Cloudinary returned no upload result."));
-            return;
-          }
-
-          console.log(`[Cloudinary upload] Upload completed: ${result.public_id}`);
-          resolve({
-            secure_url: result.secure_url,
-            public_id: result.public_id,
-          });
+  return new Promise<{
+    secure_url: string;
+    public_id: string;
+  }>((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: folder,
+        resource_type: "image",
+        timestamp: timestamp,
+      },
+      (error, result) => {
+        if (error) {
+          console.error("[Cloudinary upload] SDK Error Object:", JSON.stringify(error, null, 2));
+          reject(new Error(error.message || "Cloudinary upload failed"));
+          return;
         }
-      );
 
-      // Write the buffer to the stream and end it
-      uploadStream.end(file);
-    });
-  } catch (configError) {
-    console.error("[Cloudinary upload] Config error:", configError);
-    throw configError;
-  }
+        if (!result) {
+          reject(new Error("Cloudinary returned no result."));
+          return;
+        }
+
+        console.log(`[Cloudinary upload] Success: ${result.public_id}`);
+        resolve({
+          secure_url: result.secure_url,
+          public_id: result.public_id,
+        });
+      }
+    );
+
+    uploadStream.end(file);
+  });
 }
