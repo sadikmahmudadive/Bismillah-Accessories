@@ -14,10 +14,19 @@ export async function getHomeData() {
       .get();
       
     const banners = bannersSnap.docs
-      .map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }) as OfferBanner)
+      .map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title ?? "",
+          subtitle: data.subtitle ?? "",
+          imageUrl: data.imageUrl ?? "",
+          link: data.link ?? "",
+          buttonText: data.buttonText ?? "",
+          isActive: data.isActive ?? false,
+          order: data.order ?? 0,
+        } as any;
+      })
       .sort((a, b) => (a.order || 0) - (b.order || 0));
 
     // 2. Fetch Featured Products (Newest 4)
@@ -31,10 +40,18 @@ export async function getHomeData() {
         const data = doc.data();
         return {
           id: doc.id,
-          ...data,
-          // Convert Firestore timestamp to serializable format for Next.js props
+          name: data.name ?? "",
+          slug: data.slug ?? "",
+          description: data.description ?? "",
+          category: data.category ?? "",
+          price: data.price ?? 0,
+          stock: data.stock ?? 0,
+          imageUrl: data.imageUrl ?? "",
+          averageRating: data.averageRating ?? 0,
+          reviewCount: data.reviewCount ?? 0,
+          status: data.status ?? "active",
+          // Only pass the plain seconds for the client to use
           createdAt: data.createdAt ? { _seconds: data.createdAt._seconds } : null,
-          updatedAt: data.updatedAt ? { _seconds: data.updatedAt._seconds } : null,
         } as any;
       })
       .sort((a, b) => {
