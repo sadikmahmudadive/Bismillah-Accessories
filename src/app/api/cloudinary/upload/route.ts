@@ -24,6 +24,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Diagnostic check for environment variables
+    if (!process.env.CLOUDINARY_API_SECRET || process.env.CLOUDINARY_API_SECRET.length < 5) {
+      console.error("[Cloudinary upload] ERROR: CLOUDINARY_API_SECRET is missing or invalid in environment.");
+      return NextResponse.json(
+        { error: "Server Configuration Error: Cloudinary secrets are not configured on the server. Please check Vercel environment variables." },
+        { status: 500 },
+      );
+    }
+
     // Simplified authentication - just verify the token is valid
     console.log("[Cloudinary upload] Verifying token");
     const auth = getFirebaseAuth();
