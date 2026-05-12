@@ -109,7 +109,7 @@ export function Homepage({ initialProducts, initialBanners }: HomepageProps) {
           className="absolute inset-0"
         >
           <Image
-            src="https://images.unsplash.com/photo-1727079525588-4638ea8301e0?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src="https://images.unsplash.com/photo-1596795131676-69996a99d172?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Premium Tech Philosophy"
             fill
             priority
