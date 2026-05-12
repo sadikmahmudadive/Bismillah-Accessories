@@ -29,7 +29,12 @@ import { ProductCard } from "@/components/product/product-card";
 import { ButtonLink } from "@/components/ui/button";
 import { ProductCardSkeleton } from "@/components/ui/loader";
 import { OfferBanners } from "@/components/home/offer-banners";
-import type { Product } from "@/types/domain";
+import type { Product, OfferBanner } from "@/types/domain";
+
+interface HomepageProps {
+  initialProducts: Product[];
+  initialBanners: OfferBanner[];
+}
 
 const benefits = [
   { icon: Truck, label: "Fast delivery", sub: "Dhaka & nationwide" },
@@ -44,9 +49,9 @@ const categories = [
   { name: "Audio", icon: Headphones, href: "/products?category=Audio", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop" },
 ];
 
-export function Homepage() {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+export function Homepage({ initialProducts, initialBanners }: HomepageProps) {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>(initialProducts);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(initialProducts.length === 0);
   const [productsError, setProductsError] = useState<string | null>(null);
 
   const productsRef = useRef<HTMLDivElement>(null);
@@ -58,6 +63,9 @@ export function Homepage() {
   const productsY = useTransform(scrollYProgress, [0, 0.2], [40, 0]);
 
   useEffect(() => {
+    // Only fetch if we don't have initial products
+    if (initialProducts.length > 0) return;
+
     const fetchFeatured = async () => {
       try {
         setIsLoadingProducts(true);
@@ -88,7 +96,7 @@ export function Homepage() {
     <main className="relative isolate overflow-hidden bg-white text-neutral-950">
       {/* ─── Hero Banners ────────────────────────────────────────── */}
       <div className="w-full">
-        <OfferBanners />
+        <OfferBanners initialBanners={initialBanners} />
       </div>
 
       {/* ─── The Philosophy (Storytelling Section 1) ────────────────── */}

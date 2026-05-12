@@ -8,13 +8,20 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { OfferBanner } from "@/types/domain";
 
-export function OfferBanners() {
-  const [banners, setBanners] = useState<OfferBanner[]>([]);
+interface OfferBannersProps {
+  initialBanners: OfferBanner[];
+}
+
+export function OfferBanners({ initialBanners }: OfferBannersProps) {
+  const [banners, setBanners] = useState<OfferBanner[]>(initialBanners);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(initialBanners.length === 0);
   const [direction, setDirection] = useState(0);
 
   useEffect(() => {
+    // Only fetch if we don't have initial banners
+    if (initialBanners.length > 0) return;
+
     async function fetchBanners() {
       try {
         const res = await fetch("/api/banners");
