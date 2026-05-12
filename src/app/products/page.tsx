@@ -45,9 +45,9 @@ export default async function ProductsPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-8 text-6xl font-[900] leading-[0.9] tracking-tighter text-white sm:text-8xl lg:text-9xl"
+            className="mt-8 text-5xl font-[900] leading-[1] tracking-tighter text-white sm:text-7xl lg:text-8xl xl:text-9xl break-words"
           >
-            Precision <br /> 
+            Precision <br className="hidden sm:block" /> 
             <span className="text-white/30">Crafted.</span>
           </motion.h1>
           <motion.p 

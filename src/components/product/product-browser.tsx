@@ -126,8 +126,8 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
               setQuery(e.target.value);
               pushParams({ q: e.target.value });
             }}
-            placeholder="Search our precision crafted collection..."
-            className="h-16 w-full rounded-2xl border border-neutral-100 bg-neutral-50 pl-16 pr-12 text-lg font-bold text-neutral-950 outline-none transition focus:border-[#2f9e74] focus:bg-white focus:shadow-2xl focus:shadow-[#2f9e74]/5"
+            placeholder="Search precision collection..."
+            className="h-14 w-full rounded-2xl border border-neutral-100 bg-neutral-50 pl-14 pr-12 text-base font-bold text-neutral-950 outline-none transition focus:border-[#2f9e74] focus:bg-white focus:shadow-2xl focus:shadow-[#2f9e74]/5 lg:h-16 lg:pl-16 lg:text-lg"
           />
           {query && (
             <button 
@@ -143,7 +143,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "flex h-16 items-center gap-3 rounded-2xl border px-8 text-sm font-black uppercase tracking-widest transition-all",
+              "flex h-14 items-center gap-3 rounded-2xl border px-6 text-[10px] font-black uppercase tracking-widest transition-all lg:h-16 lg:px-8 lg:text-xs",
               showFilters || category !== "All" || minRating > 0 || priceRange[0] > 0 || priceRange[1] < 10000
                 ? "border-neutral-950 bg-neutral-950 text-white shadow-xl shadow-neutral-950/20"
                 : "border-neutral-100 bg-neutral-50 text-neutral-700 hover:border-neutral-200 hover:bg-white"
@@ -164,7 +164,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
                 setSortBy(val);
                 pushParams({ sort: val });
               }}
-              className="h-16 appearance-none rounded-2xl border border-neutral-100 bg-neutral-50 pl-8 pr-12 text-xs font-black uppercase tracking-widest text-neutral-700 outline-none transition hover:border-neutral-200 hover:bg-white focus:border-neutral-950"
+              className="h-14 appearance-none rounded-2xl border border-neutral-100 bg-neutral-50 pl-6 pr-10 text-[10px] font-black uppercase tracking-widest text-neutral-700 outline-none transition hover:border-neutral-200 hover:bg-white focus:border-neutral-950 lg:h-16 lg:pl-8 lg:pr-12"
             >
               <option value="newest">Sort: Newest First</option>
               <option value="price-asc">Sort: Price ↑</option>

@@ -70,12 +70,12 @@ export default async function ProductDetailsPage({
         >
           <Link
             href="/products"
-            className="group inline-flex items-center gap-3 text-xs font-black uppercase tracking-widest text-neutral-400 transition hover:text-neutral-950"
+            className="group inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-neutral-400 transition hover:text-neutral-950"
           >
-            <div className="grid size-10 place-items-center rounded-full border border-neutral-100 bg-white shadow-sm transition group-hover:border-neutral-950 group-hover:bg-neutral-950 group-hover:text-white">
-              <ArrowLeft className="size-4" />
+            <div className="grid size-8 place-items-center rounded-full border border-neutral-100 bg-white shadow-sm transition group-hover:border-neutral-950 group-hover:bg-neutral-950 group-hover:text-white sm:size-10">
+              <ArrowLeft className="size-3.5 sm:size-4" />
             </div>
-            Back to Collection
+            <span className="hidden xs:inline">Back to Collection</span>
           </Link>
         </motion.div>
       </div>
@@ -109,7 +109,7 @@ export default async function ProductDetailsPage({
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full border-t border-neutral-100 bg-white px-6 py-24 sm:px-12 lg:min-h-screen lg:w-2/5 lg:border-l lg:border-t-0 lg:px-20 lg:py-32"
+          className="relative w-full border-t border-neutral-100 bg-white px-6 py-16 sm:px-12 sm:py-24 lg:min-h-screen lg:w-2/5 lg:border-l lg:border-t-0 lg:px-20 lg:py-32"
         >
           <div className="flex flex-wrap gap-3">
             <div className="inline-flex items-center gap-2 rounded-full border border-neutral-100 bg-neutral-50 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-neutral-500">
@@ -126,7 +126,7 @@ export default async function ProductDetailsPage({
             </div>
           </div>
 
-          <h1 className="mt-10 text-4xl font-[900] leading-[1] tracking-tighter text-neutral-950 sm:text-6xl lg:text-7xl">
+          <h1 className="mt-8 break-words text-4xl font-[900] leading-[1] tracking-tighter text-neutral-950 sm:text-6xl lg:text-7xl">
             {product.name}
           </h1>
           
@@ -173,7 +173,7 @@ export default async function ProductDetailsPage({
           </div>
 
           {/* Value Props */}
-          <div className="mt-16 grid grid-cols-3 gap-4">
+          <div className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-3">
             {[
               { icon: Truck, label: "Fast Express" },
               { icon: ShieldCheck, label: "Quality First" },
@@ -181,10 +181,10 @@ export default async function ProductDetailsPage({
             ].map((item) => (
               <div
                 key={item.label}
-                className="group flex flex-col items-center gap-3 rounded-[2rem] border border-neutral-100 bg-neutral-50 p-6 transition-all hover:bg-white hover:shadow-2xl hover:shadow-neutral-950/5"
+                className="group flex items-center gap-4 rounded-2xl border border-neutral-100 bg-neutral-50 p-4 transition-all sm:flex-col sm:items-center sm:gap-3 sm:rounded-[2rem] sm:p-6 hover:bg-white hover:shadow-2xl hover:shadow-neutral-950/5"
               >
-                <div className="grid size-12 place-items-center rounded-full bg-white text-[#2f9e74] shadow-sm transition group-hover:bg-neutral-950 group-hover:text-white">
-                  <item.icon className="size-5" />
+                <div className="grid size-10 place-items-center rounded-full bg-white text-[#2f9e74] shadow-sm transition sm:size-12 group-hover:bg-neutral-950 group-hover:text-white">
+                  <item.icon className="size-4 sm:size-5" />
                 </div>
                 <p className="text-[9px] font-black uppercase tracking-widest text-neutral-600">
                   {item.label}

@@ -53,10 +53,10 @@ export function Navbar() {
             BA
           </motion.div>
           <div className="flex flex-col leading-none">
-            <span className="text-lg font-[900] tracking-tighter sm:text-xl">
+            <span className="text-base font-[900] tracking-tighter sm:text-xl">
               BISMILLAH
             </span>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2f9e74]">
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#2f9e74] sm:text-[10px]">
               Accessories
             </span>
           </div>
