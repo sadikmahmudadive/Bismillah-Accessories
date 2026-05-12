@@ -22,7 +22,7 @@ export function Footer() {
               <span className="text-lg font-[900] tracking-tighter sm:text-xl uppercase">
                 BISMILLAH
               </span>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2f9e74]">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#257e5d]">
                 Accessories
               </span>
             </div>
@@ -43,7 +43,7 @@ export function Footer() {
 
         <div className="grid grid-cols-2 gap-12 sm:grid-cols-2 md:gap-24">
           <div>
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Navigate</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Navigate</h2>
             <div className="mt-8 grid gap-4">
               {footerLinks.map((link) => (
                 <Link
@@ -58,7 +58,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Connect</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Connect</h2>
             <div className="mt-8 grid gap-6 text-sm font-bold text-neutral-600">
               <div className="flex items-center gap-4">
                 <div className="grid size-10 place-items-center rounded-xl bg-neutral-50 text-[#2f9e74]">
@@ -86,12 +86,12 @@ export function Footer() {
       <div className="mx-auto mt-24 w-full px-6 sm:px-12 lg:px-24">
         <div className="h-px w-full bg-neutral-100" />
         <div className="mt-12 flex flex-col items-center justify-between gap-6 sm:flex-row">
-          <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
+          <p className="text-[10px] font-black uppercase tracking-widest text-neutral-500">
             © {new Date().getFullYear()} Bismillah Accessories. All Rights Reserved.
           </p>
           <div className="flex gap-8">
-            <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-neutral-950">Privacy</Link>
-            <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-neutral-950">Terms</Link>
+            <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:text-neutral-950">Privacy</Link>
+            <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:text-neutral-950">Terms</Link>
           </div>
         </div>
       </div>

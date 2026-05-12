@@ -68,19 +68,20 @@ export function AnimatedBackground() {
         // Animate with GSAP-like timing
         setTimeout(() => {
             if (!particlesContainer.contains(particle)) return;
-            particle.style.transition = `all ${duration}s linear`;
+            particle.style.transition = `transform ${duration}s linear, opacity ${duration}s linear`;
             particle.style.opacity = (Math.random() * 0.3 + 0.1).toString();
             
-            // Move in a slight direction
-            const moveX = pos.x + (Math.random() * 20 - 10);
-            const moveY = pos.y - Math.random() * 30; // Move upwards
+            // Move in a slight direction using transform for performance
+            const moveX = (Math.random() * 20 - 10);
+            const moveY = - Math.random() * 30; // Move upwards
             
-            particle.style.left = `${moveX}%`;
-            particle.style.top = `${moveY}%`;
+            particle.style.transform = `translate(${moveX}vw, ${moveY}vh)`;
             
             // Reset after animation completes
             setTimeout(() => {
                 if (particlesContainer.contains(particle)) {
+                  particle.style.transition = 'none';
+                  particle.style.transform = 'translate(0,0)';
                   animateParticle(particle);
                 }
             }, duration * 1000);
@@ -171,36 +172,36 @@ export function AnimatedBackground() {
           pointer-events: none;
         }
         
-        /* Subtle CSS animations for the spheres since JS handles the mouse offset */
+        /* Optimized hardware-accelerated animations using transforms */
         @keyframes float1 {
-          0%, 100% { top: -10%; left: -10%; }
-          25% { top: -15%; left: -5%; }
-          50% { top: -10%; left: 0%; }
-          75% { top: -5%; left: -15%; }
+          0%, 100% { transform: translate(-10%, -10%); }
+          25% { transform: translate(-5%, -15%); }
+          50% { transform: translate(0%, -10%); }
+          75% { transform: translate(-15%, -5%); }
         }
         
         @keyframes float2 {
-          0%, 100% { top: 40%; right: 0%; }
-          33% { top: 35%; right: 5%; }
-          66% { top: 45%; right: -5%; }
+          0%, 100% { transform: translate(0%, 40%); }
+          33% { transform: translate(5%, 35%); }
+          66% { transform: translate(-5%, 45%); }
         }
         
         @keyframes float3 {
-          0%, 100% { bottom: -20%; left: 20%; }
-          50% { bottom: -15%; left: 25%; }
+          0%, 100% { transform: translate(20%, 80%); }
+          50% { transform: translate(25%, 85%); }
         }
       `}} />
 
-      {/* Wrapper to isolate CSS animation from JS transform */}
-      <div className="absolute inset-0 pointer-events-none" style={{ animation: 'float1 25s infinite ease-in-out' }}>
+      {/* Using transform-based float animations */}
+      <div className="absolute inset-0 pointer-events-none" style={{ animation: 'float1 25s infinite ease-in-out', willChange: 'transform' }}>
         <div className="gradient-sphere absolute h-[60vh] w-[60vw] rounded-full bg-[#2f9e74] opacity-[0.07] blur-[100px] transition-transform duration-500 ease-out will-change-transform" style={{ transform: 'translate(var(--mouse-x, 0px), var(--mouse-y, 0px))' }} />
       </div>
       
-      <div className="absolute inset-0 pointer-events-none" style={{ animation: 'float2 30s infinite ease-in-out' }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ animation: 'float2 30s infinite ease-in-out', willChange: 'transform' }}>
         <div className="gradient-sphere absolute h-[70vh] w-[50vw] rounded-full bg-[#b8860b] opacity-[0.06] blur-[120px] transition-transform duration-500 ease-out will-change-transform" style={{ transform: 'translate(var(--mouse-x, 0px), var(--mouse-y, 0px))' }} />
       </div>
 
-      <div className="absolute inset-0 pointer-events-none" style={{ animation: 'float3 20s infinite ease-in-out' }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ animation: 'float3 20s infinite ease-in-out', willChange: 'transform' }}>
         <div className="gradient-sphere absolute h-[50vh] w-[40vw] rounded-full bg-[#3b82f6] opacity-[0.04] blur-[100px] transition-transform duration-500 ease-out will-change-transform" style={{ transform: 'translate(var(--mouse-x, 0px), var(--mouse-y, 0px))' }} />
       </div>
 

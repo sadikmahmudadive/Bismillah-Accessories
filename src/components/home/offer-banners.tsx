@@ -99,7 +99,7 @@ export function OfferBanners({ initialBanners }: OfferBannersProps) {
           <div className="absolute inset-0 overflow-hidden">
             <motion.div
               key={`img-container-${currentIndex}`}
-              initial={{ scale: 1.1, opacity: 0 }}
+              initial={{ scale: 1.05, opacity: currentIndex === 0 ? 0.55 : 0 }}
               animate={{ scale: 1, opacity: 0.55 }}
               transition={{ duration: 6, ease: "easeOut" }}
               className="relative h-full w-full"
@@ -128,8 +128,9 @@ export function OfferBanners({ initialBanners }: OfferBannersProps) {
               transition={{ delay: 0.3 }}
               className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white backdrop-blur-md"
             >
-              <Sparkles className="size-3 text-[#2f9e74]" />
-              Limited Offer
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#257e5d]">
+                Accessories
+              </span>
             </motion.div>
             
             <motion.h2 
@@ -146,7 +147,7 @@ export function OfferBanners({ initialBanners }: OfferBannersProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.55, duration: 0.8 }}
-                className="mt-6 max-w-xl text-lg font-medium text-white/60 sm:text-xl lg:text-2xl"
+                className="mt-6 max-w-xl text-lg font-medium text-white/80 sm:text-xl lg:text-2xl"
               >
                 {currentBanner.subtitle}
               </motion.p>
@@ -180,6 +181,7 @@ export function OfferBanners({ initialBanners }: OfferBannersProps) {
             {banners.map((_, idx) => (
               <button
                 key={idx}
+                aria-label={`Go to slide ${idx + 1}`}
                 onClick={() => {
                   setDirection(idx > currentIndex ? 1 : -1);
                   setCurrentIndex(idx);
@@ -197,12 +199,14 @@ export function OfferBanners({ initialBanners }: OfferBannersProps) {
           <div className="absolute bottom-12 right-8 z-10 flex gap-3 sm:right-20">
             <button
               onClick={() => paginate(-1)}
+              aria-label="Previous slide"
               className="grid size-14 place-items-center rounded-full border border-white/10 bg-white/5 text-white backdrop-blur-xl transition-all hover:bg-white/10 hover:scale-110 active:scale-95"
             >
               <ChevronLeft className="size-6" />
             </button>
             <button
               onClick={() => paginate(1)}
+              aria-label="Next slide"
               className="grid size-14 place-items-center rounded-full border border-white/10 bg-white/5 text-white backdrop-blur-xl transition-all hover:bg-white/10 hover:scale-110 active:scale-95"
             >
               <ChevronRight className="size-6" />
