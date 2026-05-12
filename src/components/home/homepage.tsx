@@ -99,68 +99,75 @@ export function Homepage({ initialProducts, initialBanners }: HomepageProps) {
         <OfferBanners initialBanners={initialBanners} />
       </div>
 
-      {/* ─── The Philosophy (Storytelling Section 1) ────────────────── */}
-      <section className="relative px-6 py-20 sm:px-12 lg:px-24 lg:py-40 overflow-hidden">
-        <div className="mx-auto w-full max-w-7xl">
-          <div className="grid gap-12 xl:grid-cols-2 xl:items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <p className="text-sm font-black uppercase tracking-[0.3em] text-[#2f9e74]">
-                Our Philosophy
-              </p>
-              <h2 className="mt-6 break-words text-4xl font-[900] leading-[1] tracking-tighter sm:text-6xl md:text-7xl xl:text-8xl 2xl:text-9xl">
-                Accessories <br className="hidden sm:block" /> 
-                <span className="text-neutral-200">Reimagined.</span>
-              </h2>
-              <p className="mt-8 max-w-xl text-base font-medium leading-relaxed text-neutral-500 sm:text-lg lg:text-2xl lg:leading-[1.4]">
-                We believe tech should be as beautiful as it is functional. Our curated collection brings world-class protection and charging to your fingertips.
-              </p>
-              <div className="mt-12">
-                <ButtonLink href="/products" showArrow className="h-16 px-10 text-lg">
-                  Explore the collection
-                </ButtonLink>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="relative aspect-square w-full max-w-md mx-auto xl:max-w-none overflow-hidden rounded-[2.5rem] sm:rounded-[3rem] bg-neutral-100 shadow-2xl shadow-neutral-950/10 will-change-transform"
-            >
-              <Image 
-                src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1000&auto=format&fit=crop" 
-                alt="Premium tech" 
-                fill
-                priority
-                className="h-full w-full object-cover transition-transform duration-[10s] hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-            </motion.div>
-          </div>
+      {/* ─── The Philosophy (Immersive Hero Section) ────────────────── */}
+      <section className="relative h-[90svh] min-h-[600px] w-full overflow-hidden flex items-center justify-center sm:h-screen">
+        {/* Background Image */}
+        <motion.div
+          initial={{ scale: 1.1 }}
+          whileInView={{ scale: 1 }}
+          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-0"
+        >
+          <Image
+            src="https://images.unsplash.com/photo-1727079525588-4638ea8301e0?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Premium Tech Philosophy"
+            fill
+            priority
+            className="object-cover"
+          />
+          {/* Subtle White-to-Transparent Overlay for Legibility */}
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]" />
+        </motion.div>
+
+        <div className="relative z-10 w-full max-w-screen-2xl px-6 text-center sm:px-12 lg:px-24">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center"
+          >
+            <p className="text-xs font-black uppercase tracking-[0.4em] text-[#2f9e74] sm:text-sm">
+              Our Philosophy
+            </p>
+            <h2 className="mt-8 text-5xl font-[900] leading-[1] tracking-tighter text-neutral-950 sm:text-7xl lg:text-8xl xl:text-9xl 2xl:text-[10rem]">
+              Accessories <br />
+              <span className="text-[#2f9e74]/90">Reimagined.</span>
+            </h2>
+            <p className="mt-10 max-w-2xl text-lg font-medium leading-relaxed text-neutral-600 sm:text-xl lg:text-2xl lg:leading-[1.5]">
+              We believe tech should be as beautiful as it is functional. Our curated collection brings world-class protection and charging to your fingertips.
+            </p>
+            <div className="mt-16 flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
+              <ButtonLink href="/products" showArrow className="h-16 px-12 text-lg">
+                Explore the collection
+              </ButtonLink>
+              <Link
+                href="#products"
+                className="group flex items-center gap-3 text-xs font-black uppercase tracking-widest text-neutral-400 transition hover:text-neutral-950"
+              >
+                Learn More
+                <div className="h-px w-8 bg-neutral-200 transition-all group-hover:w-12 group-hover:bg-neutral-950" />
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ─── Innovation Grid (Storytelling Section 2) ────────────────── */}
-      <section className="relative flex min-h-screen flex-col justify-center bg-neutral-950 py-24 text-white sm:py-32 lg:py-48 w-full overflow-hidden">
+      <section className="relative flex min-h-screen flex-col items-center justify-center bg-neutral-950 py-24 text-white sm:py-32 lg:py-40 w-full overflow-hidden">
         {/* Subtle background texture or glow */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(47,158,116,0.08),transparent_70%)]" />
-        
-        <div className="relative mx-auto w-full px-6 sm:px-12 lg:px-24">
+
+        <div className="relative w-full max-w-screen-2xl px-6 sm:px-12 lg:px-24">
           <div className="flex flex-col items-center text-center">
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               className="text-xs font-black uppercase tracking-[0.4em] text-[#2f9e74]"
             >
               Excellence in every detail
             </motion.p>
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               className="mt-6 text-4xl font-[900] leading-[1] tracking-tighter sm:text-6xl lg:text-8xl"
@@ -191,8 +198,8 @@ export function Homepage({ initialProducts, initialBanners }: HomepageProps) {
       </section>
 
       {/* ─── Shop by Category ─────────────────────────────────────────── */}
-      <section className="px-6 py-24 sm:px-12 lg:px-24 lg:py-48">
-        <div className="mx-auto w-full">
+      <section className="flex flex-col items-center px-6 py-24 sm:px-12 lg:px-24 lg:py-40">
+        <div className="w-full max-w-screen-2xl">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -219,12 +226,12 @@ export function Homepage({ initialProducts, initialBanners }: HomepageProps) {
               >
                 <Link href={cat.href} className="block h-full w-full">
                   <div className="absolute inset-0 transition-transform duration-1000 group-hover:scale-110 will-change-transform">
-                     <Image 
-                        src={cat.img} 
-                        alt={cat.name} 
-                        fill
-                        className="h-full w-full object-cover grayscale-[0.5] transition-all duration-700 group-hover:grayscale-0" 
-                     />
+                    <Image
+                      src={cat.img}
+                      alt={cat.name}
+                      fill
+                      className="h-full w-full object-cover grayscale-[0.5] transition-all duration-700 group-hover:grayscale-0"
+                    />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute bottom-6 left-6 right-6 text-white sm:bottom-10 sm:left-10">
@@ -245,58 +252,60 @@ export function Homepage({ initialProducts, initialBanners }: HomepageProps) {
       <section
         ref={productsRef}
         id="products"
-        className="px-6 py-24 sm:px-12 lg:px-24 bg-neutral-50 border-t border-neutral-100 lg:py-48"
+        className="flex flex-col items-center bg-neutral-50 border-t border-neutral-100 px-6 py-24 sm:px-12 lg:px-24 lg:py-40"
       >
-        <motion.div
-          className="mx-auto w-full"
-          style={{ opacity: productsOpacity, y: productsY }}
-        >
-          <div className="flex flex-col justify-between gap-8 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.4em] text-[#2f9e74]">
-                The Shop
-              </p>
-              <h2 className="mt-6 text-3xl font-[900] tracking-tighter sm:text-5xl lg:text-6xl">
-                New Arrivals.
-              </h2>
-            </div>
-            <ButtonLink href="/products" variant="secondary" showArrow className="h-14">
-              View all products
-            </ButtonLink>
-          </div>
-
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {isLoadingProducts ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <ProductCardSkeleton key={i} />
-              ))
-            ) : featuredProducts.length > 0 ? (
-              featuredProducts.map((product, i) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08, duration: 0.45 }}
-                >
-                  <ProductCard product={product} />
-                </motion.div>
-              ))
-            ) : (
-              <div className="col-span-full rounded-[3rem] border-2 border-dashed border-neutral-200 bg-white py-24 text-center">
-                <p className="text-lg font-bold text-neutral-400">
-                  {productsError
-                    ? "Connectivity issue. Please refresh."
-                    : "Fresh arrivals are on the way."}
+        <div className="w-full max-w-screen-2xl">
+          <motion.div
+            className="w-full"
+            style={{ opacity: productsOpacity, y: productsY }}
+          >
+            <div className="flex flex-col justify-between gap-8 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.4em] text-[#2f9e74]">
+                  The Shop
                 </p>
+                <h2 className="mt-6 text-3xl font-[900] tracking-tighter sm:text-5xl lg:text-6xl">
+                  New Arrivals.
+                </h2>
               </div>
-            )}
-          </div>
-        </motion.div>
+              <ButtonLink href="/products" variant="secondary" showArrow className="h-14">
+                View all products
+              </ButtonLink>
+            </div>
+
+            <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {isLoadingProducts ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))
+              ) : featuredProducts.length > 0 ? (
+                featuredProducts.map((product, i) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.08, duration: 0.45 }}
+                  >
+                    <ProductCard product={product} />
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-full rounded-[3rem] border-2 border-dashed border-neutral-200 bg-white py-24 text-center">
+                  <p className="text-lg font-bold text-neutral-400">
+                    {productsError
+                      ? "Connectivity issue. Please refresh."
+                      : "Fresh arrivals are on the way."}
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* ─── CTA Banner ───────────────────────────────────────────────── */}
-      <section className="relative flex min-h-[80svh] flex-col justify-center overflow-hidden bg-neutral-950 px-8 py-24 text-center w-full sm:min-h-screen">
+      <section className="relative flex min-h-[80svh] flex-col items-center justify-center overflow-hidden bg-neutral-950 px-8 py-24 text-center w-full sm:min-h-screen">
         {/* Background glow */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute -left-32 -top-32 size-[800px] rounded-full bg-[#2f9e74]/10 blur-[160px]" />
@@ -307,7 +316,7 @@ export function Homepage({ initialProducts, initialBanners }: HomepageProps) {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative mx-auto max-w-7xl"
+          className="relative w-full max-w-screen-2xl"
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-2 text-xs font-black uppercase tracking-widest text-white/60 backdrop-blur-md">
             <Sparkles className="size-3.5 text-[#2f9e74]" />
