@@ -9,11 +9,19 @@ export function AnimatedBackground() {
     if (!containerRef.current) return;
     
     const particlesContainer = containerRef.current;
-    const particleCount = 20; // Reduced for performance
+    const particleCount = 15; // Slightly reduced for mobile performance
     
-    // Create particles
-    for (let i = 0; i < particleCount; i++) {
+    // Create particles with a slight delay or idle callback to improve FCP/LCP
+    const initParticles = () => {
+      for (let i = 0; i < particleCount; i++) {
         createParticle();
+      }
+    };
+
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => initParticles());
+    } else {
+      setTimeout(initParticles, 2000);
     }
     
     function createParticle() {
