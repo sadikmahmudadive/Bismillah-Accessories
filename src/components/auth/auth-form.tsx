@@ -34,7 +34,7 @@ export function AuthForm() {
     ? "Enter your email address and we'll send you a link to reset your password."
     : isSignUp
     ? "Set up a customer account for checkout and order history."
-    : "Sign in to manage checkout, saved details, and admin access.";
+    : "Sign in to manage checkout and saved details.";
 
   const initials = useMemo(() => {
     const source = profile?.displayName || user?.displayName || user?.email || "BA";
@@ -85,6 +85,7 @@ export function AuthForm() {
   }
 
   if (user) {
+    const { isAdmin } = useAuth();
     return (
       <motion.div
         initial={{ opacity: 0, y: 18 }}
@@ -103,9 +104,20 @@ export function AuthForm() {
           </div>
         </div>
         <p className="mt-5 rounded-2xl bg-[#f6f4ee] p-4 text-sm leading-6 text-neutral-600">
-          Your account is connected. Admin access is role-based through the
-          Firestore user profile.
+          {isAdmin
+            ? "Administrator privileges verified. You can access the management panel."
+            : "Your account is active and connected for checkout and order tracking."}
         </p>
+        {isAdmin ? (
+          <div className="mt-6">
+            <Button
+              onClick={() => router.push("/admin")}
+              className="w-full h-12 rounded-2xl bg-[#2f9e74] hover:bg-[#257e5d] text-white font-bold"
+            >
+              Open Admin Dashboard
+            </Button>
+          </div>
+        ) : null}
       </motion.div>
     );
   }

@@ -18,7 +18,8 @@ import {
   Loader2,
   Navigation,
   CloudUpload,
-  Camera
+  Camera,
+  ShieldCheck
 } from "lucide-react";
 import dynamic from "next/dynamic";
 const MapPicker = dynamic(() => import("@/components/ui/map-picker").then((mod) => mod.MapPicker), { 
@@ -261,6 +262,15 @@ export function ProfileShell() {
                 icon={MapPin}
                 label="Addresses"
               />
+              {isAdmin ? (
+                <a
+                  href="/admin"
+                  className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-[#2f9e74] transition hover:bg-[#2f9e74]/10"
+                >
+                  <ShieldCheck className="size-4" />
+                  Admin Dashboard
+                </a>
+              ) : null}
               <div className="my-4 h-px bg-neutral-100" />
               <button
                 onClick={() => void signOut()}

@@ -26,8 +26,8 @@ const features = [
   },
   {
     icon: Sparkles,
-    title: "Admin access",
-    desc: "Role-based dashboard for store owners",
+    title: "Exclusive perks",
+    desc: "Member rewards & promotional discounts",
   },
 ];
 
@@ -52,8 +52,7 @@ export default function AuthPage() {
               <span className="text-[#2f9e74]">Accessories</span> account
             </h1>
             <p className="mt-4 text-sm leading-7 text-white/65">
-              Sign in to manage your orders, track deliveries, and access the
-              admin dashboard if you&apos;re a store owner.
+              Sign in to manage your orders, track deliveries, and enjoy a personalized shopping experience.
             </p>
 
             <div className="mt-8 grid gap-4">

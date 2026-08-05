@@ -4,8 +4,8 @@ import { FaFacebookF, FaInstagram } from "react-icons/fa6";
 
 const footerLinks = [
   { href: "/products", label: "Products" },
+  { href: "/cart", label: "Cart" },
   { href: "/checkout", label: "Checkout" },
-  { href: "/admin", label: "Admin dashboard" },
   { href: "/auth", label: "Account" },
 ];
 
