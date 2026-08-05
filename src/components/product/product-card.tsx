@@ -82,7 +82,7 @@ export function ProductCard({
                 src={displayImage}
                 alt={displayName}
                 fill
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-contain transition-all duration-1000 ease-[0.16,1,0.3,1] group-hover:scale-110 group-hover:rotate-2"
               />
             ) : (

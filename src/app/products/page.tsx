@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getActiveProducts } from "@/lib/products";
 import { ProductBrowser } from "@/components/product/product-browser";
 import * as motion from "framer-motion/client";
@@ -21,9 +22,13 @@ export default async function ProductsPage() {
           transition={{ duration: 10, ease: "linear" }}
           className="absolute inset-0"
         >
-          <img 
-            src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1999&auto=format&fit=crop" 
+          <Image 
+            src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=75&w=1200&auto=format&fit=crop" 
             alt="Collection"
+            fill
+            priority
+            fetchPriority="high"
+            sizes="(max-width: 768px) 100vw, 100vw"
             className="h-full w-full object-cover"
           />
         </motion.div>

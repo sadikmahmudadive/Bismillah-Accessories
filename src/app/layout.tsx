@@ -38,9 +38,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <head>
-        {/* Preconnect hints to eliminate network latency for critical origins */}
+        {/* Preconnect hints for origins requested on initial page render */}
         <link rel="preconnect" href="https://apis.google.com" />
-        <link rel="preconnect" href="https://bismillah-accessories.firebaseapp.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://apis.google.com" />
