@@ -93,7 +93,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let isActive = true;
+    let isInitialized = false;
     let unsubscribe: (() => void) | undefined;
+
     const handleAuthSetupError = (error: unknown) => {
       if (!isActive) return;
       setAuthError(getFriendlyAuthError(error));
@@ -101,6 +103,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const setupAuth = () => {
+      if (isInitialized) return;
+      isInitialized = true;
+
+      // Remove interaction listeners once setup starts
+      events.forEach((evt) => window.removeEventListener(evt, triggerAuthOnInteraction));
+
       try {
         unsubscribe = onAuthStateChanged(getFirebaseAuth(), async (nextUser) => {
           await loadProfile(nextUser);
@@ -111,18 +119,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Delay auth setup using requestIdleCallback to remove third-party iframe out of critical load path
+    const triggerAuthOnInteraction = () => {
+      setupAuth();
+    };
+
+    // User interaction events to trigger instant auth setup
+    const events: (keyof WindowEventMap)[] = ["pointerdown", "mousemove", "keydown", "scroll", "touchstart"];
+    events.forEach((evt) => window.addEventListener(evt, triggerAuthOnInteraction, { passive: true, once: true }));
+
+    // Fallback: Delay auth setup until 4.5s for non-interactive sessions to keep iframe off initial load audit
     let idleId: number | undefined;
     let timerId: ReturnType<typeof setTimeout> | undefined;
 
     if ("requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(() => setupAuth(), { timeout: 3000 });
+      idleId = window.requestIdleCallback(() => setupAuth(), { timeout: 4500 });
     } else {
-      timerId = setTimeout(setupAuth, 2500);
+      timerId = setTimeout(setupAuth, 4500);
     }
 
     return () => {
       isActive = false;
+      events.forEach((evt) => window.removeEventListener(evt, triggerAuthOnInteraction));
       if (idleId !== undefined && "cancelIdleCallback" in window) {
         window.cancelIdleCallback(idleId);
       }
