@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut as firebaseSignOut,
   updateProfile,
   GoogleAuthProvider,
@@ -120,6 +121,11 @@ export async function signInWithGoogle() {
   return credential.user;
 }
 
+export async function resetCustomerPassword(email: string) {
+  const auth = getFirebaseAuth();
+  await sendPasswordResetEmail(auth, email.trim());
+}
+
 export async function signOutCustomer() {
   await firebaseSignOut(getFirebaseAuth());
 }
@@ -182,6 +188,14 @@ export function getFriendlyAuthError(error: unknown) {
 
   if (error.message.includes("auth/invalid-email")) {
     return "Please enter a valid email address.";
+  }
+
+  if (error.message.includes("auth/user-not-found")) {
+    return "No account found with this email address.";
+  }
+
+  if (error.message.includes("auth/too-many-requests")) {
+    return "Too many attempts. Please wait a few minutes before trying again.";
   }
 
   return error.message;

@@ -104,6 +104,17 @@ export function getFirebaseAdminApp() {
   return adminApp;
 }
 
+export async function setAdminCustomClaim(uid: string, isAdmin: boolean = true) {
+  const app = getFirebaseAdminApp();
+  try {
+    await getAuth(app).setCustomUserClaims(uid, { admin: isAdmin });
+    console.log(`[setAdminCustomClaim] Successfully set custom claim { admin: ${isAdmin} } for user ${uid}`);
+  } catch (err) {
+    console.error(`[setAdminCustomClaim] Failed setting custom claim for user ${uid}:`, err);
+    throw err;
+  }
+}
+
 export async function verifyAdminIdToken(idToken: string) {
   const app = getFirebaseAdminApp();
   console.log("[verifyAdminIdToken] Verifying token with Auth SDK...");
@@ -117,7 +128,13 @@ export async function verifyAdminIdToken(idToken: string) {
     throw new Error(`Invalid auth token: ${tokenErr instanceof Error ? tokenErr.message : String(tokenErr)}`);
   }
 
-  console.log(`[verifyAdminIdToken] Checking admin role for user ${decodedToken.uid}...`);
+  // 1. Fast Path: Check if token already contains custom claim { admin: true }
+  if (decodedToken.admin === true) {
+    console.log(`[verifyAdminIdToken] User ${decodedToken.uid} verified via Firebase Custom Claim { admin: true }`);
+    return decodedToken;
+  }
+
+  console.log(`[verifyAdminIdToken] Custom claim absent. Checking Firestore role for user ${decodedToken.uid}...`);
 
   try {
     const db = getFirestoreDb();
@@ -129,9 +146,8 @@ export async function verifyAdminIdToken(idToken: string) {
     if (!profile.exists) {
       console.error(`[verifyAdminIdToken] User profile not found for ${decodedToken.uid}`);
 
-      // For development purposes, if Firestore is not accessible, we'll allow admin access
-      // based on email pattern (you can modify this logic as needed)
-      if (decodedToken.email?.endsWith('@admin.com') || decodedToken.email?.includes('admin')) {
+      // For development purposes, if Firestore is not accessible, allow admin access by email
+      if (decodedToken.email?.endsWith("@admin.com") || decodedToken.email?.includes("admin")) {
         console.warn(`[verifyAdminIdToken] Allowing admin access for ${decodedToken.email} due to Firestore unavailability`);
         return decodedToken;
       }
@@ -141,10 +157,9 @@ export async function verifyAdminIdToken(idToken: string) {
 
     const role = profile.data()?.role;
     if (role !== "admin") {
-      console.error(`[verifyAdminIdToken] User ${decodedToken.uid} does not have admin role (has: ${role || 'none'})`);
+      console.error(`[verifyAdminIdToken] User ${decodedToken.uid} does not have admin role (has: ${role || "none"})`);
 
-      // For development purposes, allow access if email suggests admin
-      if (decodedToken.email?.endsWith('@admin.com') || decodedToken.email?.includes('admin')) {
+      if (decodedToken.email?.endsWith("@admin.com") || decodedToken.email?.includes("admin")) {
         console.warn(`[verifyAdminIdToken] Allowing admin access for ${decodedToken.email} despite missing role`);
         return decodedToken;
       }
@@ -152,18 +167,20 @@ export async function verifyAdminIdToken(idToken: string) {
       throw new Error("Admin role required. Please contact an administrator to assign admin privileges.");
     }
 
+    // Automatically assign custom claim for future requests
+    try {
+      await setAdminCustomClaim(decodedToken.uid, true);
+    } catch (claimErr) {
+      console.warn(`[verifyAdminIdToken] Unable to auto-assign custom claim for ${decodedToken.uid}:`, claimErr);
+    }
+
     console.log(`[verifyAdminIdToken] User ${decodedToken.uid} verified as admin`);
     return decodedToken;
   } catch (profileErr) {
     console.error("[verifyAdminIdToken] Role check failed:", profileErr);
 
-    // If it's an authentication error (Firestore not accessible), allow admin access for development
-    if (profileErr instanceof Error && profileErr.message.includes('UNAUTHENTICATED')) {
+    if (profileErr instanceof Error && profileErr.message.includes("UNAUTHENTICATED")) {
       console.warn("[verifyAdminIdToken] Firestore authentication failed, allowing admin access for development");
-      console.warn("To fix this permanently:");
-      console.warn("1. Go to Firebase Console > Firestore Database and create a database");
-      console.warn("2. Ensure your service account has 'Cloud Datastore User' role");
-      console.warn("3. Or download a new service account key from Firebase Console > Project Settings > Service Accounts");
       return decodedToken;
     }
 

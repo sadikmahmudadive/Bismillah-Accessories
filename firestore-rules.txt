@@ -34,11 +34,13 @@ service cloud.firestore {
       allow create: if request.auth != null;
     }
 
-    // Helper function to check if user is admin
+    // Helper function to check if user is admin (Custom Claims or Firestore document)
     function isAdminUser() {
-      return request.auth != null &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return request.auth != null && (
+        request.auth.token.admin == true ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
     }
   }
 }

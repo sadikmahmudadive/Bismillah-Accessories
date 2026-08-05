@@ -2,28 +2,37 @@
 
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Lock, Mail, UserRound } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, UserRound } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type AuthMode = "sign-in" | "sign-up";
+type AuthMode = "sign-in" | "sign-up" | "forgot-password";
 
 export function AuthForm() {
   const router = useRouter();
-  const { authError, clearAuthError, isLoading, signIn, signUp, loginWithGoogle, user, profile } =
+  const { authError, clearAuthError, isLoading, signIn, signUp, sendPasswordReset, loginWithGoogle, user, profile } =
     useAuth();
   const [mode, setMode] = useState<AuthMode>("sign-in");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   const isSignUp = mode === "sign-up";
-  const title = isSignUp ? "Create your account" : "Welcome back";
-  const subtitle = isSignUp
+  const isForgot = mode === "forgot-password";
+
+  const title = isForgot
+    ? "Reset your password"
+    : isSignUp
+    ? "Create your account"
+    : "Welcome back";
+  const subtitle = isForgot
+    ? "Enter your email address and we'll send you a link to reset your password."
+    : isSignUp
     ? "Set up a customer account for checkout and order history."
     : "Sign in to manage checkout, saved details, and admin access.";
 
@@ -36,6 +45,21 @@ export function AuthForm() {
     event.preventDefault();
     setLocalError(null);
     clearAuthError();
+    setResetSuccess(false);
+
+    if (isForgot) {
+      if (!email.trim()) {
+        setLocalError("Please enter your email address.");
+        return;
+      }
+      try {
+        await sendPasswordReset(email);
+        setResetSuccess(true);
+      } catch {
+        return;
+      }
+      return;
+    }
 
     if (!email.trim() || !password.trim()) {
       setLocalError("Email and password are required.");
@@ -107,11 +131,12 @@ export function AuthForm() {
                 onClick={() => {
                   setMode(item);
                   setLocalError(null);
+                  setResetSuccess(false);
                   clearAuthError();
                 }}
                 className={cn(
                   "relative rounded-xl px-5 py-2 text-sm font-bold transition-all duration-300",
-                  mode === item
+                  (mode === item && !isForgot) || (isForgot && item === "sign-in")
                     ? "bg-neutral-950 text-white shadow-lg shadow-neutral-950/20"
                     : "text-neutral-500 hover:text-neutral-950"
                 )}
@@ -153,16 +178,49 @@ export function AuthForm() {
               autoComplete="email"
             />
 
-            <LabelledInput
-              icon={<Lock className="size-4" />}
-              label="Password"
-              type="password"
-              value={password}
-              onChange={setPassword}
-              placeholder="••••••••"
-              autoComplete={isSignUp ? "new-password" : "current-password"}
-            />
+            {!isForgot ? (
+              <div>
+                <LabelledInput
+                  icon={<Lock className="size-4" />}
+                  label="Password"
+                  type="password"
+                  value={password}
+                  onChange={setPassword}
+                  placeholder="••••••••"
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                />
+                {!isSignUp ? (
+                  <div className="mt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode("forgot-password");
+                        setLocalError(null);
+                        setResetSuccess(false);
+                        clearAuthError();
+                      }}
+                      className="text-xs font-bold text-[#2f9e74] hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
           </div>
+
+          {resetSuccess ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 text-sm text-emerald-800"
+            >
+              <p className="font-bold">Reset email sent!</p>
+              <p className="mt-1 text-xs text-emerald-700">
+                Check your inbox at <strong>{email}</strong> for instructions to reset your password.
+              </p>
+            </motion.div>
+          ) : null}
 
           {localError || authError ? (
             <motion.div 
@@ -186,8 +244,23 @@ export function AuthForm() {
                 />
                 Processing...
               </span>
-            ) : isSignUp ? "Create account" : "Sign in to Account"}
+            ) : isForgot ? "Send Reset Link" : isSignUp ? "Create account" : "Sign in to Account"}
           </Button>
+
+          {isForgot ? (
+            <button
+              type="button"
+              onClick={() => {
+                setMode("sign-in");
+                setLocalError(null);
+                setResetSuccess(false);
+                clearAuthError();
+              }}
+              className="mt-4 w-full text-center text-xs font-bold text-neutral-500 hover:text-neutral-950"
+            >
+              Back to Sign in
+            </button>
+          ) : null}
 
           {/* Social Divider */}
           <div className="relative my-10">
@@ -258,6 +331,10 @@ function LabelledInput({
   type?: string;
   autoComplete?: string;
 }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+  const inputType = isPassword ? (showPassword ? "text" : "password") : type;
+
   return (
     <motion.label
       initial={{ opacity: 0, y: 8 }}
@@ -277,13 +354,26 @@ function LabelledInput({
           {icon}
         </motion.div>
         <input
-          type={type}
+          type={inputType}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
           autoComplete={autoComplete}
           className="min-w-0 flex-1 bg-transparent text-sm font-medium text-neutral-950 outline-none placeholder:text-neutral-400"
         />
+        {isPassword ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowPassword((prev) => !prev);
+            }}
+            className="grid size-8 place-items-center rounded-xl text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-950 focus:outline-none"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          </button>
+        ) : null}
       </motion.span>
     </motion.label>
   );
