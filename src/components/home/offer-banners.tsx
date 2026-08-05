@@ -109,7 +109,8 @@ export function OfferBanners({ initialBanners }: OfferBannersProps) {
                 alt={currentBanner.title}
                 fill
                 priority={currentIndex === 0}
-                sizes="100vw"
+                fetchPriority={currentIndex === 0 ? "high" : "auto"}
+                sizes="(max-width: 768px) 100vw, 100vw"
                 className="h-full w-full object-cover"
                 suppressHydrationWarning
               />

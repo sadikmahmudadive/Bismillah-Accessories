@@ -109,11 +109,12 @@ export function Homepage({ initialProducts, initialBanners }: HomepageProps) {
           className="absolute inset-0"
         >
           <Image 
-            src="https://images.unsplash.com/photo-1596795131676-69996a99d172?q=60&w=1600&auto=format&fit=crop" 
+            src="https://images.unsplash.com/photo-1596795131676-69996a99d172?q=60&w=1200&auto=format&fit=crop" 
             alt="Premium Tech Philosophy" 
             fill
             priority
-            sizes="(max-width: 768px) 100vw, 100vw"
+            fetchPriority="high"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
             className="object-cover"
           />
           {/* Subtle White-to-Transparent Overlay for Legibility */}

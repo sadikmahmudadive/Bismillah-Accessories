@@ -8,10 +8,14 @@ export function AnimatedBackground() {
   useEffect(() => {
     if (!containerRef.current) return;
     
+    // Check if device is mobile to eliminate JS DOM particle loops on low-power devices
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    if (isMobile) return;
+
     const particlesContainer = containerRef.current;
-    const particleCount = 15; // Slightly reduced for mobile performance
+    const particleCount = 12;
     
-    // Create particles with a slight delay or idle callback to improve FCP/LCP
+    // Create particles with an idle callback to avoid blocking critical rendering
     const initParticles = () => {
       for (let i = 0; i < particleCount; i++) {
         createParticle();
@@ -21,7 +25,7 @@ export function AnimatedBackground() {
     if ('requestIdleCallback' in window) {
       window.requestIdleCallback(() => initParticles());
     } else {
-      setTimeout(initParticles, 2000);
+      setTimeout(initParticles, 3000);
     }
     
     function createParticle() {

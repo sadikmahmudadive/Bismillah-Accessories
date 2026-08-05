@@ -109,12 +109,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Delay auth setup to move third-party iframe out of critical load path
-    const timer = setTimeout(setupAuth, 1500);
+    // Delay auth setup using requestIdleCallback to remove third-party iframe out of critical load path
+    let idleId: number | undefined;
+    let timerId: ReturnType<typeof setTimeout> | undefined;
+
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(() => setupAuth(), { timeout: 3000 });
+    } else {
+      timerId = setTimeout(setupAuth, 2500);
+    }
 
     return () => {
       isActive = false;
-      clearTimeout(timer);
+      if (idleId !== undefined && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timerId !== undefined) {
+        clearTimeout(timerId);
+      }
       unsubscribe?.();
     };
   }, [loadProfile]);
