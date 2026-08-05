@@ -116,6 +116,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
 
   return (
     <div className="mt-8">
+      <h2 className="sr-only">Product Catalog & Filters</h2>
       {/* Top Controls */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="relative flex-1">
@@ -127,12 +128,14 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
               pushParams({ q: e.target.value });
             }}
             placeholder="Search precision collection..."
+            aria-label="Search precision collection"
             className="h-14 w-full rounded-2xl border border-neutral-100 bg-neutral-50 pl-14 pr-12 text-base font-bold text-neutral-950 outline-none transition focus:border-[#2f9e74] focus:bg-white focus:shadow-2xl focus:shadow-[#2f9e74]/5 lg:h-16 lg:pl-16 lg:text-lg"
           />
           {query && (
             <button 
               onClick={() => { setQuery(""); pushParams({ q: "" }); }}
               className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-950"
+              aria-label="Clear search"
             >
               <X className="size-5" />
             </button>
@@ -142,6 +145,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
+            aria-label="Toggle filter sidebar"
             className={cn(
               "flex h-14 items-center gap-3 rounded-2xl border px-6 text-[10px] font-black uppercase tracking-widest transition-all lg:h-16 lg:px-8 lg:text-xs",
               showFilters || category !== "All" || minRating > 0 || priceRange[0] > 0 || priceRange[1] < 10000
@@ -164,6 +168,8 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
                 setSortBy(val);
                 pushParams({ sort: val });
               }}
+              aria-label="Sort products"
+              id="sort-select"
               className="h-14 appearance-none rounded-2xl border border-neutral-100 bg-neutral-50 pl-6 pr-10 text-[10px] font-black uppercase tracking-widest text-neutral-700 outline-none transition hover:border-neutral-200 hover:bg-white focus:border-neutral-950 lg:h-16 lg:pl-8 lg:pr-12"
             >
               <option value="newest">Sort: Newest First</option>
@@ -191,7 +197,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
             >
               {/* Categories */}
               <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm lg:bg-transparent lg:p-0 lg:border-none lg:shadow-none">
-                <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-400">
+                <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-600">
                   <LayoutGrid className="size-3.5" /> Sub-categories
                 </h3>
                 <div className="mt-4 flex flex-wrap gap-2 lg:flex-col lg:gap-1">
@@ -217,7 +223,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
 
               {/* Price Range */}
               <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm lg:bg-transparent lg:p-0 lg:border-none lg:shadow-none">
-                <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-400">
+                <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-600">
                   <ArrowUpDown className="size-3.5" /> Price Range
                 </h3>
                 <div className="mt-4 space-y-4">
@@ -225,6 +231,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
                     <input
                       type="number"
                       placeholder="Min"
+                      aria-label="Minimum price"
                       value={priceRange[0] || ""}
                       onChange={(e) => {
                         const val = Number(e.target.value);
@@ -237,6 +244,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
                     <input
                       type="number"
                       placeholder="Max"
+                      aria-label="Maximum price"
                       value={priceRange[1] || ""}
                       onChange={(e) => {
                         const val = Number(e.target.value);
@@ -265,7 +273,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
 
               {/* Ratings */}
               <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm lg:bg-transparent lg:p-0 lg:border-none lg:shadow-none">
-                <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-400">
+                <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-600">
                   <Star className="size-3.5" /> Minimum Rating
                 </h3>
                 <div className="mt-4 flex flex-col gap-1">
@@ -313,7 +321,7 @@ function ProductBrowserInner({ products }: { products: Product[] }) {
         {/* Product Grid */}
         <div className="flex-1 min-w-0">
           <div className="mb-8 flex items-center justify-between">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-neutral-600">
               Discovered <span className="text-neutral-950">{filteredAndSortedProducts.length}</span> curated pieces
             </p>
           </div>

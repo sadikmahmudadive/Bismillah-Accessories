@@ -139,7 +139,7 @@ export function ProductCard({
           
           <div className="mt-4 flex items-center justify-between">
             {product?.averageRating ? (
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-neutral-400">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-neutral-600">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star 
@@ -154,11 +154,11 @@ export function ProductCard({
                   ))}
                 </div>
                 <span>{product.averageRating.toFixed(1)}</span>
-                <span className="text-neutral-200">|</span>
+                <span className="text-neutral-300">|</span>
                 <span>{product.reviewCount} Reviews</span>
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-neutral-400">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-neutral-600">
                 <Sparkles className="size-3 text-[#2f9e74]" />
                 <span>Certified Authentic</span>
               </div>
